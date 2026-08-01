@@ -1,9 +1,12 @@
 import React from 'react';
-import { Shield, EyeOff, Lock, User, RefreshCw } from 'lucide-react';
+import { Shield, EyeOff, Lock, User, RefreshCw, LogOut } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
 
 export const SettingsPage: React.FC = () => {
+  const { user, isDemoSession, logout } = useAuth();
+
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -43,16 +46,23 @@ export const SettingsPage: React.FC = () => {
         <Card variant="dark" className="p-5 space-y-4 border-slate-800">
           <div className="flex items-center gap-2">
             <User className="w-5 h-5 text-slate-400" />
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">Account Profile</h3>
+            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">
+              Controlled Access Profile
+            </h3>
           </div>
           <div className="text-xs text-slate-300 space-y-2 leading-relaxed">
-            <p><strong>Username:</strong> alexsmith</p>
-            <p><strong>Email:</strong> alex.smith@example.com</p>
-            <p><strong>Backend Connection:</strong> Spring Boot 3 (`http://localhost:8080`)</p>
+            <p><strong>Authenticated User:</strong> {user?.fullName || 'Guest Recoverer'}</p>
+            <p><strong>Email:</strong> {user?.email || 'guest@example.com'}</p>
+            <p><strong>Session Mode:</strong> {isDemoSession ? 'Offline Demo Session' : 'JWT Authenticated (Spring Boot)'}</p>
           </div>
-          <Button variant="outline" size="sm" className="w-full mt-2">
-            <RefreshCw className="w-4 h-4 mr-2" /> Sync Local Chain with Backend
-          </Button>
+          <div className="space-y-2 pt-2">
+            <Button variant="outline" size="sm" className="w-full">
+              <RefreshCw className="w-4 h-4 mr-2" /> Sync Local Chain with Backend
+            </Button>
+            <Button variant="danger" size="sm" onClick={logout} className="w-full">
+              <LogOut className="w-4 h-4 mr-2" /> Revoke Token & Sign Out
+            </Button>
+          </div>
         </Card>
       </div>
     </div>

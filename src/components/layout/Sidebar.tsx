@@ -1,9 +1,10 @@
 import React from 'react';
-import { Home, AlertTriangle, CalendarCheck, Users, BarChart3, Settings, ShieldCheck, Flame } from 'lucide-react';
+import { Home, AlertTriangle, CalendarCheck, Users, BarChart3, Settings, ShieldCheck, Flame, LogOut, User as UserIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { QuickHideButton } from '../ui/QuickHideButton';
 import type { NavTab } from './BottomNav';
+import { useAuth } from '../../context/AuthContext';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -27,6 +28,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentStreak = 18,
   cleanRatioPercent = 94.7,
 }) => {
+  const { user, logout } = useAuth();
+
   const navItems: NavItem[] = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'checkin', label: 'Daily Check-In', icon: CalendarCheck },
@@ -51,6 +54,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <p className="text-[11px] text-slate-400 font-medium">PMO Recovery Platform</p>
           </div>
         </div>
+
+        {/* User Badge */}
+        {user && (
+          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
+            <div className="w-7 h-7 rounded-lg bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold text-xs">
+              <UserIcon className="w-4 h-4 text-emerald-400" />
+            </div>
+            <div className="overflow-hidden text-left flex-1">
+              <span className="text-xs font-bold text-slate-100 block truncate">{user.fullName}</span>
+              <span className="text-[10px] text-slate-400 block truncate">@{user.username}</span>
+            </div>
+            <button
+              onClick={logout}
+              title="Sign Out"
+              className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        )}
 
         {/* Minimalist Live Streak Metric */}
         <div className="bg-slate-900/60 border border-slate-800/60 p-3 rounded-xl space-y-2">
