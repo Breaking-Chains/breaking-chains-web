@@ -2,9 +2,10 @@ import { apiFetch } from './apiClient';
 import type { HabitChain } from '../types/chain';
 
 export async function getUserChains(): Promise<HabitChain[]> {
-  return apiFetch<HabitChain[]>('/api/v1/chains?status=ACTIVE', {
+  const res = await apiFetch<HabitChain[]>('/api/v1/chains?status=ACTIVE', {
     method: 'GET',
   });
+  return Array.isArray(res) ? res : [];
 }
 
 export async function getChainById(id: string): Promise<HabitChain> {

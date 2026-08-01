@@ -22,6 +22,9 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
 }) => {
   const [inputText, setInputText] = useState('');
 
+  const safeNotes = Array.isArray(notes) ? notes : [];
+  const safeMessages = Array.isArray(messages) ? messages : [];
+
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
@@ -45,12 +48,12 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
         </div>
       </Card>
 
-      {notes.length > 0 && (
+      {safeNotes.length > 0 && (
         <div className="space-y-2">
           <div className="flex items-center gap-1 text-xs font-bold text-amber-300">
             <Sparkles className="w-3.5 h-3.5" /> Mentor Counsel Note (Nasiha)
           </div>
-          {notes.map((note) => (
+          {safeNotes.map((note) => (
             <Card key={note.id} variant="gold" className="p-3 border-amber-500/30">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-xs font-bold text-amber-200">{note.mentorFullName}</span>
@@ -74,7 +77,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
         </div>
 
         <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-          {messages.map((msg) => {
+          {safeMessages.map((msg) => {
             const isMe = msg.senderId === 'user1';
             return (
               <div

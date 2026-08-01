@@ -21,7 +21,8 @@ export async function submitCheckInLog(
 }
 
 export async function getCheckInLogs(chainId: string): Promise<LogEntry[]> {
-  return apiFetch<LogEntry[]>(`/api/v1/chains/${chainId}/logs`, {
+  const res = await apiFetch<LogEntry[]>(`/api/v1/chains/${chainId}/logs`, {
     method: 'GET',
   });
+  return Array.isArray(res) ? res : [];
 }

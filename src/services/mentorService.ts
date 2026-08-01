@@ -23,15 +23,17 @@ export async function getMyMentorProfile(): Promise<MentorProfile | null> {
 }
 
 export async function getVerifiedMentors(): Promise<MentorProfile[]> {
-  return apiFetch<MentorProfile[]>('/api/v1/mentors/verified', {
+  const res = await apiFetch<MentorProfile[]>('/api/v1/mentors/verified', {
     method: 'GET',
   });
+  return Array.isArray(res) ? res : [];
 }
 
 export async function getAllMentorApplications(): Promise<MentorProfile[]> {
-  return apiFetch<MentorProfile[]>('/api/v1/mentors/applications', {
+  const res = await apiFetch<MentorProfile[]>('/api/v1/mentors/applications', {
     method: 'GET',
   });
+  return Array.isArray(res) ? res : [];
 }
 
 export async function updateMentorStatus(

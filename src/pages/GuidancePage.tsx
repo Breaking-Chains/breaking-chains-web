@@ -20,7 +20,7 @@ export const GuidancePage: React.FC = () => {
     setErrorMsg(null);
     try {
       const mentors = await getVerifiedMentors();
-      setVerifiedMentors(mentors);
+      setVerifiedMentors(Array.isArray(mentors) ? mentors : []);
     } catch (err: unknown) {
       setVerifiedMentors([]);
       setErrorMsg(formatApiErrorMessage(err));
@@ -32,6 +32,8 @@ export const GuidancePage: React.FC = () => {
   useEffect(() => {
     loadMentors();
   }, []);
+
+  const mentorList = Array.isArray(verifiedMentors) ? verifiedMentors : [];
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -62,7 +64,7 @@ export const GuidancePage: React.FC = () => {
 
         {isLoadingMentors ? (
           <div className="text-center py-4 text-xs text-slate-500">Loading verified mentors...</div>
-        ) : verifiedMentors.length === 0 ? (
+        ) : mentorList.length === 0 ? (
           <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-850 text-center space-y-2">
             <Users className="w-6 h-6 text-slate-600 mx-auto" />
             <p className="text-xs text-slate-400">No verified mentors listed yet.</p>
@@ -76,7 +78,7 @@ export const GuidancePage: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {verifiedMentors.map((mentor) => (
+            {mentorList.map((mentor) => (
               <div
                 key={mentor.id}
                 className="p-3 rounded-xl bg-slate-950/70 border border-slate-850 space-y-1.5 text-xs"
