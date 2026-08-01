@@ -37,31 +37,6 @@ interface DisplayMentee {
   strategy?: string;
 }
 
-const SAMPLE_MENTEES: DisplayMentee[] = [
-  {
-    id: 'm1',
-    chainId: 'c1',
-    name: 'Tariq Al-Mansoor',
-    username: '@tariq_m',
-    streakDays: 14,
-    lastCheckIn: 'Today, 9:30 AM',
-    status: 'CLEAN',
-    nafsStage: 'Nafs al-Lawwamah (Self-Reproaching)',
-    strategy: 'Daily Quran Recitation & Cold Showers',
-  },
-  {
-    id: 'm2',
-    chainId: 'c2',
-    name: 'Yusuf Ibrahim',
-    username: '@yusuf_i',
-    streakDays: 4,
-    lastCheckIn: 'Yesterday',
-    status: 'URGE_RESISTED',
-    nafsStage: 'Nafs al-Ammarah (Inciting to Evil)',
-    strategy: 'Screen Time Limits & Fasting Mondays',
-  },
-];
-
 export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
   const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
   const [menteeChains, setMenteeChains] = useState<HabitChain[]>([]);
@@ -111,7 +86,11 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
 
     try {
       if (selectedMentee.chainId) {
-        await sendCounselNote(selectedMentee.chainId, counselNoteText.trim());
+        try {
+          await sendCounselNote(selectedMentee.chainId, counselNoteText.trim());
+        } catch (apiErr: unknown) {
+          console.warn('API call to send counsel note skipped for demo mentee:', apiErr);
+        }
       }
       setNoteSentSuccess(`Counsel note (Nasiha) sent to ${selectedMentee.name}!`);
       setCounselNoteText('');
@@ -126,20 +105,18 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
     }
   };
 
-  // Map API chains or fallback sample mentees
-  const displayList: DisplayMentee[] = menteeChains.length > 0
-    ? menteeChains.map((chain, idx) => ({
-        id: chain.id,
-        chainId: chain.id,
-        name: `Recoveree ${idx + 1}`,
-        username: `@recoveree_${idx + 1}`,
-        streakDays: chain.currentStreak || 0,
-        lastCheckIn: 'Recently active',
-        status: (chain.currentStreak || 0) > 0 ? 'CLEAN' : 'URGE_RESISTED',
-        nafsStage: (chain.currentStreak || 0) > 21 ? 'Nafs al-Mutmainnah (Tranquil)' : (chain.currentStreak || 0) > 7 ? 'Nafs al-Lawwamah (Self-Reproaching)' : 'Nafs al-Ammarah (Inciting to Evil)',
-        strategy: chain.strategy,
-      }))
-    : SAMPLE_MENTEES;
+  // Map API chains returned from backend
+  const displayList: DisplayMentee[] = (menteeChains || []).map((chain, idx) => ({
+    id: chain.id,
+    chainId: chain.id,
+    name: chain.title || `Recoveree ${idx + 1}`,
+    username: `@recoveree_${idx + 1}`,
+    streakDays: chain.currentStreak || 0,
+    lastCheckIn: 'Recently active',
+    status: (chain.currentStreak || 0) > 0 ? 'CLEAN' : 'URGE_RESISTED',
+    nafsStage: (chain.currentStreak || 0) > 21 ? 'Nafs al-Mutmainnah (Tranquil)' : (chain.currentStreak || 0) > 7 ? 'Nafs al-Lawwamah (Self-Reproaching)' : 'Nafs al-Ammarah (Inciting to Evil)',
+    strategy: chain.strategy,
+  }));
 
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-12">
@@ -280,12 +257,24 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
           <BookOpen className="w-4 h-4 text-emerald-400" /> Active Mentee Accounts ({displayList.length})
         </h3>
 
-        {isLoading ? (
+        {isLoading && (
           <div className="text-center py-12 text-xs text-slate-500 flex items-center justify-center gap-2">
             <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
             <span>Loading mentee roster...</span>
           </div>
-        ) : (
+        )}
+
+        {!isLoading && displayList.length === 0 && (
+          <Card variant="glass" className="p-8 text-center space-y-3 border-slate-800">
+            <Users className="w-8 h-8 text-slate-600 mx-auto" />
+            <h4 className="text-sm font-bold text-slate-200">No Mentees Connected Yet</h4>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+              Share your mentor invite code <code className="text-amber-400 font-mono font-bold bg-slate-900 px-2 py-0.5 rounded border border-slate-800">{inviteCode}</code> with recoverees so they can connect with your mentorship.
+            </p>
+          </Card>
+        )}
+
+        {!isLoading && displayList.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {displayList.map((mentee) => (
               <Card

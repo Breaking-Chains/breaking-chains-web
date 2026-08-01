@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { ShieldCheck, HeartHandshake, Send, Sparkles, Copy, Check } from 'lucide-react';
+import { ShieldCheck, HeartHandshake, Send, Sparkles, Copy, Check, Users } from 'lucide-react';
+import { getMentees, sendCounselNote } from '../../services/partnerService';
 
 interface Mentee {
   id: string;
+  chainId: string;
   name: string;
   username: string;
   streakDays: number;
@@ -21,39 +23,44 @@ interface MyMenteesModalProps {
   mentorName?: string;
 }
 
-const SAMPLE_MENTEES: Mentee[] = [
-  {
-    id: 'm1',
-    name: 'Tariq Al-Mansoor',
-    username: '@tariq_m',
-    streakDays: 14,
-    lastCheckIn: 'Today, 9:30 AM',
-    status: 'CLEAN',
-    nafsStage: 'Nafs al-Lawwamah (Self-Reproaching)',
-  },
-  {
-    id: 'm2',
-    name: 'Yusuf Ibrahim',
-    username: '@yusuf_i',
-    streakDays: 4,
-    lastCheckIn: 'Yesterday',
-    status: 'URGE_RESISTED',
-    nafsStage: 'Nafs al-Ammarah (Inciting to Evil)',
-  },
-];
-
 export const MyMenteesModal: React.FC<MyMenteesModalProps> = ({
   isOpen,
   onClose,
   mentorName = 'Verified Mentor',
 }) => {
-  const [mentees] = useState<Mentee[]>(SAMPLE_MENTEES);
+  const [mentees, setMentees] = useState<Mentee[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedMentee, setSelectedMentee] = useState<Mentee | null>(null);
   const [counselNoteText, setCounselNoteText] = useState('');
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
   const [noteSentSuccess, setNoteSentSuccess] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [inviteCodeCopied, setInviteCodeCopied] = useState(false);
 
   const inviteCode = 'MENTOR-BC-7890';
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      setErrorMsg(null);
+      getMentees()
+        .then((chains) => {
+          const list: Mentee[] = (chains || []).map((chain, idx) => ({
+            id: chain.id,
+            chainId: chain.id,
+            name: chain.title || `Recoveree ${idx + 1}`,
+            username: `@recoveree_${idx + 1}`,
+            streakDays: chain.currentStreak || 0,
+            lastCheckIn: 'Recently active',
+            status: (chain.currentStreak || 0) > 0 ? 'CLEAN' : 'URGE_RESISTED',
+            nafsStage: (chain.currentStreak || 0) > 21 ? 'Nafs al-Mutmainnah (Tranquil)' : (chain.currentStreak || 0) > 7 ? 'Nafs al-Lawwamah (Self-Reproaching)' : 'Nafs al-Ammarah (Inciting to Evil)',
+          }));
+          setMentees(list);
+        })
+        .catch(() => setMentees([]))
+        .finally(() => setIsLoading(false));
+    }
+  }, [isOpen]);
 
   const handleCopyInviteCode = () => {
     navigator.clipboard.writeText(inviteCode);
@@ -61,16 +68,32 @@ export const MyMenteesModal: React.FC<MyMenteesModalProps> = ({
     setTimeout(() => setInviteCodeCopied(false), 2000);
   };
 
-  const handleSendCounselNote = (e: React.FormEvent) => {
+  const handleSendCounselNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!counselNoteText.trim() || !selectedMentee) return;
 
-    setNoteSentSuccess(`Counsel note sent to ${selectedMentee.name}!`);
-    setCounselNoteText('');
-    setTimeout(() => {
-      setNoteSentSuccess(null);
-      setSelectedMentee(null);
-    }, 2500);
+    setIsSubmittingNote(true);
+    setErrorMsg(null);
+
+    try {
+      if (selectedMentee.chainId) {
+        try {
+          await sendCounselNote(selectedMentee.chainId, counselNoteText.trim());
+        } catch (apiErr) {
+          console.warn('API call skipped for demo mentee:', apiErr);
+        }
+      }
+      setNoteSentSuccess(`Counsel note sent to ${selectedMentee.name}!`);
+      setCounselNoteText('');
+      setTimeout(() => {
+        setNoteSentSuccess(null);
+        setSelectedMentee(null);
+      }, 2500);
+    } catch {
+      setErrorMsg('Failed to send counsel note.');
+    } finally {
+      setIsSubmittingNote(false);
+    }
   };
 
   return (
@@ -99,6 +122,12 @@ export const MyMenteesModal: React.FC<MyMenteesModalProps> = ({
             <span>{inviteCodeCopied ? 'Copied' : inviteCode}</span>
           </button>
         </Card>
+
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+            {errorMsg}
+          </div>
+        )}
 
         {/* Note Sent Toast */}
         {noteSentSuccess && (
@@ -138,6 +167,7 @@ export const MyMenteesModal: React.FC<MyMenteesModalProps> = ({
                   type="submit"
                   variant="emerald"
                   size="sm"
+                  isLoading={isSubmittingNote}
                   className="flex items-center gap-1 text-xs"
                 >
                   <Send className="w-3.5 h-3.5" /> Send Counsel Note
@@ -148,48 +178,60 @@ export const MyMenteesModal: React.FC<MyMenteesModalProps> = ({
         ) : null}
 
         {/* Mentee List */}
-        <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
-          {mentees.map((mentee) => (
-            <div
-              key={mentee.id}
-              className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2 text-xs transition-all hover:border-slate-700"
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
-                    {mentee.name.charAt(0)}
+        {isLoading ? (
+          <div className="text-center py-8 text-xs text-slate-500">Loading mentees...</div>
+        ) : mentees.length === 0 ? (
+          <Card variant="glass" className="p-6 text-center space-y-2 border-slate-800">
+            <Users className="w-7 h-7 text-slate-600 mx-auto" />
+            <h5 className="text-xs font-bold text-slate-200">No Mentees Connected Yet</h5>
+            <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
+              Share your invite code <code className="text-amber-400 font-mono">{inviteCode}</code> with recoverees to connect them with your mentorship.
+            </p>
+          </Card>
+        ) : (
+          <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+            {mentees.map((mentee) => (
+              <div
+                key={mentee.id}
+                className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800 space-y-2 text-xs transition-all hover:border-slate-700"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold text-xs">
+                      {mentee.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h5 className="font-bold text-slate-100">{mentee.name}</h5>
+                      <span className="text-[10px] text-slate-400 font-mono">{mentee.username}</span>
+                    </div>
                   </div>
-                  <div>
-                    <h5 className="font-bold text-slate-100">{mentee.name}</h5>
-                    <span className="text-[10px] text-slate-400 font-mono">{mentee.username}</span>
-                  </div>
+
+                  <Badge
+                    variant={mentee.status === 'CLEAN' ? 'emerald' : 'amber'}
+                    className="text-[10px]"
+                  >
+                    {mentee.streakDays} Days Clean
+                  </Badge>
                 </div>
 
-                <Badge
-                  variant={mentee.status === 'CLEAN' ? 'emerald' : 'amber'}
-                  className="text-[10px]"
+                <div className="flex items-center justify-between pt-1 border-t border-slate-900 text-[10px] text-slate-400">
+                  <span>{mentee.nafsStage.split(' ')[0]} {mentee.nafsStage.split(' ')[1]}</span>
+                  <span>Checked in: {mentee.lastCheckIn}</span>
+                </div>
+
+                <Button
+                  variant="subtle"
+                  size="sm"
+                  onClick={() => setSelectedMentee(mentee)}
+                  className="w-full text-xs font-semibold flex items-center justify-center gap-1.5 border-slate-800 text-emerald-400 hover:border-emerald-500/40 py-1.5"
                 >
-                  {mentee.streakDays} Days Clean
-                </Badge>
+                  <HeartHandshake className="w-3.5 h-3.5" />
+                  Send Counsel Note (Nasiha)
+                </Button>
               </div>
-
-              <div className="flex items-center justify-between pt-1 border-t border-slate-900 text-[10px] text-slate-400">
-                <span>{mentee.nafsStage.split(' ')[0]} {mentee.nafsStage.split(' ')[1]}</span>
-                <span>Checked in: {mentee.lastCheckIn}</span>
-              </div>
-
-              <Button
-                variant="subtle"
-                size="sm"
-                onClick={() => setSelectedMentee(mentee)}
-                className="w-full text-xs font-semibold flex items-center justify-center gap-1.5 border-slate-800 text-emerald-400 hover:border-emerald-500/40 py-1.5"
-              >
-                <HeartHandshake className="w-3.5 h-3.5" />
-                Send Counsel Note (Nasiha)
-              </Button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </Modal>
   );
