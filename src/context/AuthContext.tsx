@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User, AuthTokens } from '../types/user';
+import type { User, TokenResponse } from '../types/user';
 import { loginUser, registerUser, getCurrentUser } from '../services/authService';
 import { apiFetch } from '../services/apiClient';
 
 interface AuthContextType {
   user: User | null;
-  tokens: AuthTokens | null;
+  tokens: TokenResponse | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isDemoSession: boolean;
@@ -28,7 +28,7 @@ const DEMO_USER: User = {
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [tokens, setTokens] = useState<AuthTokens | null>(null);
+  const [tokens, setTokens] = useState<TokenResponse | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isDemoSession, setIsDemoSession] = useState<boolean>(false);
 
@@ -53,9 +53,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
-      const authTokens = await loginUser(email, password);
-      setTokens(authTokens);
-      setUser(authTokens.user);
+      const authData = await loginUser(email, password);
+      if (authData.tokens) {
+        setTokens(authData.tokens);
+      }
+      if (authData.user) {
+        setUser(authData.user);
+      }
       setIsDemoSession(false);
     } finally {
       setIsLoading(false);
@@ -65,9 +69,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const register = async (email: string, password: string, fullName: string, username: string) => {
     setIsLoading(true);
     try {
-      const authTokens = await registerUser(email, password, fullName, username);
-      setTokens(authTokens);
-      setUser(authTokens.user);
+      const authData = await registerUser(email, password, fullName, username);
+      if (authData.tokens) {
+        setTokens(authData.tokens);
+      }
+      if (authData.user) {
+        setUser(authData.user);
+      }
       setIsDemoSession(false);
     } finally {
       setIsLoading(false);

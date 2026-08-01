@@ -1,15 +1,24 @@
 import { apiFetch } from './apiClient';
-import type { User, AuthTokens } from '../types/user';
+import type { User, AuthData } from '../types/user';
 
-export async function loginUser(email: string, password: string): Promise<AuthTokens> {
-  const data = await apiFetch<AuthTokens>('/api/v1/auth/login', {
+function extractAndStoreTokens(data: AuthData): void {
+  const accessToken = data.tokens?.accessToken || (data as unknown as { accessToken?: string }).accessToken;
+  const refreshToken = data.tokens?.refreshToken || (data as unknown as { refreshToken?: string }).refreshToken;
+
+  if (accessToken) {
+    localStorage.setItem('accessToken', accessToken);
+  }
+  if (refreshToken) {
+    localStorage.setItem('refreshToken', refreshToken);
+  }
+}
+
+export async function loginUser(email: string, password: string): Promise<AuthData> {
+  const data = await apiFetch<AuthData>('/api/v1/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  if (data.accessToken) {
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-  }
+  extractAndStoreTokens(data);
   return data;
 }
 
@@ -18,15 +27,12 @@ export async function registerUser(
   password: string,
   fullName: string,
   username: string
-): Promise<AuthTokens> {
-  const data = await apiFetch<AuthTokens>('/api/v1/auth/register', {
+): Promise<AuthData> {
+  const data = await apiFetch<AuthData>('/api/v1/auth/register', {
     method: 'POST',
     body: JSON.stringify({ email, password, fullName, username }),
   });
-  if (data.accessToken) {
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-  }
+  extractAndStoreTokens(data);
   return data;
 }
 

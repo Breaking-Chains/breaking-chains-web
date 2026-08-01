@@ -7,12 +7,22 @@ export interface User {
   createdAt: string;
 }
 
+export interface TokenResponse {
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface AuthData {
+  user: User;
+  tokens: TokenResponse;
+}
+
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
-  tokenType: string;
-  expiresInSeconds: number;
-  user: User;
+  tokenType?: string;
+  expiresInSeconds?: number;
+  user?: User;
 }
 
 export interface ApiResponse<T> {
