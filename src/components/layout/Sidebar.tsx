@@ -2,7 +2,6 @@ import React from 'react';
 import { Home, AlertTriangle, CalendarCheck, Users, BarChart3, Settings, ShieldCheck, Flame, LogOut, User as UserIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
-import { QuickHideButton } from '../ui/QuickHideButton';
 import type { NavTab } from './BottomNav';
 import { useAuth } from '../../context/AuthContext';
 
@@ -127,14 +126,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </nav>
-      </div>
-
-      {/* Footer Stealth Privacy Toggle */}
-      <div className="pt-3 border-t border-slate-900 space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-[11px] text-slate-400 font-medium">Stealth Mode</span>
-          <QuickHideButton />
-        </div>
       </div>
     </aside>
   );

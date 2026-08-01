@@ -1,6 +1,5 @@
 import React from 'react';
 import { ShieldCheck, Flame } from 'lucide-react';
-import { QuickHideButton } from '../ui/QuickHideButton';
 
 interface HeaderProps {
   currentStreak?: number;
@@ -30,8 +29,6 @@ export const Header: React.FC<HeaderProps> = ({
             <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span className="text-xs font-bold text-amber-300 font-mono">{currentStreak}d</span>
           </div>
-
-          <QuickHideButton />
         </div>
       </div>
     </header>

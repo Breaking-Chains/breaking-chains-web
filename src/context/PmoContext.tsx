@@ -7,11 +7,14 @@ import { getChainAnalytics } from '../services/analyticsService';
 import { submitCheckInLog } from '../services/logService';
 import { startEmergencySession, completeEmergencySession } from '../services/emergencyService';
 
+import type { CounselNote } from '../types/partner';
+import { getCounselNotes } from '../services/partnerService';
 import { formatApiErrorMessage } from '../services/apiClient';
 
 interface PmoContextType {
   chain: HabitChain | null;
   analytics: AnalyticsSummary | null;
+  counselNotes: CounselNote[];
   currentStreak: number;
   cleanRatioPercent: number;
   chaserEffectActive: boolean;
@@ -38,6 +41,7 @@ const PmoContext = createContext<PmoContextType | undefined>(undefined);
 export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [chain, setChain] = useState<HabitChain | null>(null);
   const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
+  const [counselNotes, setCounselNotes] = useState<CounselNote[]>([]);
   const [chaserEffectActive, setChaserEffectActive] = useState<boolean>(false);
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const [isOfflineDemo, setIsOfflineDemo] = useState<boolean>(false);
@@ -60,21 +64,28 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
       if (activeChain) {
         try {
-          const stats = await getChainAnalytics(activeChain.id);
+          const [stats, notes] = await Promise.all([
+            getChainAnalytics(activeChain.id).catch(() => null),
+            getCounselNotes(activeChain.id).catch(() => []),
+          ]);
           setAnalytics(stats);
+          setCounselNotes(Array.isArray(notes) ? notes : []);
           setChaserEffectActive(stats?.chaserEffectActive || false);
         } catch (err) {
-          console.warn('Failed to load chain analytics:', err);
+          console.warn('Failed to load chain analytics or counsel notes:', err);
           setAnalytics(null);
+          setCounselNotes([]);
           setChaserEffectActive(false);
         }
       } else {
         setAnalytics(null);
+        setCounselNotes([]);
         setChaserEffectActive(false);
       }
     } catch (err: unknown) {
       setChain(null);
       setAnalytics(null);
+      setCounselNotes([]);
       setChaserEffectActive(false);
       setApiError(formatApiErrorMessage(err));
     } finally {
@@ -157,6 +168,7 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         chain,
         analytics,
+        counselNotes,
         currentStreak: chain?.currentStreak ?? 0,
         cleanRatioPercent: chain?.cleanRatioPercent ?? 0,
         chaserEffectActive,

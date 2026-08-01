@@ -77,27 +77,34 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
         </div>
 
         <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-          {safeMessages.map((msg) => {
-            const isMe = msg.senderId === 'user1';
-            return (
-              <div
-                key={msg.id}
-                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
-              >
+          {safeMessages.length === 0 ? (
+            <p className="text-center text-xs text-slate-500 py-6 font-medium italic">
+              No confidential messages exchanged yet. Send a message to connect.
+            </p>
+          ) : (
+            safeMessages.map((msg) => {
+              const isMe = msg.senderId === 'user1' || msg.senderId === 'me';
+              return (
                 <div
-                  className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${isMe
-                      ? 'bg-emerald-600 text-white rounded-br-none'
-                      : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700/50'
-                    }`}
+                  key={msg.id}
+                  className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
                 >
-                  <p>{msg.messageContent}</p>
+                  <div
+                    className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
+                      isMe
+                        ? 'bg-emerald-600 text-white rounded-br-none'
+                        : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700/50'
+                    }`}
+                  >
+                    <p>{msg.messageContent}</p>
+                  </div>
+                  <span className="text-[9px] text-slate-500 mt-0.5 px-1 font-mono">
+                    {msg.senderFullName ? msg.senderFullName.split(' ')[0] : 'You'} • {new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </span>
                 </div>
-                <span className="text-[9px] text-slate-500 mt-0.5 px-1 font-mono">
-                  {msg.senderFullName.split(' ')[0]} • 11:35 AM
-                </span>
-              </div>
-            );
-          })}
+              );
+            })
+          )}
         </div>
 
         <form onSubmit={handleSend} className="flex gap-2 pt-2 border-t border-slate-800">

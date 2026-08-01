@@ -31,8 +31,8 @@ function ProtectedAppContent() {
     setIsSosOpen(true);
   };
 
-  const handleCloseSos = async () => {
-    await completeSos(60);
+  const handleCloseSos = async (durationSeconds: number) => {
+    await completeSos(durationSeconds);
     setIsSosOpen(false);
   };
 

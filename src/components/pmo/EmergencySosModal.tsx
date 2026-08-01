@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 
 interface EmergencySosModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (durationSeconds: number) => void;
 }
 
 export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, onClose }) => {
@@ -14,6 +14,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
   const [breathCounter, setBreathCounter] = useState<number>(4);
   const [timerSeconds, setTimerSeconds] = useState<number>(60);
   const [isBreathingActive, setIsBreathingActive] = useState<boolean>(false);
+  const [startTime, setStartTime] = useState<number>(Date.now());
 
   // Reset steps on open
   useEffect(() => {
@@ -21,8 +22,14 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
       setStep(1);
       setIsBreathingActive(false);
       setTimerSeconds(60);
+      setStartTime(Date.now());
     }
   }, [isOpen]);
+
+  const handleFinishSos = () => {
+    const elapsedSeconds = Math.max(10, Math.floor((Date.now() - startTime) / 1000));
+    onClose(elapsedSeconds);
+  };
 
   // Box Breathing Logic
   useEffect(() => {
@@ -64,7 +71,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
         </div>
 
         <button
-          onClick={onClose}
+          onClick={handleFinishSos}
           className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"
         >
           Exit SOS
@@ -170,7 +177,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
               <Button
                 variant="emerald"
                 size="lg"
-                onClick={onClose}
+                onClick={handleFinishSos}
                 className="w-full mt-4"
               >
                 <CheckCircle2 className="w-5 h-5 mr-2" /> Urge Successfully Resisted!

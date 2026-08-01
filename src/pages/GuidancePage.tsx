@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { MentorshipChat } from '../components/pmo/MentorshipChat';
 import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
-import { MyMenteesModal } from '../components/pmo/MyMenteesModal';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
-import { ShieldCheck, Award, Users, Clock } from 'lucide-react';
+import { Input } from '../components/ui/Input';
+import { Modal } from '../components/ui/Modal';
+import { ShieldCheck, Award, Users, Clock, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
+import type { MentorshipChatMessage } from '../types/partner';
 
 interface GuidancePageProps {
   onOpenMenteesPage?: () => void;
@@ -18,9 +20,25 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
   const [isBecomeMentorOpen, setIsBecomeMentorOpen] = useState(false);
-  const [isMenteesModalOpen, setIsMenteesModalOpen] = useState(false);
+  const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
+  const [connectSuccessMsg, setConnectSuccessMsg] = useState<string | null>(null);
+
   const [isLoadingMentors, setIsLoadingMentors] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([
+    {
+      id: 'msg-1',
+      partnershipId: 'p-1',
+      senderId: 'mentor-1',
+      senderFullName: 'Shaykh Ahmad',
+      senderUsername: 'shaykh_ahmad',
+      messageContent: 'Assalamu alaikum! Remember to guard your gaze and keep up your daily Muhasabah check-ins.',
+      isRead: true,
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+    },
+  ]);
 
   const loadMentors = async () => {
     setIsLoadingMentors(true);
@@ -51,9 +69,32 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const handleOpenMentees = () => {
     if (onOpenMenteesPage) {
       onOpenMenteesPage();
-    } else {
-      setIsMenteesModalOpen(true);
     }
+  };
+
+  const handleConnectMentor = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteCodeInput.trim()) return;
+    setConnectSuccessMsg(`Successfully connected to mentor with code ${inviteCodeInput.trim()}!`);
+    setInviteCodeInput('');
+    setTimeout(() => {
+      setConnectSuccessMsg(null);
+      setIsConnectModalOpen(false);
+    }, 2000);
+  };
+
+  const handleSendMessage = (text: string) => {
+    const newMsg: MentorshipChatMessage = {
+      id: `msg-${Date.now()}`,
+      partnershipId: 'p-1',
+      senderId: 'me',
+      senderFullName: myProfile?.fullName || 'You',
+      senderUsername: myProfile?.username || 'user',
+      messageContent: text,
+      isRead: false,
+      createdAt: new Date().toISOString(),
+    };
+    setChatMessages((prev) => [...prev, newMsg]);
   };
 
   return (
@@ -63,6 +104,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           {errorMsg}
         </div>
       )}
+
       {/* Verified Mentor Directory Section */}
       <Card variant="glass" className="p-4 space-y-3 border-slate-800">
         <div className="flex items-center justify-between">
@@ -74,29 +116,42 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             </div>
           </div>
 
-          {isApprovedMentor ? (
-            <Button
-              variant="emerald"
-              size="sm"
-              onClick={handleOpenMentees}
-              className="flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-emerald-950/50"
-            >
-              <Users className="w-4 h-4" /> View My Mentees
-            </Button>
-          ) : isPendingMentor ? (
-            <Badge variant="amber" className="flex items-center gap-1 py-1 px-2.5 text-xs font-semibold">
-              <Clock className="w-3.5 h-3.5" /> Review Pending
-            </Badge>
-          ) : (
-            <Button
-              variant="emerald"
-              size="sm"
-              onClick={() => setIsBecomeMentorOpen(true)}
-              className="flex items-center gap-1.5 text-xs"
-            >
-              <Award className="w-4 h-4" /> Become a Mentor
-            </Button>
-          )}
+          <div className="flex items-center gap-2">
+            {!isApprovedMentor && (
+              <Button
+                variant="subtle"
+                size="sm"
+                onClick={() => setIsConnectModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs border-slate-800 text-amber-400 hover:border-amber-500/40"
+              >
+                <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
+              </Button>
+            )}
+
+            {isApprovedMentor ? (
+              <Button
+                variant="emerald"
+                size="sm"
+                onClick={handleOpenMentees}
+                className="flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-emerald-950/50"
+              >
+                <Users className="w-4 h-4" /> View My Mentees
+              </Button>
+            ) : isPendingMentor ? (
+              <Badge variant="amber" className="flex items-center gap-1 py-1 px-2.5 text-xs font-semibold">
+                <Clock className="w-3.5 h-3.5" /> Review Pending
+              </Badge>
+            ) : (
+              <Button
+                variant="emerald"
+                size="sm"
+                onClick={() => setIsBecomeMentorOpen(true)}
+                className="flex items-center gap-1.5 text-xs"
+              >
+                <Award className="w-4 h-4" /> Become a Mentor
+              </Button>
+            )}
+          </div>
         </div>
 
         {isLoadingMentors ? (
@@ -151,7 +206,12 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       </Card>
 
       {/* Active Mentorship Chat & Counsel Notes */}
-      <MentorshipChat />
+      <MentorshipChat
+        partnerName={isApprovedMentor ? 'Recoveree Student Roster' : 'Shaykh Ahmad (Spiritual Mentor)'}
+        inviteCode="MENTOR-BC-7890"
+        messages={chatMessages}
+        onSendMessage={handleSendMessage}
+      />
 
       <BecomeMentorModal
         isOpen={isBecomeMentorOpen}
@@ -159,11 +219,33 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         onSuccess={loadMentors}
       />
 
-      <MyMenteesModal
-        isOpen={isMenteesModalOpen}
-        onClose={() => setIsMenteesModalOpen(false)}
-        mentorName={myProfile?.fullName || 'Verified Mentor'}
-      />
+      {/* Connect to Mentor Modal */}
+      <Modal isOpen={isConnectModalOpen} onClose={() => setIsConnectModalOpen(false)} title="Connect with a Mentor">
+        <form onSubmit={handleConnectMentor} className="space-y-4">
+          <p className="text-xs text-slate-300">
+            Enter the unique <strong>Invite Code</strong> provided by your assigned spiritual mentor or recovery coach.
+          </p>
+
+          {connectSuccessMsg && (
+            <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-400" />
+              {connectSuccessMsg}
+            </div>
+          )}
+
+          <Input
+            label="Mentor Invite Code"
+            placeholder="e.g. MENTOR-BC-7890"
+            value={inviteCodeInput}
+            onChange={(e) => setInviteCodeInput(e.target.value)}
+            required
+          />
+
+          <Button type="submit" variant="emerald" size="lg" className="w-full text-xs">
+            Connect & Start Guidance
+          </Button>
+        </form>
+      </Modal>
     </div>
   );
 };
