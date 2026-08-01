@@ -19,6 +19,13 @@ interface PmoContextType {
   submitCheckIn: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => Promise<void>;
   startSos: () => Promise<string>;
   completeSos: (durationSeconds: number) => Promise<void>;
+  createCustomChain: (options: {
+    title: string;
+    strategy: string;
+    privacyLevel: string;
+    triggerTags: string[];
+    intentStatement: string;
+  }) => Promise<void>;
   refreshData: () => Promise<void>;
 }
 
@@ -36,17 +43,9 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsApiLoading(true);
     try {
       const chains = await getUserChains();
-      let activeChain = Array.isArray(chains)
+      const activeChain = Array.isArray(chains)
         ? chains.find((c) => c.strategy === 'PMO_RECOVERY') || chains[0]
         : null;
-      
-      if (!activeChain && Array.isArray(chains)) {
-        try {
-          activeChain = await createPmoChain();
-        } catch {
-          activeChain = null;
-        }
-      }
 
       setChain(activeChain || null);
       setIsOfflineDemo(false);
@@ -76,6 +75,23 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     fetchLiveData();
   }, []);
+
+  const createCustomChain = async (options: {
+    title: string;
+    strategy: string;
+    privacyLevel: string;
+    triggerTags: string[];
+    intentStatement: string;
+  }) => {
+    setIsApiLoading(true);
+    try {
+      const newChain = await createPmoChain(options);
+      setChain(newChain);
+      await fetchLiveData();
+    } finally {
+      setIsApiLoading(false);
+    }
+  };
 
   const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
     if (!chain) return;
@@ -131,6 +147,7 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         submitCheckIn,
         startSos,
         completeSos,
+        createCustomChain,
         refreshData: fetchLiveData,
       }}
     >

@@ -4,6 +4,7 @@ import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
 import type { LogStatus, PMOTriggerTag } from '../../types/log';
+import { triggerConfetti } from '../../utils/confetti';
 
 interface CheckInModalProps {
   isOpen: boolean;
@@ -33,6 +34,10 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
     setTimeout(() => {
       onSubmitLog(selectedStatus, selectedTrigger, notes);
       setIsSubmitting(false);
+
+      if (selectedStatus === 'CLEAN' || selectedStatus === 'URGE_RESISTED') {
+        triggerConfetti();
+      }
 
       if (selectedStatus === 'SLIP_UP') {
         setPostSlipSubmitted(true);

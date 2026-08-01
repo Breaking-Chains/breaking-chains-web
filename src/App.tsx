@@ -11,14 +11,19 @@ import { SettingsPage } from './pages/SettingsPage';
 import { AuthPage } from './pages/AuthPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
 import { CheckInModal } from './components/pmo/CheckInModal';
+import { OnboardingWizardModal } from './components/pmo/OnboardingWizardModal';
 import type { LogStatus, PMOTriggerTag } from './types/log';
+import type { PrivacyLevel } from './types/chain';
 
 function ProtectedAppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [isSosOpen, setIsSosOpen] = useState<boolean>(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState<boolean>(false);
+  const [isOnboardingDismissed, setIsOnboardingDismissed] = useState<boolean>(false);
 
-  const { currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos } = usePmo();
+  const { chain, isApiLoading, currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos, createCustomChain } = usePmo();
+
+  const showOnboarding = chain === null && !isApiLoading && !isOnboardingDismissed;
 
   const handleTriggerSos = async () => {
     await startSos();
@@ -40,6 +45,17 @@ function ProtectedAppContent() {
 
   const handleSubmitLog = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
     await submitCheckIn(status, triggerTag, notes);
+  };
+
+  const handleCompleteOnboarding = async (data: {
+    title: string;
+    strategy: string;
+    privacyLevel: PrivacyLevel;
+    triggerTags: string[];
+    intentStatement: string;
+  }) => {
+    await createCustomChain(data);
+    setIsOnboardingDismissed(true);
   };
 
   return (
@@ -87,6 +103,13 @@ function ProtectedAppContent() {
         isOpen={isCheckInOpen}
         onClose={() => setIsCheckInOpen(false)}
         onSubmitLog={handleSubmitLog}
+      />
+
+      {/* New User Onboarding Setup Wizard */}
+      <OnboardingWizardModal
+        isOpen={showOnboarding}
+        onClose={() => setIsOnboardingDismissed(true)}
+        onCompleteOnboarding={handleCompleteOnboarding}
       />
     </MobileLayout>
   );

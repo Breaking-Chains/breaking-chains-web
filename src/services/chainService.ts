@@ -13,14 +13,23 @@ export async function getChainById(id: string): Promise<HabitChain> {
   });
 }
 
-export async function createPmoChain(title = 'PMO Recovery Chain'): Promise<HabitChain> {
+export async function createPmoChain(options?: {
+  title?: string;
+  category?: string;
+  strategy?: string;
+  privacyLevel?: string;
+  triggerTags?: string[];
+  intentStatement?: string;
+}): Promise<HabitChain> {
   return apiFetch<HabitChain>('/api/v1/chains', {
     method: 'POST',
     body: JSON.stringify({
-      title,
-      category: 'SPIRITUAL_MORAL',
-      strategy: 'PMO_RECOVERY',
-      privacyLevel: 'LEVEL_0_PRIVATE',
+      title: options?.title || 'PMO Recovery Chain',
+      category: options?.category || 'SPIRITUAL_MORAL',
+      strategy: options?.strategy || 'PMO_RECOVERY',
+      privacyLevel: options?.privacyLevel || 'LEVEL_0_PRIVATE',
+      triggerTags: options?.triggerTags || ['🌙 Late Night Solitude', '⚡ Stress & Anxiety'],
+      intentStatement: options?.intentStatement || null,
     }),
   });
 }
