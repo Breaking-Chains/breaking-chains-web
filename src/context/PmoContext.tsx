@@ -24,78 +24,50 @@ interface PmoContextType {
 
 const PmoContext = createContext<PmoContextType | undefined>(undefined);
 
-const DEMO_CHAIN: HabitChain = {
-  id: 'demo-pmo-chain-1',
-  userId: 'demo-user-1',
-  title: 'PMO Recovery & Purity Chain',
-  category: 'SPIRITUAL_MORAL',
-  strategy: 'PMO_RECOVERY',
-  privacyLevel: 'LEVEL_0_PRIVATE',
-  startDate: '2026-07-14T00:00:00Z',
-  totalCleanDays: 18,
-  currentStreak: 18,
-  longestStreak: 21,
-  resilienceScore: 94.7,
-  cleanRatioPercent: 94.7,
-  status: 'ACTIVE',
-  createdAt: '2026-07-14T00:00:00Z',
-  updatedAt: '2026-08-01T00:00:00Z',
-};
-
-const DEMO_ANALYTICS: AnalyticsSummary = {
-  chainId: 'demo-pmo-chain-1',
-  totalDaysSinceStart: 19,
-  totalCleanDays: 18,
-  cleanRatioPercent: 94.7,
-  currentStreak: 18,
-  longestStreak: 21,
-  resilienceScore: 94.7,
-  estimatedMoneySaved: 54,
-  estimatedHoursSaved: 36,
-  sadaqahRedemptionPotential: 54,
-  nafsStage: 'NAFS_AL_LAWWAMAH',
-  dopamineRebootProgressPercent: 20.0,
-  dopamineStageTitle: 'Flatline & Rebalancing',
-  dopamineStageDescription: 'Temporary low energy / brain fog. Receptors are sensitivity healing.',
-  chaserEffectActive: false,
-  topTriggers: [
-    { trigger: '🌙 Late Night Solitude', count: 12 },
-    { trigger: '⚡ Stress & Work Anxiety', count: 6 },
-    { trigger: '📱 Social Media Peeking', count: 4 },
-  ],
-};
-
 export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [chain, setChain] = useState<HabitChain | null>(DEMO_CHAIN);
-  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(DEMO_ANALYTICS);
+  const [chain, setChain] = useState<HabitChain | null>(null);
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [chaserEffectActive, setChaserEffectActive] = useState<boolean>(false);
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
-  const [isOfflineDemo, setIsOfflineDemo] = useState<boolean>(true);
+  const [isOfflineDemo, setIsOfflineDemo] = useState<boolean>(false);
   const [activeSosSessionId, setActiveSosSessionId] = useState<string | null>(null);
 
   const fetchLiveData = async () => {
     setIsApiLoading(true);
     try {
       const chains = await getUserChains();
-      let activeChain = chains.find((c) => c.strategy === 'PMO_RECOVERY') || chains[0];
+      let activeChain = Array.isArray(chains)
+        ? chains.find((c) => c.strategy === 'PMO_RECOVERY') || chains[0]
+        : null;
       
-      if (!activeChain) {
-        activeChain = await createPmoChain();
+      if (!activeChain && Array.isArray(chains)) {
+        try {
+          activeChain = await createPmoChain();
+        } catch {
+          activeChain = null;
+        }
       }
 
-      setChain(activeChain);
+      setChain(activeChain || null);
       setIsOfflineDemo(false);
 
       if (activeChain) {
-        const stats = await getChainAnalytics(activeChain.id);
-        setAnalytics(stats);
-        setChaserEffectActive(stats.chaserEffectActive);
+        try {
+          const stats = await getChainAnalytics(activeChain.id);
+          setAnalytics(stats);
+          setChaserEffectActive(stats?.chaserEffectActive || false);
+        } catch {
+          setAnalytics(null);
+          setChaserEffectActive(false);
+        }
+      } else {
+        setAnalytics(null);
+        setChaserEffectActive(false);
       }
     } catch {
-      // Backend offline: fallback smoothly to high-performance local demo state
-      setIsOfflineDemo(true);
-      setChain(DEMO_CHAIN);
-      setAnalytics(DEMO_ANALYTICS);
+      setChain(null);
+      setAnalytics(null);
+      setChaserEffectActive(false);
     } finally {
       setIsApiLoading(false);
     }
@@ -108,30 +80,18 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
     if (!chain) return;
 
-    if (!isOfflineDemo) {
-      try {
-        await submitCheckInLog(chain.id, status, triggerTag, notes);
-        await fetchLiveData();
-        return;
-      } catch (err) {
-        console.warn('API call failed, falling back to local state:', err);
-      }
-    }
-
-    // Local state fallback update
-    if (status === 'CLEAN' || status === 'URGE_RESISTED') {
-      setChain((prev) => prev ? { ...prev, currentStreak: prev.currentStreak + 1, totalCleanDays: prev.totalCleanDays + 1 } : prev);
-    } else if (status === 'PEEKED_EDGED') {
-      setChaserEffectActive(true);
-    } else if (status === 'SLIP_UP') {
-      setChain((prev) => prev ? { ...prev, currentStreak: 0 } : prev);
-      setChaserEffectActive(true);
+    try {
+      await submitCheckInLog(chain.id, status, triggerTag, notes);
+      await fetchLiveData();
+      return;
+    } catch (err) {
+      console.warn('API call failed during checkin:', err);
     }
   };
 
   const startSos = async (): Promise<string> => {
-    if (!chain || isOfflineDemo) {
-      const demoId = `sos-demo-${Date.now()}`;
+    if (!chain) {
+      const demoId = `sos-${Date.now()}`;
       setActiveSosSessionId(demoId);
       return demoId;
     }
@@ -140,14 +100,14 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setActiveSosSessionId(session.id);
       return session.id;
     } catch {
-      const demoId = `sos-demo-${Date.now()}`;
+      const demoId = `sos-${Date.now()}`;
       setActiveSosSessionId(demoId);
       return demoId;
     }
   };
 
   const completeSos = async (durationSeconds: number): Promise<void> => {
-    if (activeSosSessionId && !isOfflineDemo) {
+    if (activeSosSessionId) {
       try {
         await completeEmergencySession(activeSosSessionId, durationSeconds);
       } catch (err) {
@@ -162,8 +122,8 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       value={{
         chain,
         analytics,
-        currentStreak: chain?.currentStreak ?? 18,
-        cleanRatioPercent: chain?.cleanRatioPercent ?? 94.7,
+        currentStreak: chain?.currentStreak ?? 0,
+        cleanRatioPercent: chain?.cleanRatioPercent ?? 0,
         chaserEffectActive,
         isApiLoading,
         isOfflineDemo,

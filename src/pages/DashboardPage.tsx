@@ -15,12 +15,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onOpenCheckIn,
   onTriggerSos,
 }) => {
-  const { currentStreak, cleanRatioPercent, chaserEffectActive } = usePmo();
+  const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics } = usePmo();
+
+  const hoursSaved = analytics?.estimatedHoursSaved ?? currentStreak * 2;
+  const moneySaved = analytics?.estimatedMoneySaved ?? currentStreak * 3;
+  const nafsStage = analytics?.nafsStage || (currentStreak <= 7 ? 'NAFS_AL_AMMARAH' : currentStreak <= 40 ? 'NAFS_AL_LAWWAMAH' : 'NAFS_AL_MUTMAINNAH');
 
   return (
     <div className="space-y-6 animate-fade-in max-w-6xl mx-auto">
       {/* 48-Hour Chaser Effect Shield Banner */}
-      <ChaserEffectBanner isActive={chaserEffectActive} hoursRemaining={32} />
+      <ChaserEffectBanner isActive={chaserEffectActive} hoursRemaining={chaserEffectActive ? 48 : 0} />
 
       {/* Sleek Minimalist Hero Display */}
       <MinimalStreakHero
@@ -36,8 +40,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div className="lg:col-span-2 space-y-6">
           <DopamineRebootCard
             currentCleanDays={currentStreak}
-            estimatedHoursSaved={currentStreak * 2}
-            estimatedMoneySaved={currentStreak * 3}
+            estimatedHoursSaved={hoursSaved}
+            estimatedMoneySaved={moneySaved}
           />
 
           <GuardingGazeCard cleanGazeDays={currentStreak} />
@@ -45,7 +49,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
         {/* Side Column Section */}
         <div className="space-y-6">
-          <NafsProgressTracker currentStage="NAFS_AL_LAWWAMAH" currentCleanDays={currentStreak} />
+          <NafsProgressTracker currentStage={nafsStage} currentCleanDays={currentStreak} />
         </div>
       </div>
     </div>

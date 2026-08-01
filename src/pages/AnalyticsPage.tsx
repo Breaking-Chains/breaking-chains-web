@@ -1,28 +1,33 @@
 import React from 'react';
 import { BarChart3, Award } from 'lucide-react';
 import { Card } from '../components/ui/Card';
+import { usePmo } from '../context/PmoContext';
 
 interface AnalyticsPageProps {
-  currentStreak: number;
-  cleanRatioPercent: number;
+  currentStreak?: number;
+  cleanRatioPercent?: number;
 }
 
-export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
-  currentStreak = 18,
-  cleanRatioPercent = 94.7,
-}) => {
-  const topTriggers = [
-    { name: '🌙 Late Night Solitude', count: 12, percent: 54 },
-    { name: '⚡ Stress & Work Anxiety', count: 6, percent: 27 },
-    { name: '📱 Social Media Peeking', count: 4, percent: 19 },
+export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
+  const { analytics, currentStreak, cleanRatioPercent } = usePmo();
+
+  const totalTriggersCount = analytics?.topTriggers?.reduce((sum, t) => sum + t.count, 0) || 1;
+
+  const topTriggers = analytics?.topTriggers?.map((trig) => ({
+    name: trig.trigger,
+    count: trig.count,
+    percent: Math.round((trig.count / totalTriggersCount) * 100),
+  })) || [];
+
+  const defaultBadges = [
+    { title: 'Day 3 Survivor', desc: 'Acute Withdrawal Wave Overcome', achieved: currentStreak >= 3 },
+    { title: 'Day 7 Flatline Warrior', desc: 'Dopamine Re-balancing Initialized', achieved: currentStreak >= 7 },
+    { title: 'Day 21 Rewire Master', desc: 'New Neural Pathways Formed', achieved: currentStreak >= 21 },
+    { title: 'Day 40 Heart Purity', desc: 'Deep Spiritual Tazkiyah Milestone', achieved: currentStreak >= 40 },
   ];
 
-  const badges = [
-    { title: 'Day 3 Survivor', desc: 'Acute Withdrawal Wave Overcome', achieved: true },
-    { title: 'Day 7 Flatline Warrior', desc: 'Dopamine Re-balancing Initialized', achieved: true },
-    { title: 'Day 21 Rewire Master', desc: 'New Neural Pathways Formed', achieved: false },
-    { title: 'Day 40 Heart Purity', desc: 'Deep Spiritual Tazkiyah Milestone', achieved: false },
-  ];
+  const hoursSaved = analytics?.estimatedHoursSaved ?? currentStreak * 2;
+  const moneySaved = analytics?.estimatedMoneySaved ?? currentStreak * 3;
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -48,11 +53,11 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           </div>
           <div className="bg-slate-950/60 p-4 rounded-xl border border-emerald-900/40 text-center">
             <span className="text-xs text-slate-400 block font-medium">Time Reclaimed</span>
-            <span className="text-2xl font-black text-teal-300 font-mono mt-1 block">{currentStreak * 2} Hours</span>
+            <span className="text-2xl font-black text-teal-300 font-mono mt-1 block">{hoursSaved} Hours</span>
           </div>
           <div className="bg-slate-950/60 p-4 rounded-xl border border-emerald-900/40 text-center">
             <span className="text-xs text-slate-400 block font-medium">Sadaqah Potential</span>
-            <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">${currentStreak * 3} Saved</span>
+            <span className="text-2xl font-black text-amber-400 font-mono mt-1 block">${moneySaved} Saved</span>
           </div>
         </div>
       </Card>
@@ -65,20 +70,24 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
             Top PMO Craving Triggers Radar
           </h3>
           <div className="space-y-3">
-            {topTriggers.map((trig) => (
-              <div key={trig.name} className="space-y-1.5">
-                <div className="flex justify-between text-xs text-slate-300">
-                  <span className="font-semibold">{trig.name}</span>
-                  <span className="font-mono text-emerald-400 font-bold">{trig.percent}%</span>
+            {topTriggers.length === 0 ? (
+              <p className="text-xs text-slate-500 italic">No triggers logged yet. Log daily check-ins to build radar maps.</p>
+            ) : (
+              topTriggers.map((trig) => (
+                <div key={trig.name} className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-slate-300">
+                    <span className="font-semibold">{trig.name}</span>
+                    <span className="font-mono text-emerald-400 font-bold">{trig.percent}%</span>
+                  </div>
+                  <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
+                    <div
+                      className="bg-gradient-to-r from-emerald-600 to-teal-400 h-full rounded-full"
+                      style={{ width: `${trig.percent}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800">
-                  <div
-                    className="bg-gradient-to-r from-emerald-600 to-teal-400 h-full rounded-full"
-                    style={{ width: `${trig.percent}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </Card>
 
@@ -92,7 +101,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {badges.map((bdg) => (
+            {defaultBadges.map((bdg) => (
               <div
                 key={bdg.title}
                 className={`p-3.5 rounded-xl border flex items-center gap-3 ${

@@ -14,40 +14,10 @@ interface MentorshipChatProps {
 }
 
 export const MentorshipChat: React.FC<MentorshipChatProps> = ({
-  partnerName = 'Ustadh Farooq (Spiritual Guide)',
-  inviteCode = 'SUHBAH-A1B2C3',
-  notes = [
-    {
-      id: 'n1',
-      chainId: 'c1',
-      mentorUserId: 'm1',
-      mentorFullName: 'Ustadh Farooq',
-      noteContent: 'Assalamu Alaikum brother. Remember that every urge you overcome in solitude elevates your spiritual rank (*Darajah*). Keep your daily dhikr strong.',
-      createdAt: '2026-08-01T10:00:00Z',
-    },
-  ],
-  messages = [
-    {
-      id: 'msg1',
-      partnershipId: 'p1',
-      senderId: 'user1',
-      senderFullName: 'Alex Smith',
-      senderUsername: 'alexsmith',
-      messageContent: 'Assalamu Alaikum Ustadh, I completed 18 days clean today and survived a strong urge last night!',
-      isRead: true,
-      createdAt: '2026-08-01T11:30:00Z',
-    },
-    {
-      id: 'msg2',
-      partnershipId: 'p1',
-      senderId: 'mentor1',
-      senderFullName: 'Ustadh Farooq',
-      senderUsername: 'ufarooq',
-      messageContent: 'MashaAllah! May Allah keep you steadfast. You are entering the Flatline stage now—stay patient.',
-      isRead: true,
-      createdAt: '2026-08-01T11:35:00Z',
-    },
-  ],
+  partnerName = 'No Active Mentor',
+  inviteCode = '',
+  notes = [],
+  messages = [],
   onSendMessage,
 }) => {
   const [inputText, setInputText] = useState('');
