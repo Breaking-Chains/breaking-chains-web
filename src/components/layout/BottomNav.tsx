@@ -3,7 +3,7 @@ import { Home, AlertTriangle, CalendarCheck, Users, BarChart3 } from 'lucide-rea
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
-export type NavTab = 'dashboard' | 'checkin' | 'emergency' | 'guidance' | 'analytics' | 'settings';
+export type NavTab = 'dashboard' | 'checkin' | 'emergency' | 'guidance' | 'mentees' | 'analytics' | 'settings';
 
 interface TabItem {
   id: NavTab;

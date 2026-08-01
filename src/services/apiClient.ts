@@ -1,4 +1,4 @@
-import type { ApiResponse, ApiErrorResponse } from '../types/user';
+import type { ApiErrorResponse } from '../types/user';
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
@@ -130,8 +130,10 @@ export async function apiFetch<T>(
       );
     }
 
-    const successJson = json as ApiResponse<T>;
-    return successJson.data;
+    if (json && typeof json === 'object' && 'data' in json && json.data !== undefined) {
+      return json.data as T;
+    }
+    return json as T;
   } catch (err: unknown) {
     if (err instanceof ApiError) {
       throw err;

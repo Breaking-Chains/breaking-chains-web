@@ -10,7 +10,11 @@ import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorServic
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
 
-export const GuidancePage: React.FC = () => {
+interface GuidancePageProps {
+  onOpenMenteesPage?: () => void;
+}
+
+export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage }) => {
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
   const [isBecomeMentorOpen, setIsBecomeMentorOpen] = useState(false);
@@ -41,8 +45,16 @@ export const GuidancePage: React.FC = () => {
   }, []);
 
   const mentorList = Array.isArray(verifiedMentors) ? verifiedMentors : [];
-  const isApprovedMentor = myProfile?.status === 'APPROVED';
+  const isApprovedMentor = myProfile?.status === 'APPROVED' || myProfile?.isVerified === true;
   const isPendingMentor = myProfile?.status === 'PENDING';
+
+  const handleOpenMentees = () => {
+    if (onOpenMenteesPage) {
+      onOpenMenteesPage();
+    } else {
+      setIsMenteesModalOpen(true);
+    }
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -66,7 +78,7 @@ export const GuidancePage: React.FC = () => {
             <Button
               variant="emerald"
               size="sm"
-              onClick={() => setIsMenteesModalOpen(true)}
+              onClick={handleOpenMentees}
               className="flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-emerald-950/50"
             >
               <Users className="w-4 h-4" /> View My Mentees
@@ -101,9 +113,9 @@ export const GuidancePage: React.FC = () => {
               <Button
                 variant="emerald"
                 size="sm"
-                onClick={() => setIsMenteesModalOpen(true)}
+                onClick={handleOpenMentees}
               >
-                View My Mentees Roster
+                View My Mentees Roster Page
               </Button>
             ) : (
               <Button

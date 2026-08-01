@@ -7,6 +7,7 @@ import { DashboardPage } from './pages/DashboardPage';
 import { EmergencyPage } from './pages/EmergencyPage';
 import { AnalyticsPage } from './pages/AnalyticsPage';
 import { GuidancePage } from './pages/GuidancePage';
+import { MenteesPage } from './pages/MenteesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AuthPage } from './pages/AuthPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
@@ -84,7 +85,13 @@ function ProtectedAppContent() {
         />
       )}
 
-      {activeTab === 'guidance' && <GuidancePage />}
+      {activeTab === 'guidance' && (
+        <GuidancePage onOpenMenteesPage={() => setActiveTab('mentees')} />
+      )}
+
+      {activeTab === 'mentees' && (
+        <MenteesPage onBack={() => setActiveTab('guidance')} />
+      )}
 
       {activeTab === 'settings' && <SettingsPage />}
 
