@@ -51,7 +51,7 @@ export const AuthPage: React.FC = () => {
             Breaking Chains
           </h1>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            Controlled Access Gateway • PMO Recovery & Spiritual Purification (*Tazkiyah*)
+            PMO Recovery & Spiritual Purification (Tazkiyah)
           </p>
         </div>
 
@@ -146,7 +146,7 @@ export const AuthPage: React.FC = () => {
               isLoading={isLoading}
               className="w-full mt-2 text-sm"
             >
-              {mode === 'login' ? 'Authenticate & Enter' : 'Create Account & Start Recovery'}
+              {mode === 'login' ? 'Sign In' : 'Create Account'}
             </Button>
           </form>
 
@@ -154,7 +154,7 @@ export const AuthPage: React.FC = () => {
           <div className="relative flex py-2 items-center">
             <div className="flex-grow border-t border-slate-900"></div>
             <span className="flex-shrink mx-3 text-[10px] uppercase font-semibold text-slate-600">
-              or controlled access preview
+              or
             </span>
             <div className="flex-grow border-t border-slate-900"></div>
           </div>
@@ -175,7 +175,7 @@ export const AuthPage: React.FC = () => {
 
         {/* Confidentiality Footer */}
         <p className="text-center text-[11px] text-slate-500 max-w-xs mx-auto">
-          🔒 100% Confidential & Encrypted (Satr). JWT Token Security standard matching Spring Boot 3 backend.
+          🔒 100% Confidential & Encrypted (Satr)
         </p>
       </div>
     </div>
