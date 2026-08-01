@@ -9,54 +9,56 @@ interface EmergencyPageProps {
 
 export const EmergencyPage: React.FC<EmergencyPageProps> = ({ onTriggerSosModal }) => {
   return (
-    <div className="space-y-4 animate-fade-in">
-      <Card variant="alert" className="p-5 text-center space-y-3 border-rose-500/50">
-        <div className="w-14 h-14 rounded-full bg-rose-900/60 border-2 border-rose-500 flex items-center justify-center mx-auto text-rose-300 animate-bounce">
-          <AlertTriangle className="w-7 h-7" />
+    <div className="space-y-6 animate-fade-in">
+      <Card variant="alert" className="p-6 text-center space-y-4 border-rose-500/50 shadow-2xl">
+        <div className="w-16 h-16 rounded-full bg-rose-900/60 border-2 border-rose-500 flex items-center justify-center mx-auto text-rose-300 animate-bounce">
+          <AlertTriangle className="w-8 h-8" />
         </div>
-        <div>
-          <h2 className="text-xl font-black text-white">PMO URGE EMERGENCY TOOLKIT</h2>
-          <p className="text-xs text-rose-100/90 mt-1 leading-relaxed">
+        <div className="max-w-xl mx-auto space-y-1">
+          <h2 className="text-2xl font-black text-white">PMO URGE EMERGENCY TOOLKIT</h2>
+          <p className="text-sm text-rose-100/90 leading-relaxed">
             Urges are temporary neurochemical spikes. They reach a peak and fade within 2 to 5 minutes.
           </p>
         </div>
 
-        <Button variant="sos" size="lg" onClick={onTriggerSosModal} className="w-full text-base py-4">
+        <Button variant="sos" size="lg" onClick={onTriggerSosModal} className="max-w-md mx-auto text-base py-4">
           <Zap className="w-5 h-5 mr-2" /> Launch 4-Step Urge Interrupter
         </Button>
       </Card>
 
-      <div className="space-y-2">
-        <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider">
-          Immediate Circuit Breakers
+      <div className="space-y-3">
+        <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+          Immediate Physical & Psychological Circuit Breakers
         </h3>
 
-        <Card variant="dark" className="p-4 space-y-2 border-slate-800">
-          <div className="flex items-center gap-2 text-rose-400 font-bold text-xs">
-            <Shield className="w-4 h-4" /> 1. The Physical Break Rule
-          </div>
-          <p className="text-xs text-slate-300">
-            Never stay in bed or behind a closed door with a screen while experiencing an urge. Stand up immediately.
-          </p>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card variant="dark" className="p-5 space-y-2 border-slate-800">
+            <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
+              <Shield className="w-5 h-5" /> 1. Physical Break Rule
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Never stay in bed or behind a closed door with a screen while experiencing an urge. Stand up immediately.
+            </p>
+          </Card>
 
-        <Card variant="dark" className="p-4 space-y-2 border-slate-800">
-          <div className="flex items-center gap-2 text-teal-400 font-bold text-xs">
-            <Droplets className="w-4 h-4" /> 2. Hydrotherapy Wudu Reset
-          </div>
-          <p className="text-xs text-slate-300">
-            Cold water on your face and arms activates the dive reflex, slowing heart rate and resetting emotional arousal.
-          </p>
-        </Card>
+          <Card variant="dark" className="p-5 space-y-2 border-slate-800">
+            <div className="flex items-center gap-2 text-teal-400 font-bold text-sm">
+              <Droplets className="w-5 h-5" /> 2. Hydrotherapy Wudu Reset
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Cold water on your face and arms activates the dive reflex, slowing heart rate and resetting emotional arousal.
+            </p>
+          </Card>
 
-        <Card variant="dark" className="p-4 space-y-2 border-slate-800">
-          <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-            <Wind className="w-4 h-4" /> 3. 60-Second Box Breathing
-          </div>
-          <p className="text-xs text-slate-300">
-            Inhale 4s, hold 4s, exhale 4s, hold 4s. Re-engages the prefrontal cortex for self-mastery.
-          </p>
-        </Card>
+          <Card variant="dark" className="p-5 space-y-2 border-slate-800">
+            <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm">
+              <Wind className="w-5 h-5" /> 3. 60-Second Box Breathing
+            </div>
+            <p className="text-xs text-slate-300 leading-relaxed">
+              Inhale 4s, hold 4s, exhale 4s, hold 4s. Re-engages the prefrontal cortex for self-mastery.
+            </p>
+          </Card>
+        </div>
       </div>
     </div>
   );
