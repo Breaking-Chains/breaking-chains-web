@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { useAuth } from '../context/AuthContext';
+import { formatApiErrorMessage } from '../services/apiClient';
 
 export const AuthPage: React.FC = () => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -35,7 +36,7 @@ export const AuthPage: React.FC = () => {
         await register(email, password, fullName, username);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Authentication failed. Please check credentials.');
+      setError(formatApiErrorMessage(err));
     }
   };
 

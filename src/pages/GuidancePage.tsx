@@ -6,19 +6,27 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { ShieldCheck, Award, Users } from 'lucide-react';
 import { getVerifiedMentors } from '../services/mentorService';
+import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
 
 export const GuidancePage: React.FC = () => {
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [isBecomeMentorOpen, setIsBecomeMentorOpen] = useState(false);
   const [isLoadingMentors, setIsLoadingMentors] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const loadMentors = () => {
+  const loadMentors = async () => {
     setIsLoadingMentors(true);
-    getVerifiedMentors()
-      .then(setVerifiedMentors)
-      .catch(() => setVerifiedMentors([]))
-      .finally(() => setIsLoadingMentors(false));
+    setErrorMsg(null);
+    try {
+      const mentors = await getVerifiedMentors();
+      setVerifiedMentors(mentors);
+    } catch (err: unknown) {
+      setVerifiedMentors([]);
+      setErrorMsg(formatApiErrorMessage(err));
+    } finally {
+      setIsLoadingMentors(false);
+    }
   };
 
   useEffect(() => {
@@ -27,6 +35,11 @@ export const GuidancePage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {errorMsg && (
+        <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+          {errorMsg}
+        </div>
+      )}
       {/* Verified Mentor Directory Section */}
       <Card variant="glass" className="p-4 space-y-3 border-slate-800">
         <div className="flex items-center justify-between">

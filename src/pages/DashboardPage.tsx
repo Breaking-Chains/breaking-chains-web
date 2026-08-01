@@ -15,7 +15,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onOpenCheckIn,
   onTriggerSos,
 }) => {
-  const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics } = usePmo();
+  const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics, apiError } = usePmo();
 
   const hoursSaved = analytics?.estimatedHoursSaved ?? currentStreak * 2;
   const moneySaved = analytics?.estimatedMoneySaved ?? currentStreak * 3;
@@ -23,6 +23,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   return (
     <div className="space-y-6 animate-fade-in max-w-6xl mx-auto">
+      {apiError && (
+        <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs font-medium text-center shadow-lg">
+          ⚠️ {apiError}
+        </div>
+      )}
       {/* 48-Hour Chaser Effect Shield Banner */}
       <ChaserEffectBanner isActive={chaserEffectActive} hoursRemaining={chaserEffectActive ? 48 : 0} />
 

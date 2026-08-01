@@ -7,6 +7,8 @@ import { getChainAnalytics } from '../services/analyticsService';
 import { submitCheckInLog } from '../services/logService';
 import { startEmergencySession, completeEmergencySession } from '../services/emergencyService';
 
+import { formatApiErrorMessage } from '../services/apiClient';
+
 interface PmoContextType {
   chain: HabitChain | null;
   analytics: AnalyticsSummary | null;
@@ -16,6 +18,8 @@ interface PmoContextType {
   isApiLoading: boolean;
   isOfflineDemo: boolean;
   activeSosSessionId: string | null;
+  apiError: string | null;
+  clearApiError: () => void;
   submitCheckIn: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => Promise<void>;
   startSos: () => Promise<string>;
   completeSos: (durationSeconds: number) => Promise<void>;
@@ -38,9 +42,13 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
   const [isOfflineDemo, setIsOfflineDemo] = useState<boolean>(false);
   const [activeSosSessionId, setActiveSosSessionId] = useState<string | null>(null);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  const clearApiError = () => setApiError(null);
 
   const fetchLiveData = async () => {
     setIsApiLoading(true);
+    setApiError(null);
     try {
       const chains = await getUserChains();
       const activeChain = Array.isArray(chains)
@@ -55,7 +63,8 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           const stats = await getChainAnalytics(activeChain.id);
           setAnalytics(stats);
           setChaserEffectActive(stats?.chaserEffectActive || false);
-        } catch {
+        } catch (err) {
+          console.warn('Failed to load chain analytics:', err);
           setAnalytics(null);
           setChaserEffectActive(false);
         }
@@ -63,10 +72,11 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAnalytics(null);
         setChaserEffectActive(false);
       }
-    } catch {
+    } catch (err: unknown) {
       setChain(null);
       setAnalytics(null);
       setChaserEffectActive(false);
+      setApiError(formatApiErrorMessage(err));
     } finally {
       setIsApiLoading(false);
     }
@@ -84,24 +94,32 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     intentStatement: string;
   }) => {
     setIsApiLoading(true);
+    setApiError(null);
     try {
       const newChain = await createPmoChain(options);
       setChain(newChain);
       await fetchLiveData();
+    } catch (err) {
+      const formatted = formatApiErrorMessage(err);
+      setApiError(formatted);
+      throw new Error(formatted);
     } finally {
       setIsApiLoading(false);
     }
   };
 
   const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
-    if (!chain) return;
+    if (!chain) {
+      throw new Error('No active habit chain found to check in.');
+    }
 
     try {
       await submitCheckInLog(chain.id, status, triggerTag, notes);
       await fetchLiveData();
-      return;
     } catch (err) {
-      console.warn('API call failed during checkin:', err);
+      const formatted = formatApiErrorMessage(err);
+      setApiError(formatted);
+      throw new Error(formatted);
     }
   };
 
@@ -115,7 +133,8 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const session = await startEmergencySession(chain.id);
       setActiveSosSessionId(session.id);
       return session.id;
-    } catch {
+    } catch (err) {
+      console.warn('API call failed during SOS start, falling back to local session:', err);
       const demoId = `sos-${Date.now()}`;
       setActiveSosSessionId(demoId);
       return demoId;
@@ -144,6 +163,8 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isApiLoading,
         isOfflineDemo,
         activeSosSessionId,
+        apiError,
+        clearApiError,
         submitCheckIn,
         startSos,
         completeSos,

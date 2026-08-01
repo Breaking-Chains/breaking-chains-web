@@ -5,6 +5,7 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { ShieldCheck, Award, CheckCircle, Clock, XCircle, Sparkles } from 'lucide-react';
 import { registerMentor, getMyMentorProfile } from '../../services/mentorService';
+import { formatApiErrorMessage } from '../../services/apiClient';
 import type { MentorProfile } from '../../types/mentor';
 
 interface BecomeMentorModalProps {
@@ -73,7 +74,7 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
       );
       if (onSuccess) onSuccess();
     } catch (err: unknown) {
-      setErrorMsg(err instanceof Error ? err.message : 'Failed to submit mentor application');
+      setErrorMsg(formatApiErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

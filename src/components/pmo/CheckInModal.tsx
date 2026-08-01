@@ -9,7 +9,7 @@ import { triggerConfetti } from '../../utils/confetti';
 interface CheckInModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmitLog: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => void;
+  onSubmitLog: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => Promise<void> | void;
 }
 
 export const CheckInModal: React.FC<CheckInModalProps> = ({
@@ -22,18 +22,21 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   const [notes] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [postSlipSubmitted, setPostSlipSubmitted] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSelectStatus = (status: LogStatus) => {
     setSelectedStatus(status);
+    setErrorMsg(null);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedStatus) return;
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmitLog(selectedStatus, selectedTrigger, notes);
-      setIsSubmitting(false);
+    setErrorMsg(null);
+
+    try {
+      await onSubmitLog(selectedStatus, selectedTrigger, notes);
 
       if (selectedStatus === 'CLEAN' || selectedStatus === 'URGE_RESISTED') {
         triggerConfetti();
@@ -45,7 +48,11 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
         onClose();
         setSelectedStatus(null);
       }
-    }, 600);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to save check-in log. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const triggerOptions: { id: PMOTriggerTag; label: string }[] = [
@@ -60,6 +67,11 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Daily PMO Check-In (Muhasabah)">
       {!postSlipSubmitted ? (
         <div className="space-y-4">
+          {errorMsg && (
+            <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+              {errorMsg}
+            </div>
+          )}
           <p className="text-xs text-slate-300">
             Select your status for today. Honest reflection (*Muhasabah*) is key to recovery.
           </p>

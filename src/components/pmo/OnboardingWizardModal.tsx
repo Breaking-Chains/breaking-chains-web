@@ -34,6 +34,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
     'I commit to seeking purity, self-mastery, and spiritual elevation for the sake of Allah.'
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const availableTriggers = [
     '🌙 Late Night Solitude',
@@ -51,6 +52,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setErrorMsg(null);
     try {
       await onCompleteOnboarding({
         title,
@@ -60,6 +62,8 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
         intentStatement,
       });
       onClose();
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : 'Failed to create recovery chain. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -68,6 +72,11 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Welcome to Breaking Chains">
       <div className="space-y-5">
+        {errorMsg && (
+          <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+            {errorMsg}
+          </div>
+        )}
         {/* Step Progress Bar */}
         <div className="flex items-center justify-between text-xs border-b border-slate-800 pb-3">
           <div className="flex items-center gap-2">

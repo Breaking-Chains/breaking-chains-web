@@ -6,6 +6,7 @@ import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../context/AuthContext';
 import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
 import { getMyMentorProfile, getAllMentorApplications, updateMentorStatus } from '../services/mentorService';
+import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
 
 export const SettingsPage: React.FC = () => {
@@ -14,11 +15,18 @@ export const SettingsPage: React.FC = () => {
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
   const [allApplications, setAllApplications] = useState<MentorProfile[]>([]);
   const [showAdminPanel, setShowAdminPanel] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const loadProfiles = () => {
-    getMyMentorProfile().then(setMyProfile);
-    if (showAdminPanel) {
-      getAllMentorApplications().then(setAllApplications);
+  const loadProfiles = async () => {
+    try {
+      const profile = await getMyMentorProfile();
+      setMyProfile(profile);
+      if (showAdminPanel) {
+        const apps = await getAllMentorApplications();
+        setAllApplications(apps);
+      }
+    } catch (err: unknown) {
+      console.warn('Failed to load profile settings:', err);
     }
   };
 
@@ -27,12 +35,22 @@ export const SettingsPage: React.FC = () => {
   }, [showAdminPanel]);
 
   const handleStatusChange = async (profileId: string, status: 'APPROVED' | 'REJECTED') => {
-    await updateMentorStatus(profileId, { status });
-    loadProfiles();
+    setErrorMsg(null);
+    try {
+      await updateMentorStatus(profileId, { status });
+      await loadProfiles();
+    } catch (err: unknown) {
+      setErrorMsg(formatApiErrorMessage(err));
+    }
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {errorMsg && (
+        <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+          {errorMsg}
+        </div>
+      )}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card variant="glass" className="p-5 space-y-4 border-slate-800">
           <div className="flex items-center gap-2">
