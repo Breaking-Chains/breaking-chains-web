@@ -1,0 +1,14 @@
+# Reports folder
+REPORTS/
+REPORTS
+
+# Dependencies & Build Outputs
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs & Operating System Files
+*.log
+.DS_Store
+Thumbs.db
