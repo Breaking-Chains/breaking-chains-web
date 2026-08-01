@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PmoProvider, usePmo } from './context/PmoContext';
 import { MobileLayout } from './components/layout/MobileLayout';
 import type { NavTab } from './components/layout/BottomNav';
 import { DashboardPage } from './pages/DashboardPage';
@@ -8,20 +9,23 @@ import { GuidancePage } from './pages/GuidancePage';
 import { SettingsPage } from './pages/SettingsPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
 import { CheckInModal } from './components/pmo/CheckInModal';
-import type { LogStatus } from './types/log';
+import type { LogStatus, PMOTriggerTag } from './types/log';
 
-export function App() {
+function AppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [isSosOpen, setIsSosOpen] = useState<boolean>(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState<boolean>(false);
 
-  // App State
-  const [currentStreak, setCurrentStreak] = useState<number>(18);
-  const [cleanRatioPercent, setCleanRatioPercent] = useState<number>(94.7);
-  const [chaserEffectActive, setChaserEffectActive] = useState<boolean>(false);
+  const { currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos } = usePmo();
 
-  const handleTriggerSos = () => {
+  const handleTriggerSos = async () => {
+    await startSos();
     setIsSosOpen(true);
+  };
+
+  const handleCloseSos = async () => {
+    await completeSos(60);
+    setIsSosOpen(false);
   };
 
   const handleTabChange = (tab: NavTab) => {
@@ -32,17 +36,8 @@ export function App() {
     }
   };
 
-  const handleSubmitLog = (status: LogStatus) => {
-    if (status === 'CLEAN' || status === 'URGE_RESISTED') {
-      setCurrentStreak((prev) => prev + 1);
-      setCleanRatioPercent(95.2);
-    } else if (status === 'PEEKED_EDGED') {
-      setChaserEffectActive(true);
-    } else if (status === 'SLIP_UP') {
-      setCurrentStreak(0);
-      setChaserEffectActive(true);
-      setCleanRatioPercent(92.1);
-    }
+  const handleSubmitLog = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
+    await submitCheckIn(status, triggerTag, notes);
   };
 
   return (
@@ -55,9 +50,6 @@ export function App() {
     >
       {activeTab === 'dashboard' && (
         <DashboardPage
-          currentStreak={currentStreak}
-          cleanRatioPercent={cleanRatioPercent}
-          chaserEffectActive={chaserEffectActive}
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onTriggerSos={handleTriggerSos}
         />
@@ -80,16 +72,13 @@ export function App() {
 
       {activeTab === 'checkin' && (
         <DashboardPage
-          currentStreak={currentStreak}
-          cleanRatioPercent={cleanRatioPercent}
-          chaserEffectActive={chaserEffectActive}
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onTriggerSos={handleTriggerSos}
         />
       )}
 
       {/* Emergency SOS Modal */}
-      <EmergencySosModal isOpen={isSosOpen} onClose={() => setIsSosOpen(false)} />
+      <EmergencySosModal isOpen={isSosOpen} onClose={handleCloseSos} />
 
       {/* Daily Check-In Modal */}
       <CheckInModal
@@ -98,6 +87,14 @@ export function App() {
         onSubmitLog={handleSubmitLog}
       />
     </MobileLayout>
+  );
+}
+
+export function App() {
+  return (
+    <PmoProvider>
+      <AppContent />
+    </PmoProvider>
   );
 }
 

@@ -32,43 +32,43 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'checkin', label: 'Daily Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge Interrupter', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance & Mentor', icon: Users },
-    { id: 'analytics', label: 'Analytics & Barakah', icon: BarChart3 },
-    { id: 'settings', label: 'Settings & Privacy', icon: Settings },
+    { id: 'analytics', label: 'Analytics & Impact', icon: BarChart3 },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 lg:w-72 bg-slate-950 border-r border-slate-800/80 p-4 h-screen sticky top-0 justify-between shrink-0">
-      {/* Top Logo & App Title */}
+    <aside className="hidden md:flex flex-col w-64 bg-slate-950 border-r border-slate-900 p-5 h-screen sticky top-0 justify-between shrink-0">
       <div className="space-y-6">
-        <div className="flex items-center gap-3 px-2 py-1">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 p-0.5 shadow-lg shadow-emerald-950/60 flex items-center justify-center">
-            <ShieldCheck className="w-6 h-6 text-slate-950 stroke-[2.5]" />
+        {/* Sleek App Brand */}
+        <div className="flex items-center gap-3 px-1 py-1">
+          <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center">
+            <ShieldCheck className="w-5 h-5 text-emerald-400 stroke-[2.2]" />
           </div>
           <div>
-            <h1 className="text-base font-extrabold text-slate-100 tracking-tight flex items-center gap-2">
+            <h1 className="text-sm font-extrabold text-slate-100 tracking-tight">
               Breaking Chains
             </h1>
-            <p className="text-xs text-emerald-400 font-medium">PMO Recovery Platform</p>
+            <p className="text-[11px] text-slate-400 font-medium">PMO Recovery Platform</p>
           </div>
         </div>
 
-        {/* Live Streak & Clean Ratio Card */}
-        <div className="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">Current Streak</span>
-            <div className="flex items-center gap-1 text-amber-400 font-mono font-bold text-xs bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-500/30">
-              <Flame className="w-3.5 h-3.5 fill-amber-400 animate-pulse" />
-              {currentStreak} Days Clean
+        {/* Minimalist Live Streak Metric */}
+        <div className="bg-slate-900/60 border border-slate-800/60 p-3 rounded-xl space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+            <span>Current Streak</span>
+            <div className="flex items-center gap-1 text-amber-400 font-mono font-bold">
+              <Flame className="w-3.5 h-3.5 fill-amber-400" />
+              {currentStreak} Days
             </div>
           </div>
-          <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
-            <span className="text-xs text-slate-400 font-medium">Clean Ratio</span>
-            <span className="text-xs font-mono font-bold text-emerald-400">{cleanRatioPercent}%</span>
+          <div className="flex items-center justify-between text-xs text-slate-400 font-medium pt-1.5 border-t border-slate-800/80">
+            <span>Clean Ratio</span>
+            <span className="font-mono font-bold text-emerald-400">{cleanRatioPercent}%</span>
           </div>
         </div>
 
-        {/* Navigation Items */}
-        <nav className="space-y-1.5">
+        {/* Minimal Navigation List */}
+        <nav className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -78,10 +78,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={onTriggerSos}
-                  className="w-full mt-2 flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white font-bold shadow-lg shadow-rose-950/50 transition-all duration-200 animate-pulse-glow"
+                  className="w-full mt-2 flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-sm transition-all duration-200"
                 >
-                  <AlertTriangle className="w-5 h-5 text-white" />
-                  <span className="text-sm">{item.label}</span>
+                  <AlertTriangle className="w-4 h-4 text-white" />
+                  <span>{item.label}</span>
                 </button>
               );
             }
@@ -91,13 +91,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 key={item.id}
                 onClick={() => onTabChange(item.id)}
                 className={cn(
-                  'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
+                  'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200',
                   isActive
-                    ? 'bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-bold shadow-sm'
-                    : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/60'
+                    ? 'bg-slate-900 border border-slate-800 text-emerald-400 font-bold'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
                 )}
               >
-                <Icon className={cn('w-5 h-5', isActive ? 'text-emerald-400' : 'text-slate-500')} />
+                <Icon className={cn('w-4 h-4', isActive ? 'text-emerald-400' : 'text-slate-500')} />
                 <span>{item.label}</span>
               </button>
             );
@@ -106,14 +106,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Footer Stealth Privacy Toggle */}
-      <div className="pt-4 border-t border-slate-800 space-y-2">
+      <div className="pt-3 border-t border-slate-900 space-y-2">
         <div className="flex items-center justify-between px-1">
-          <span className="text-xs text-slate-400 font-medium">Stealth Privacy (Satr)</span>
+          <span className="text-[11px] text-slate-400 font-medium">Stealth Mode</span>
           <QuickHideButton />
         </div>
-        <p className="text-[11px] text-slate-500 text-center">
-          Breaking Chains v1.0 • Offline Ready
-        </p>
       </div>
     </aside>
   );

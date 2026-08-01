@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'emerald' | 'gold' | 'danger' | 'ghost' | 'sos' | 'outline';
+  variant?: 'emerald' | 'subtle' | 'danger' | 'ghost' | 'sos' | 'outline' | 'gold';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
 }
@@ -21,28 +21,30 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 touch-manipulation';
+      'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] touch-manipulation';
 
     const variantStyles = {
       emerald:
-        'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30 focus:ring-emerald-500 border border-emerald-500/30',
+        'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm font-semibold',
       gold:
-        'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-900/30 focus:ring-amber-400 border border-amber-400/40 font-semibold',
+        'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-sm',
+      subtle:
+        'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700/60 font-medium',
       danger:
-        'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-950/40 focus:ring-rose-500 border border-rose-500/30',
+        'bg-rose-600 hover:bg-rose-500 text-white font-semibold',
       ghost:
-        'bg-slate-800/60 hover:bg-slate-800 text-slate-200 focus:ring-slate-400 border border-slate-700/50',
+        'bg-transparent hover:bg-slate-800/50 text-slate-300',
       outline:
-        'bg-transparent hover:bg-slate-900 text-emerald-400 border border-emerald-600/40 focus:ring-emerald-500',
+        'bg-transparent hover:bg-slate-900 text-emerald-400 border border-emerald-500/30',
       sos:
-        'bg-gradient-to-r from-rose-600 to-amber-600 hover:from-rose-500 hover:to-amber-500 text-white shadow-xl shadow-rose-950/60 font-bold tracking-wide animate-pulse-glow border border-rose-400/30',
+        'bg-rose-600 hover:bg-rose-500 text-white font-bold tracking-wide shadow-md shadow-rose-950/40',
     };
 
     const sizeStyles = {
-      sm: 'text-xs px-3 py-2 min-h-[36px]',
-      md: 'text-sm px-4 py-3 min-h-[48px]',
-      lg: 'text-base px-6 py-4 min-h-[56px] w-full',
-      icon: 'p-3 min-h-[44px] min-w-[44px] rounded-full',
+      sm: 'text-xs px-3 py-2 min-h-[38px]',
+      md: 'text-sm px-4 py-2.5 min-h-[44px]',
+      lg: 'text-sm px-5 py-3 min-h-[48px] w-full',
+      icon: 'p-2.5 min-h-[40px] min-w-[40px] rounded-xl',
     };
 
     return (
