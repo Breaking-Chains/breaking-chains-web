@@ -14,7 +14,7 @@ export async function submitCheckInLog(
       body: JSON.stringify({
         status,
         triggerTag,
-        notes,
+        reflectionNote: notes,
       }),
     }
   );
