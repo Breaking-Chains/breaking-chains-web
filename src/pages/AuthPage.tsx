@@ -65,11 +65,10 @@ export const AuthPage: React.FC = () => {
                 setMode('login');
                 setError('');
               }}
-              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                mode === 'login'
+              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${mode === 'login'
                   ? 'bg-slate-900 text-emerald-400 border border-slate-800 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+                }`}
             >
               <LogIn className="w-3.5 h-3.5" /> Sign In
             </button>
@@ -79,11 +78,10 @@ export const AuthPage: React.FC = () => {
                 setMode('register');
                 setError('');
               }}
-              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-                mode === 'register'
+              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${mode === 'register'
                   ? 'bg-slate-900 text-emerald-400 border border-slate-800 font-bold'
                   : 'text-slate-400 hover:text-slate-200'
-              }`}
+                }`}
             >
               <UserPlus className="w-3.5 h-3.5" /> Create Account
             </button>
@@ -175,7 +173,7 @@ export const AuthPage: React.FC = () => {
 
         {/* Confidentiality Footer */}
         <p className="text-center text-[11px] text-slate-500 max-w-xs mx-auto">
-          🔒 100% Confidential & Encrypted (Satr)
+          🔒 100% Confidential & Encrypted
         </p>
       </div>
     </div>

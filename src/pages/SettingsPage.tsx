@@ -1,11 +1,35 @@
-import React from 'react';
-import { Shield, EyeOff, Lock, User, RefreshCw, LogOut } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Shield, EyeOff, Lock, User, RefreshCw, LogOut, Award, CheckCircle, Clock } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
 import { useAuth } from '../context/AuthContext';
+import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
+import { getMyMentorProfile, getAllMentorApplications, updateMentorStatus } from '../services/mentorService';
+import type { MentorProfile } from '../types/mentor';
 
 export const SettingsPage: React.FC = () => {
   const { user, isDemoSession, logout } = useAuth();
+  const [isMentorModalOpen, setIsMentorModalOpen] = useState(false);
+  const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
+  const [allApplications, setAllApplications] = useState<MentorProfile[]>([]);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
+
+  const loadProfiles = () => {
+    getMyMentorProfile().then(setMyProfile);
+    if (showAdminPanel) {
+      getAllMentorApplications().then(setAllApplications);
+    }
+  };
+
+  useEffect(() => {
+    loadProfiles();
+  }, [showAdminPanel]);
+
+  const handleStatusChange = async (profileId: string, status: 'APPROVED' | 'REJECTED') => {
+    await updateMentorStatus(profileId, { status });
+    loadProfiles();
+  };
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -14,7 +38,7 @@ export const SettingsPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <Shield className="w-5 h-5 text-emerald-400" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider">
-              Privacy & Stealth Settings (Satr)
+              Privacy & Stealth Settings
             </h2>
           </div>
 
@@ -54,8 +78,31 @@ export const SettingsPage: React.FC = () => {
             <p><strong>Authenticated User:</strong> {user?.fullName || 'Guest Recoverer'}</p>
             <p><strong>Email:</strong> {user?.email || 'guest@example.com'}</p>
             <p><strong>Session Mode:</strong> {isDemoSession ? 'Offline Demo Session' : 'JWT Authenticated (Spring Boot)'}</p>
+            <p className="flex items-center gap-2">
+              <strong>Mentor Role:</strong>
+              {myProfile?.status === 'APPROVED' ? (
+                <Badge variant="emerald" className="inline-flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3" /> VERIFIED MENTOR
+                </Badge>
+              ) : myProfile?.status === 'PENDING' ? (
+                <Badge variant="amber" className="inline-flex items-center gap-1">
+                  <Clock className="w-3 h-3" /> PENDING REVIEW
+                </Badge>
+              ) : (
+                <span className="text-slate-400">Standard User</span>
+              )}
+            </p>
           </div>
           <div className="space-y-2 pt-2">
+            <Button
+              variant="emerald"
+              size="sm"
+              onClick={() => setIsMentorModalOpen(true)}
+              className="w-full flex items-center justify-center gap-2"
+            >
+              <Award className="w-4 h-4" />
+              {myProfile ? 'View / Manage Mentor Registration' : 'Register as Spiritual Mentor'}
+            </Button>
             <Button variant="outline" size="sm" className="w-full">
               <RefreshCw className="w-4 h-4 mr-2" /> Sync Local Chain with Backend
             </Button>
@@ -65,6 +112,84 @@ export const SettingsPage: React.FC = () => {
           </div>
         </Card>
       </div>
+
+      {/* Admin / Dev Review Panel */}
+      <Card variant="glass" className="p-5 space-y-4 border-slate-800">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-amber-400" />
+            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+              Admin & Dev Control: Mentor Applications
+            </h3>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowAdminPanel(!showAdminPanel)}
+          >
+            {showAdminPanel ? 'Hide Applications' : 'Load All Applications'}
+          </Button>
+        </div>
+
+        {showAdminPanel && (
+          <div className="space-y-3 pt-2">
+            {allApplications.length === 0 ? (
+              <p className="text-xs text-slate-400 italic">No mentor applications registered yet.</p>
+            ) : (
+              allApplications.map((app) => (
+                <div
+                  key={app.id}
+                  className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <strong className="text-slate-100 text-sm">{app.fullName}</strong>
+                      <span className="text-slate-500">(@{app.username})</span>
+                      {app.status === 'APPROVED' && <Badge variant="emerald">APPROVED</Badge>}
+                      {app.status === 'PENDING' && <Badge variant="amber">PENDING</Badge>}
+                      {app.status === 'REJECTED' && <Badge variant="rose">REJECTED</Badge>}
+                    </div>
+                    <p className="text-slate-300">
+                      <strong>Qualification:</strong> {app.qualification} ({app.yearsOfExperience} yrs exp)
+                    </p>
+                    <p className="text-slate-400">
+                      <strong>Specialization:</strong> {app.specialization} {app.organization ? `| ${app.organization}` : ''}
+                    </p>
+                    <p className="text-slate-400 italic">"{app.bio}"</p>
+                  </div>
+
+                  <div className="flex gap-2 flex-shrink-0">
+                    {app.status !== 'APPROVED' && (
+                      <Button
+                        variant="emerald"
+                        size="sm"
+                        onClick={() => handleStatusChange(app.id, 'APPROVED')}
+                      >
+                        Approve
+                      </Button>
+                    )}
+                    {app.status !== 'REJECTED' && (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => handleStatusChange(app.id, 'REJECTED')}
+                      >
+                        Reject
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+      </Card>
+
+      <BecomeMentorModal
+        isOpen={isMentorModalOpen}
+        onClose={() => setIsMentorModalOpen(false)}
+        onSuccess={loadProfiles}
+      />
     </div>
   );
 };

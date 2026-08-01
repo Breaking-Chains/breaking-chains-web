@@ -36,7 +36,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
           <Lock className="w-4 h-4 text-emerald-400" />
           <div>
             <h4 className="text-xs font-bold text-slate-100">Confidential Guidance (Suhbah)</h4>
-            <p className="text-[10px] text-slate-400">100% Encrypted & Privacy Protected (Satr)</p>
+            <p className="text-[10px] text-slate-400">100% Encrypted & Privacy Protected </p>
           </div>
         </div>
         <div className="text-right">
@@ -82,11 +82,10 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
                 className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
               >
                 <div
-                  className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${
-                    isMe
+                  className={`max-w-[85%] p-3 rounded-2xl text-xs leading-relaxed ${isMe
                       ? 'bg-emerald-600 text-white rounded-br-none'
                       : 'bg-slate-800 text-slate-200 rounded-bl-none border border-slate-700/50'
-                  }`}
+                    }`}
                 >
                   <p>{msg.messageContent}</p>
                 </div>
