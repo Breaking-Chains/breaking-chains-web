@@ -100,19 +100,19 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   return (
     <div className="space-y-6 animate-fade-in">
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+        <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
           {errorMsg}
         </div>
       )}
 
       {/* Verified Mentor Directory Section */}
-      <Card variant="glass" className="p-4 space-y-3 border-slate-800">
+      <Card variant="glass" className="p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-400" />
+            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
             <div>
-              <h3 className="text-sm font-bold text-white">Verified Community Mentors</h3>
-              <p className="text-[10px] text-slate-400">Islamic Spiritual Guides & Certified Recovery Coaches</p>
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Verified Community Mentors</h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Islamic Spiritual Guides & Certified Recovery Coaches</p>
             </div>
           </div>
 
@@ -122,7 +122,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 variant="subtle"
                 size="sm"
                 onClick={() => setIsConnectModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs border-slate-800 text-amber-400 hover:border-amber-500/40"
+                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 hover:border-amber-500/40 cursor-pointer"
               >
                 <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
               </Button>
@@ -133,7 +133,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 variant="emerald"
                 size="sm"
                 onClick={handleOpenMentees}
-                className="flex items-center gap-1.5 text-xs font-bold shadow-lg shadow-emerald-950/50"
+                className="flex items-center gap-1.5 text-xs font-bold shadow-md dark:shadow-lg dark:shadow-emerald-950/50"
               >
                 <Users className="w-4 h-4" /> View My Mentees
               </Button>
@@ -157,9 +157,9 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         {isLoadingMentors ? (
           <div className="text-center py-4 text-xs text-slate-500">Loading verified mentors...</div>
         ) : mentorList.length === 0 ? (
-          <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-850 text-center space-y-2">
+          <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
             <Users className="w-6 h-6 text-slate-600 mx-auto" />
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               {isApprovedMentor
                 ? 'You are a verified mentor! No other mentors registered yet.'
                 : 'No verified mentors listed yet.'}
@@ -187,18 +187,18 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             {mentorList.map((mentor) => (
               <div
                 key={mentor.id}
-                className="p-3 rounded-xl bg-slate-950/70 border border-slate-850 space-y-1.5 text-xs"
+                className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-850 space-y-1.5 text-xs"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <strong className="text-slate-100">{mentor.fullName}</strong>
+                    <strong className="text-slate-900 dark:text-slate-100">{mentor.fullName}</strong>
                     <Badge variant="emerald" className="text-[9px] py-0 px-1.5">VERIFIED</Badge>
                   </div>
-                  <span className="text-[10px] text-slate-500 font-mono">{mentor.yearsOfExperience} yrs exp</span>
+                  <span className="text-[10px] text-slate-600 dark:text-slate-500 font-mono">{mentor.yearsOfExperience} yrs exp</span>
                 </div>
-                <p className="text-[11px] text-emerald-300 font-semibold">{mentor.specialization}</p>
-                <p className="text-[10px] text-slate-400">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
-                <p className="text-[10px] text-slate-300 italic line-clamp-2">"{mentor.bio}"</p>
+                <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">{mentor.specialization}</p>
+                <p className="text-[10px] text-slate-600 dark:text-slate-400">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
+                <p className="text-[10px] text-slate-700 dark:text-slate-300 italic line-clamp-2">"{mentor.bio}"</p>
               </div>
             ))}
           </div>
@@ -222,13 +222,13 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       {/* Connect to Mentor Modal */}
       <Modal isOpen={isConnectModalOpen} onClose={() => setIsConnectModalOpen(false)} title="Connect with a Mentor">
         <form onSubmit={handleConnectMentor} className="space-y-4">
-          <p className="text-xs text-slate-300">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             Enter the unique <strong>Invite Code</strong> provided by your assigned spiritual mentor or recovery coach.
           </p>
 
           {connectSuccessMsg && (
-            <div className="p-3 rounded-xl bg-emerald-950/80 border border-emerald-700 text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
+            <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/80 border border-emerald-250 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
+              <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               {connectSuccessMsg}
             </div>
           )}
