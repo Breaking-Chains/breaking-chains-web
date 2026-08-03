@@ -57,22 +57,22 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex flex-col justify-between p-4 overflow-y-auto animate-fade-in">
+    <div className="fixed inset-0 z-50 bg-slate-50/98 dark:bg-slate-950/95 backdrop-blur-xl flex flex-col justify-between p-4 overflow-y-auto animate-fade-in text-slate-900 dark:text-white transition-colors duration-300">
       {/* Top Warning Bar */}
-      <div className="flex items-center justify-between border-b border-rose-900/40 pb-3 pt-2">
+      <div className="flex items-center justify-between border-b border-rose-200 dark:border-rose-900/40 pb-3 pt-2">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-rose-600/20 border border-rose-500/40 flex items-center justify-center animate-pulse">
-            <AlertTriangle className="w-4 h-4 text-rose-400" />
+          <div className="w-8 h-8 rounded-full bg-rose-100 dark:bg-rose-600/20 border border-rose-300 dark:border-rose-500/40 flex items-center justify-center animate-pulse">
+            <AlertTriangle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
           </div>
           <div>
-            <h2 className="text-sm font-bold text-rose-200">URGE INTERRUPTER ACTIVATED</h2>
-            <p className="text-[11px] text-slate-400">Step {step} of 4 • Calming the urge</p>
+            <h2 className="text-sm font-bold text-rose-900 dark:text-rose-200">URGE INTERRUPTER ACTIVATED</h2>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400">Step {step} of 4 • Calming the urge</p>
           </div>
         </div>
 
         <button
           onClick={handleFinishSos}
-          className="text-xs text-slate-400 hover:text-white px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800"
+          className="text-xs text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white px-3 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 cursor-pointer"
         >
           Exit SOS
         </button>
@@ -81,13 +81,13 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
       {/* Main Interactive Step Card */}
       <div className="my-auto max-w-sm mx-auto w-full py-4 space-y-4">
         {step === 1 && (
-          <Card variant="alert" className="space-y-4 text-center p-6 border-rose-500/50 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-rose-900/60 border-2 border-rose-500/60 flex items-center justify-center mx-auto text-3xl animate-bounce">
+          <Card variant="alert" className="space-y-4 text-center p-6 border-rose-500/30 dark:border-rose-500/50 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-rose-100 dark:bg-rose-900/60 border-2 border-rose-300 dark:border-rose-500 flex items-center justify-center mx-auto text-rose-600 dark:text-rose-300 animate-bounce">
               🛑
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-extrabold text-white">STEP 1: PHYSICAL CIRCUIT BREAK</h3>
-              <p className="text-sm text-rose-100 font-medium leading-relaxed">
+              <h3 className="text-xl font-extrabold text-rose-950 dark:text-white">STEP 1: PHYSICAL CIRCUIT BREAK</h3>
+              <p className="text-sm text-rose-900/90 dark:text-rose-100 font-medium leading-relaxed">
                 Stand up right now. Put your smartphone or laptop on the table and leave the room or bed immediately.
               </p>
             </div>
@@ -103,13 +103,13 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
         )}
 
         {step === 2 && (
-          <Card variant="emerald" className="space-y-4 text-center p-6 border-teal-500/50 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-teal-950 border-2 border-teal-400 flex items-center justify-center mx-auto text-teal-300">
+          <Card variant="emerald" className="space-y-4 text-center p-6 border-teal-500/30 dark:border-teal-500/50 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-teal-50 dark:bg-teal-950 border-2 border-teal-300 dark:border-teal-400 flex items-center justify-center mx-auto text-teal-600 dark:text-teal-300">
               <Droplets className="w-8 h-8 animate-pulse" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-extrabold text-white">STEP 2: HYDROTHERAPY & WUDU</h3>
-              <p className="text-sm text-teal-100 font-medium leading-relaxed">
+              <h3 className="text-xl font-extrabold text-teal-950 dark:text-white">STEP 2: HYDROTHERAPY & WUDU</h3>
+              <p className="text-sm text-teal-900/90 dark:text-teal-100 font-medium leading-relaxed">
                 Go to the sink. Splash cold water over your face, hands, and arms (Perform Wudu). Cold water naturally lowers your heart rate and calms your nerves.
               </p>
             </div>
@@ -125,19 +125,19 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
         )}
 
         {step === 3 && (
-          <Card variant="gold" className="space-y-4 text-center p-6 border-amber-500/50 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-amber-950 border-2 border-amber-400 flex items-center justify-center mx-auto text-amber-300">
+          <Card variant="gold" className="space-y-4 text-center p-6 border-amber-500/20 dark:border-amber-500/50 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-amber-100 dark:bg-amber-950 border-2 border-amber-300 dark:border-amber-400 flex items-center justify-center mx-auto text-amber-700 dark:text-amber-300">
               <BookOpen className="w-8 h-8" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-lg font-extrabold text-amber-100">STEP 3: GUARDING THE GAZE</h3>
-              <div className="bg-slate-950/80 p-4 rounded-xl border border-amber-500/30 text-amber-200 text-xs italic font-serif leading-relaxed">
+              <h3 className="text-lg font-extrabold text-amber-900 dark:text-amber-100">STEP 3: GUARDING THE GAZE</h3>
+              <div className="bg-slate-50 dark:bg-slate-950/80 p-4 rounded-xl border border-amber-250 dark:border-amber-500/30 text-amber-800 dark:text-amber-250 text-xs italic font-serif leading-relaxed">
                 "Tell the believing men to lower their gaze and guard their private parts. That is purer for them. Indeed, Allah is Acquainted with what they do."
-                <span className="block font-sans font-bold text-[10px] mt-2 not-italic text-amber-400">
+                <span className="block font-sans font-bold text-[10px] mt-2 not-italic text-amber-600 dark:text-amber-400">
                   — Surah An-Nur (24:30)
                 </span>
               </div>
-              <p className="text-xs text-amber-100/90 font-medium">
+              <p className="text-xs text-amber-900/90 dark:text-amber-100/90 font-medium">
                 The visual trigger has passed. You are in control of your eyes and soul.
               </p>
             </div>
@@ -156,21 +156,21 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
         )}
 
         {step === 4 && (
-          <Card variant="dark" className="space-y-4 text-center p-6 border-emerald-600/40 shadow-2xl">
-            <div className="w-16 h-16 rounded-full bg-emerald-950 border-2 border-emerald-400 flex items-center justify-center mx-auto">
-              <Wind className="w-8 h-8 text-emerald-400 animate-spin" />
+          <Card variant="dark" className="space-y-4 text-center p-6 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-950 border-2 border-emerald-300 dark:border-emerald-400 flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400">
+              <Wind className="w-8 h-8 animate-spin" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-100">STEP 4: MINDFUL URGE SURFING</h3>
-              <p className="text-xs text-slate-400">Urges peak like waves and subside in under 60 seconds.</p>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">STEP 4: MINDFUL URGE SURFING</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Urges peak like waves and subside in under 60 seconds.</p>
             </div>
 
-            <div className="relative w-36 h-36 mx-auto rounded-full bg-slate-900 border-4 border-emerald-500/50 flex flex-col items-center justify-center shadow-lg shadow-emerald-950/60 animate-pulse-glow">
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+            <div className="relative w-36 h-36 mx-auto rounded-full bg-slate-100 dark:bg-slate-900 border-4 border-emerald-500/30 dark:border-emerald-500/50 flex flex-col items-center justify-center shadow-sm dark:shadow-lg dark:shadow-emerald-950/60 animate-pulse-glow">
+              <span className="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
                 {breathPhase}
               </span>
-              <span className="text-4xl font-extrabold text-white font-mono">{breathCounter}s</span>
-              <span className="text-[10px] text-slate-400 mt-1">Remaining: {timerSeconds}s</span>
+              <span className="text-4xl font-extrabold text-slate-900 dark:text-white font-mono">{breathCounter}s</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-1">Remaining: {timerSeconds}s</span>
             </div>
 
             {timerSeconds === 0 ? (
@@ -183,7 +183,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
                 <CheckCircle2 className="w-5 h-5 mr-2" /> Urge Successfully Resisted!
               </Button>
             ) : (
-              <p className="text-xs text-emerald-300 font-medium animate-pulse">
+              <p className="text-xs text-emerald-600 dark:text-emerald-300 font-medium animate-pulse">
                 Keep breathing deeply... You are reclaiming your heart.
               </p>
             )}
