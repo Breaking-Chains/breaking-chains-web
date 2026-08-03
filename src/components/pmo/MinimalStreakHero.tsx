@@ -20,7 +20,7 @@ export const MinimalStreakHero: React.FC<MinimalStreakHeroProps> = ({
     <Card variant="glass" className="p-6 md:p-8 space-y-6 text-center shadow-sm">
       {/* Sleek Minimalist Central Ring */}
       <div className="relative w-36 h-36 md:w-44 md:h-44 mx-auto rounded-full bg-slate-100 dark:bg-slate-950/80 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center p-4">
-        <div className="flex items-center gap-1 text-amber-650 dark:text-amber-400 font-medium text-xs mb-0.5">
+        <div className="flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium text-xs mb-0.5">
           <Flame className="w-4 h-4 text-amber-500 dark:text-amber-400 fill-amber-500 dark:fill-amber-400" />
           <span>Active Streak</span>
         </div>

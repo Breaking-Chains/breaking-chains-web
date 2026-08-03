@@ -218,7 +218,7 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
             {/* Dev Mode Toggle */}
             <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 flex items-center justify-between text-xs">
               <div className="space-y-0.5">
-                <span className="font-bold text-amber-850 dark:text-amber-300 flex items-center gap-1">
+                <span className="font-bold text-amber-800 dark:text-amber-300 flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5" /> Skip Approval (Testing Mode)
                 </span>
                 <p className="text-[10px] text-amber-900/80 dark:text-amber-400/80">

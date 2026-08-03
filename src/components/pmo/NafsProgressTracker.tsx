@@ -73,7 +73,7 @@ export const NafsProgressTracker: React.FC<NafsProgressTrackerProps> = ({
                     {stg.subtitle.split('(')[1]?.replace(')', '') || ''}
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-650 dark:text-slate-300 leading-normal pl-6">{stg.description}</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-normal pl-6">{stg.description}</p>
               </div>
             );
           })}

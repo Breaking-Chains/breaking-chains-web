@@ -33,7 +33,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       danger:
         'bg-rose-600 hover:bg-rose-500 text-white font-semibold',
       ghost:
-        'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300',
+        'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-600 dark:text-slate-300',
       outline:
         'bg-transparent hover:bg-emerald-50 dark:hover:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
       sos:

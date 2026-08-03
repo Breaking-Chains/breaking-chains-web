@@ -29,7 +29,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className={cn('w-full space-y-1.5', className)} {...props}>
       {(label || showPercentage) && (
-        <div className="flex justify-between items-center text-xs font-medium text-slate-655 dark:text-slate-300">
+        <div className="flex justify-between items-center text-xs font-medium text-slate-600 dark:text-slate-300">
           <span>{label}</span>
           {showPercentage && <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">{clampedValue.toFixed(1)}%</span>}
         </div>

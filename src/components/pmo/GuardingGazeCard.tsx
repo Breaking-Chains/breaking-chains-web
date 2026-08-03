@@ -12,7 +12,7 @@ export const GuardingGazeCard: React.FC<GuardingGazeCardProps> = ({ cleanGazeDay
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Eye className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-          <h3 className="text-xs font-bold text-amber-850 dark:text-amber-200 uppercase tracking-wider">
+          <h3 className="text-xs font-bold text-amber-800 dark:text-amber-200 uppercase tracking-wider">
             Guarding the Gaze (Hafd al-Basar)
           </h3>
         </div>
