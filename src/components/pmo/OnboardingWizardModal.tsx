@@ -23,7 +23,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
   onCompleteOnboarding,
 }) => {
   const [title, setTitle] = useState('My Recovery Journey');
-  const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('LEVEL_0_PRIVATE');
+  const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('LEVEL_2_FULL_COUNSEL');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -75,14 +75,14 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
             <div className="space-y-2">
               {[
                 {
-                  level: 'LEVEL_0_PRIVATE' as PrivacyLevel,
-                  title: 'Strictly Private (Recommended)',
-                  desc: 'Your logs and streak statistics are 100% confidential and visible only to you.',
+                  level: 'LEVEL_2_FULL_COUNSEL' as PrivacyLevel,
+                  title: 'Share with Mentor (Recommended)',
+                  desc: 'Allows your future spiritual mentor to view your streak and check-in logs to guide you properly.',
                 },
                 {
-                  level: 'LEVEL_1_STREAK_ONLY' as PrivacyLevel,
-                  title: 'Share Streak Only',
-                  desc: 'Allows your future spiritual mentor to view your current streak length.',
+                  level: 'LEVEL_0_PRIVATE' as PrivacyLevel,
+                  title: 'Strictly Private',
+                  desc: 'Your logs and streak statistics are confidential and visible only to you.',
                 },
               ].map((item) => (
                 <button
