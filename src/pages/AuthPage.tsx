@@ -52,7 +52,7 @@ export const AuthPage: React.FC = () => {
             Breaking Chains
           </h1>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
-            PMO Recovery & Spiritual Purification (Tazkiyah)
+            PMO Recovery & Spiritual Growth
           </p>
         </div>
 

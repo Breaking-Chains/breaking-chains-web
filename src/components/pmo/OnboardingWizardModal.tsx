@@ -23,7 +23,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
   onCompleteOnboarding,
 }) => {
   const [step, setStep] = useState<1 | 2>(1);
-  const [title, setTitle] = useState('PMO Recovery & Purity Chain');
+  const [title, setTitle] = useState('My Recovery Journey');
   const [strategy, setStrategy] = useState('PMO_RECOVERY');
   const [privacyLevel, setPrivacyLevel] = useState<PrivacyLevel>('LEVEL_0_PRIVATE');
   const [selectedTriggers, setSelectedTriggers] = useState<string[]>([
@@ -31,7 +31,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
     '⚡ Stress & Anxiety',
   ]);
   const [intentStatement, setIntentStatement] = useState(
-    'I commit to seeking purity, self-mastery, and spiritual elevation for the sake of Allah.'
+    'I commit to seeking purity, self-mastery, and spiritual growth.'
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -42,6 +42,12 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
     '🛋️ Boredom & Idleness',
     '📱 Social Media Peeking',
     '😴 Exhaustion & Fatigue',
+  ];
+
+  const intentionTemplates = [
+    'I commit to seeking purity, self-mastery, and spiritual growth.',
+    'I want to break free from bad habits and reclaim my time.',
+    'I am choosing clean living for my health, mind, and relationships.',
   ];
 
   const toggleTrigger = (trig: string) => {
@@ -88,7 +94,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
               1
             </span>
             <span className={step === 1 ? 'text-slate-100 font-bold' : 'text-slate-400'}>
-              Strategy & Privacy
+              Goal & Focus
             </span>
           </div>
 
@@ -103,19 +109,19 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
               2
             </span>
             <span className={step === 2 ? 'text-slate-100 font-bold' : 'text-slate-400'}>
-              Triggers & Niyyah
+              Triggers & Intention
             </span>
           </div>
         </div>
 
         {step === 1 ? (
-          /* Step 1: Strategy & Privacy Level */
+          /* Step 1: Strategy Focus */
           <div className="space-y-4 animate-fade-in">
             <Input
               label="Habit Chain Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. PMO Recovery & Spiritual Purity"
+              placeholder="e.g. My Recovery Journey"
               required
             />
 
@@ -134,7 +140,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
                   }`}
                 >
                   <ShieldCheck className="w-4 h-4 text-emerald-400 mb-1" />
-                  PMO Recovery & Tazkiyah
+                  Spiritual Recovery & Growth
                 </button>
                 <button
                   type="button"
@@ -151,55 +157,13 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
               </div>
             </div>
 
-            <div>
-              <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-                Confidentiality & Privacy Level (*Satr*)
-              </label>
-              <div className="space-y-2">
-                {[
-                  {
-                    level: 'LEVEL_0_PRIVATE' as PrivacyLevel,
-                    title: 'Level 0 — Strictly Private',
-                    desc: 'Only you see your log statistics. 100% encrypted & confidential.',
-                  },
-                  {
-                    level: 'LEVEL_1_STREAK_ONLY' as PrivacyLevel,
-                    title: 'Level 1 — Streak Shared with Mentor',
-                    desc: 'Your designated mentor sees your active streak length only.',
-                  },
-                  {
-                    level: 'LEVEL_2_FULL_COUNSEL' as PrivacyLevel,
-                    title: 'Level 2 — Full Spiritual Counsel',
-                    desc: 'Mentor sees streak & check-in status to provide tailored Nasiha.',
-                  },
-                ].map((item) => (
-                  <button
-                    key={item.level}
-                    type="button"
-                    onClick={() => setPrivacyLevel(item.level)}
-                    className={`w-full p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 ${
-                      privacyLevel === item.level
-                        ? 'bg-slate-900/90 border-emerald-500 text-slate-100 ring-1 ring-emerald-500/40'
-                        : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700'
-                    }`}
-                  >
-                    <Lock className={`w-4 h-4 mt-0.5 shrink-0 ${privacyLevel === item.level ? 'text-emerald-400' : 'text-slate-500'}`} />
-                    <div>
-                      <h5 className="text-xs font-bold text-slate-200">{item.title}</h5>
-                      <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <Button
               variant="emerald"
               size="lg"
               onClick={() => setStep(2)}
               className="w-full text-xs font-bold flex items-center justify-center gap-2 mt-2"
             >
-              <span>Continue to Triggers & Niyyah</span>
+              <span>Continue to Triggers & Intention</span>
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -233,13 +197,29 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
 
             <div>
               <label className="text-xs font-semibold text-slate-300 block mb-1.5">
-                Spiritual Intent Statement (*Niyyah*)
+                My Intention / Commitment Statement
               </label>
+              <div className="flex flex-col gap-1.5 mb-3">
+                {intentionTemplates.map((tpl) => (
+                  <button
+                    key={tpl}
+                    type="button"
+                    onClick={() => setIntentStatement(tpl)}
+                    className={`px-3 py-2 rounded-xl border text-left text-[11px] transition-all leading-normal ${
+                      intentStatement === tpl
+                        ? 'bg-slate-900 border-emerald-500/60 text-slate-100 font-medium'
+                        : 'bg-slate-950/40 border-slate-900 text-slate-400 hover:border-slate-800'
+                    }`}
+                  >
+                    {tpl}
+                  </button>
+                ))}
+              </div>
               <textarea
                 value={intentStatement}
                 onChange={(e) => setIntentStatement(e.target.value)}
                 rows={3}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-all leading-relaxed"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-emerald-500 transition-all leading-relaxed resize-none"
                 placeholder="Write your personal commitment..."
               />
             </div>
@@ -263,7 +243,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
                 className="text-xs font-bold flex items-center justify-center gap-2"
               >
                 <HeartHandshake className="w-4 h-4" />
-                <span>Initialize Chain</span>
+                <span>Start My Journey</span>
               </Button>
             </div>
           </div>
