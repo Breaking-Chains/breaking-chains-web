@@ -66,7 +66,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
           </div>
           <div>
             <h2 className="text-sm font-bold text-rose-200">URGE INTERRUPTER ACTIVATED</h2>
-            <p className="text-[11px] text-slate-400">Step {step} of 4 • De-escalating limbic urge</p>
+            <p className="text-[11px] text-slate-400">Step {step} of 4 • Calming the urge</p>
           </div>
         </div>
 
@@ -110,7 +110,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
             <div className="space-y-2">
               <h3 className="text-xl font-extrabold text-white">STEP 2: HYDROTHERAPY & WUDU</h3>
               <p className="text-sm text-teal-100 font-medium leading-relaxed">
-                Go to the sink. Splash cold water over your face, hands, and arms (Perform Wudu). Cold water triggers the mammalian dive reflex to instantly lower your heart rate.
+                Go to the sink. Splash cold water over your face, hands, and arms (Perform Wudu). Cold water naturally lowers your heart rate and calms your nerves.
               </p>
             </div>
             <Button
@@ -161,7 +161,7 @@ export const EmergencySosModal: React.FC<EmergencySosModalProps> = ({ isOpen, on
               <Wind className="w-8 h-8 text-emerald-400 animate-spin" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-bold text-slate-100">STEP 4: SOMATIC URGE SURFING</h3>
+              <h3 className="text-lg font-bold text-slate-100">STEP 4: MINDFUL URGE SURFING</h3>
               <p className="text-xs text-slate-400">Urges peak like waves and subside in under 60 seconds.</p>
             </div>
 

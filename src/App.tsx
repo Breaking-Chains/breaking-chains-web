@@ -129,7 +129,7 @@ function ControlledAccessGuard() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 space-y-3">
         <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-        <span className="text-xs font-mono">Verifying JWT Tokens...</span>
+        <span className="text-xs">Securing your connection...</span>
       </div>
     );
   }

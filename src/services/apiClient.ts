@@ -45,12 +45,12 @@ export function formatApiErrorMessage(err: unknown): string {
       case 'INTERNAL_SERVER_ERROR':
         return 'Server error. The server encountered an issue processing your request. Please try again shortly.';
       case 'NETWORK_ERROR':
-        return 'Unable to connect to backend server. Please verify your connection or check if the server is running.';
+        return 'Unable to connect. Please check your internet connection and try again.';
       default:
         if (err.message && !err.message.includes('Unexpected token') && !err.message.includes('JSON')) {
           return err.message;
         }
-        return `Request failed (${err.code || 'HTTP_' + (err.status || 500)}). Please try again.`;
+        return `Something went wrong. Please try again. (Error code: ${err.code || 'HTTP_' + (err.status || 500)})`;
     }
   }
 
@@ -59,7 +59,7 @@ export function formatApiErrorMessage(err: unknown): string {
       return 'Network Error: Cannot connect to the server. Please check your connection.';
     }
     if (err.message.includes('JSON') || err.message.includes('Unexpected token')) {
-      return 'Server response error. The backend returned an unparseable response.';
+      return 'We encountered an unexpected error. Please try again later.';
     }
     return err.message;
   }

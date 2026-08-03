@@ -60,9 +60,9 @@ export const SettingsPage: React.FC = () => {
             </h3>
           </div>
           <div className="text-xs text-slate-300 space-y-2 leading-relaxed">
-            <p><strong>Authenticated User:</strong> {user?.fullName || 'Guest Recoverer'}</p>
+            <p><strong>Logged in as:</strong> {user?.fullName || 'Guest Recoverer'}</p>
             <p><strong>Email:</strong> {user?.email || 'guest@example.com'}</p>
-            <p><strong>Session Mode:</strong> {isDemoSession ? 'Offline Demo Session' : 'Active Account Session'}</p>
+            <p><strong>Account Status:</strong> {isDemoSession ? 'Offline Demo Session' : 'Active Account Session'}</p>
             <p className="flex items-center gap-2">
               <strong>Mentor Role:</strong>
               {myProfile?.status === 'APPROVED' ? (
@@ -89,10 +89,10 @@ export const SettingsPage: React.FC = () => {
               {myProfile ? 'View / Manage Mentor Registration' : 'Register as Spiritual Mentor'}
             </Button>
             <Button variant="outline" size="sm" className="w-full">
-              <RefreshCw className="w-4 h-4 mr-2" /> Sync Local Chain with Backend
+              <RefreshCw className="w-4 h-4 mr-2" /> Sync progress with cloud
             </Button>
             <Button variant="danger" size="sm" onClick={logout} className="w-full">
-              <LogOut className="w-4 h-4 mr-2" /> Revoke Token & Sign Out
+              <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>
           </div>
         </Card>

@@ -17,10 +17,10 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
   const progressPercent = Math.min(100, (currentCleanDays / 90) * 100);
 
   const getDopamineStageText = (days: number) => {
-    if (days <= 3) return { title: 'Acute Withdrawal', desc: 'Dopamine receptors upregulation initialized. Expect craving waves.' };
-    if (days <= 14) return { title: 'Flatline & Rebalancing', desc: 'Temporary low energy / brain fog. Receptors are sensitivity healing.' };
+    if (days <= 3) return { title: 'Acute Withdrawal', desc: 'Dopamine receptors are beginning to recover. Expect craving waves.' };
+    if (days <= 14) return { title: 'Flatline & Rebalancing', desc: 'Temporary low energy / brain fog. Brain chemistry is restoring balance.' };
     if (days <= 40) return { title: 'Neural Pathway Rewiring', desc: 'New healthy habits forming. High mental clarity restoration.' };
-    return { title: 'Complete Neuro-Reboot', desc: 'Baseline dopamine sensitivity restored. High self-mastery.' };
+    return { title: 'Complete Reboot', desc: 'Baseline dopamine sensitivity restored. High self-mastery.' };
   };
 
   const stageInfo = getDopamineStageText(currentCleanDays);
@@ -31,7 +31,7 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
         <div className="flex items-center gap-2">
           <Brain className="w-4 h-4 text-emerald-400" />
           <h3 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
-            90-Day Dopamine Neuro-Reboot
+            90-Day Dopamine Reboot
           </h3>
         </div>
         <span className="text-xs font-mono font-bold text-emerald-400">{currentCleanDays}/90 Days</span>

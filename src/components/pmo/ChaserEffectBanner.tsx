@@ -29,7 +29,7 @@ export const ChaserEffectBanner: React.FC<ChaserEffectBannerProps> = ({
             </span>
           </div>
           <p className="text-xs text-rose-100/90 leading-relaxed font-normal">
-            Post-slip deltaFosB spike causes heightened dopamine cravings for 48 hours. Keep your phone outside your bedroom and stay in social spaces.
+            A recent slip triggers intense chemical cravings in the brain for the next 48 hours. Keep your phone outside your bedroom and stay in social spaces.
           </p>
         </div>
       </div>

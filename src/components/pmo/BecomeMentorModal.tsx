@@ -86,7 +86,7 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
         {isLoadingProfile ? (
           <div className="flex items-center justify-center p-8 space-x-2 text-slate-400">
             <div className="w-5 h-5 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-            <span className="text-xs font-mono">Loading profile...</span>
+            <span className="text-xs">Loading profile...</span>
           </div>
         ) : existingProfile ? (
           <Card variant="glass" className="p-5 space-y-4 border-slate-800">
@@ -219,10 +219,10 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
             <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 flex items-center justify-between text-xs">
               <div className="space-y-0.5">
                 <span className="font-bold text-amber-300 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" /> Instant Auto-Approve (Dev Mode)
+                  <Sparkles className="w-3.5 h-3.5" /> Skip Approval (Testing Mode)
                 </span>
                 <p className="text-[10px] text-amber-400/80">
-                  Bypasses admin review for instant development testing.
+                  Instantly approves your application for testing purposes.
                 </p>
               </div>
               <input
