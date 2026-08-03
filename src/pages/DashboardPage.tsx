@@ -95,8 +95,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
               <DopamineRebootCard
                 currentCleanDays={currentStreak}
-                estimatedHoursSaved={hoursSaved}
-                estimatedMoneySaved={moneySaved}
               />
             </div>
           )}

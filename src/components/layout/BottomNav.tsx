@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, AlertTriangle, CalendarCheck, Users, BarChart3 } from 'lucide-react';
+import { Home, AlertTriangle, CalendarCheck, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 

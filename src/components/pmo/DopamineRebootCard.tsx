@@ -1,18 +1,14 @@
 import React from 'react';
-import { Brain, Clock, DollarSign } from 'lucide-react';
+import { Brain } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { ProgressBar } from '../ui/ProgressBar';
 
 interface DopamineRebootCardProps {
   currentCleanDays: number;
-  estimatedHoursSaved: number;
-  estimatedMoneySaved: number;
 }
 
 export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
   currentCleanDays,
-  estimatedHoursSaved,
-  estimatedMoneySaved,
 }) => {
   const progressPercent = Math.min(100, (currentCleanDays / 90) * 100);
 
