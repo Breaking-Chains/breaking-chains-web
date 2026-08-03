@@ -1,5 +1,4 @@
-import React from 'react';
-import { Home, AlertTriangle, CalendarCheck, Users } from 'lucide-react';
+import { Home, AlertTriangle, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
@@ -25,7 +24,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   const tabs: TabItem[] = [
     { id: 'dashboard', label: 'Home', icon: Home },
-    { id: 'checkin', label: 'Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance', icon: Users },
   ];
