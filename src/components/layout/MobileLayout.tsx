@@ -36,7 +36,11 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
       <div className="flex-1 flex flex-col min-h-screen relative w-full overflow-x-hidden">
         {/* Mobile Header (hidden on md and up) */}
         <div className="md:hidden">
-          <Header currentStreak={currentStreak} cleanRatioPercent={cleanRatioPercent} />
+          <Header
+            currentStreak={currentStreak}
+            cleanRatioPercent={cleanRatioPercent}
+            onOpenSettings={() => onTabChange('settings')}
+          />
         </div>
 
         {/* Desktop Header Topbar (visible on md and up) */}

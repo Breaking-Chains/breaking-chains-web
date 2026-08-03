@@ -1,13 +1,15 @@
 import React from 'react';
-import { ShieldCheck, Flame } from 'lucide-react';
+import { ShieldCheck, Flame, Settings } from 'lucide-react';
 
 interface HeaderProps {
   currentStreak?: number;
   cleanRatioPercent?: number;
+  onOpenSettings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   currentStreak = 18,
+  onOpenSettings,
 }) => {
   return (
     <header className="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60 px-4 py-3">
@@ -29,6 +31,15 @@ export const Header: React.FC<HeaderProps> = ({
             <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
             <span className="text-xs font-bold text-amber-300 font-mono">{currentStreak}d</span>
           </div>
+          {onOpenSettings && (
+            <button
+              onClick={onOpenSettings}
+              className="p-1.5 text-slate-400 hover:text-slate-200 bg-slate-900 border border-slate-800 rounded-xl transition-all"
+              aria-label="Open Settings"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </div>
     </header>
