@@ -89,11 +89,11 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
             <span className="text-xs">Loading profile...</span>
           </div>
         ) : existingProfile ? (
-          <Card variant="glass" className="p-5 space-y-4 border-slate-800">
+          <Card variant="glass" className="p-5 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                <h4 className="text-sm font-bold text-white">Application Status</h4>
+                <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">Application Status</h4>
               </div>
               {existingProfile.status === 'APPROVED' && (
                 <Badge variant="emerald" className="flex items-center gap-1">
@@ -112,19 +112,19 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
               )}
             </div>
 
-            <div className="bg-slate-950/70 p-4 rounded-xl space-y-2 text-xs border border-slate-850">
-              <p><span className="text-slate-400">Qualification:</span> <strong className="text-slate-200">{existingProfile.qualification}</strong></p>
-              <p><span className="text-slate-400">Specialization:</span> <strong className="text-slate-200">{existingProfile.specialization}</strong></p>
-              <p><span className="text-slate-400">Experience:</span> <strong className="text-slate-200">{existingProfile.yearsOfExperience} years</strong></p>
+            <div className="text-xs space-y-1.5 p-3 rounded-xl bg-slate-100/60 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 leading-relaxed">
+              <p><span className="text-slate-500 dark:text-slate-400">Qualification:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.qualification}</strong></p>
+              <p><span className="text-slate-500 dark:text-slate-400">Specialization:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.specialization}</strong></p>
+              <p><span className="text-slate-500 dark:text-slate-400">Experience:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.yearsOfExperience} years</strong></p>
               {existingProfile.organization && (
-                <p><span className="text-slate-400">Organization:</span> <strong className="text-slate-200">{existingProfile.organization}</strong></p>
+                <p><span className="text-slate-500 dark:text-slate-400">Organization:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.organization}</strong></p>
               )}
-              <p className="pt-1 text-slate-300 italic">"{existingProfile.bio}"</p>
+              <p className="pt-1 text-slate-700 dark:text-slate-300 italic">"{existingProfile.bio}"</p>
             </div>
 
             {existingProfile.status === 'APPROVED' && (
-              <div className="p-3 bg-emerald-950/30 border border-emerald-800/50 rounded-xl text-xs text-emerald-300 flex items-start gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+              <div className="p-3 bg-emerald-55/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs text-emerald-850 dark:text-emerald-300 flex items-start gap-2">
+                <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                 <span>You are verified to leave Counsel Notes (*Nasiha*) and mentor struggling recoverers across the platform.</span>
               </div>
             )}
@@ -135,41 +135,41 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
           </Card>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex items-center gap-2 p-3 bg-emerald-950/30 border border-emerald-800/40 rounded-xl text-xs text-emerald-300">
-              <Award className="w-5 h-5 text-emerald-400 flex-shrink-0" />
+            <div className="flex items-center gap-2 p-3 bg-emerald-55/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 rounded-xl text-xs text-emerald-850 dark:text-emerald-300">
+              <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span>Register as a verified Spiritual Counselor or Recovery Mentor to support recoverers on their Tazkiyah journey.</span>
             </div>
 
             {errorMsg && (
-              <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-xs text-rose-300">
+              <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-xs text-rose-800 dark:text-rose-300">
                 {errorMsg}
               </div>
             )}
 
             {successMsg && (
-              <div className="p-3 rounded-xl bg-emerald-950/50 border border-emerald-800 text-xs text-emerald-300">
+              <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-800 dark:text-emerald-300">
                 {successMsg}
               </div>
             )}
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Qualification / Background *</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Qualification / Background *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. Alimiyyah Degree, Certified Recovery Coach, Islamic Studies Scholar"
                 value={qualification}
                 onChange={(e) => setQualification(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
               />
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Primary Specialization *</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Primary Specialization *</label>
               <select
                 value={specialization}
                 onChange={(e) => setSpecialization(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
               >
                 <option value="Spiritual Counsel (Tazkiyah)">Spiritual Counsel (Tazkiyah & Heart Purity)</option>
                 <option value="PMO Recovery Coaching">PMO & Addiction Recovery Coaching</option>
@@ -180,48 +180,48 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Years of Experience *</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Years of Experience *</label>
                 <input
                   type="number"
                   min="0"
                   required
                   value={yearsOfExperience}
                   onChange={(e) => setYearsOfExperience(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-300">Organization (Optional)</label>
+                <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Organization (Optional)</label>
                 <input
                   type="text"
                   placeholder="e.g. Local Masjid, Youth Center"
                   value={organization}
                   onChange={(e) => setOrganization(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
 
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-slate-300">Bio / Statement of Purpose *</label>
+              <label className="text-xs font-semibold text-slate-700 dark:text-slate-300">Bio / Statement of Purpose *</label>
               <textarea
                 rows={3}
                 required
                 placeholder="Briefly state your experience and how you plan to guide recoverers with sincere Nasiha..."
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none"
+                className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-emerald-500 resize-none animate-none"
               />
             </div>
 
             {/* Dev Mode Toggle */}
-            <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/40 flex items-center justify-between text-xs">
+            <div className="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/40 flex items-center justify-between text-xs">
               <div className="space-y-0.5">
-                <span className="font-bold text-amber-300 flex items-center gap-1">
+                <span className="font-bold text-amber-850 dark:text-amber-300 flex items-center gap-1">
                   <Sparkles className="w-3.5 h-3.5" /> Skip Approval (Testing Mode)
                 </span>
-                <p className="text-[10px] text-amber-400/80">
+                <p className="text-[10px] text-amber-900/80 dark:text-amber-400/80">
                   Instantly approves your application for testing purposes.
                 </p>
               </div>
