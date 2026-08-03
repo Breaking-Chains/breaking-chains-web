@@ -43,10 +43,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                 className="flex flex-col items-center justify-center -mt-6 group focus:outline-none"
                 aria-label="Trigger 1-Tap SOS Emergency Interrupter"
               >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 p-0.5 shadow-xl shadow-rose-950/70 border-2 border-slate-950 flex items-center justify-center animate-pulse-glow group-active:scale-90 transition-transform">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 p-0.5 shadow-xl shadow-rose-950/70 border-2 border-white dark:border-slate-950 flex items-center justify-center animate-pulse-glow group-active:scale-90 transition-transform">
                   <AlertTriangle className="w-7 h-7 text-white stroke-[2.5]" />
                 </div>
-                <span className="text-[10px] font-bold text-rose-400 mt-1 uppercase tracking-wider">
+                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-1 uppercase tracking-wider">
                   SOS Helper
                 </span>
               </button>
@@ -58,8 +58,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={cn(
-                'flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 min-h-[48px] min-w-[56px]',
-                isActive ? 'text-emerald-400 font-semibold' : 'text-slate-400 hover:text-slate-200'
+                'flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all duration-200 min-h-[48px] min-w-[56px] cursor-pointer',
+                isActive ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
               )}
             >
               <Icon className={cn('w-5 h-5 transition-transform', isActive && 'scale-110')} />

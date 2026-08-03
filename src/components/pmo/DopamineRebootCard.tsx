@@ -22,15 +22,15 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
   const stageInfo = getDopamineStageText(currentCleanDays);
 
   return (
-    <Card variant="glass" className="space-y-4 p-4 border-slate-800">
+    <Card variant="glass" className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Brain className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
+          <Brain className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider">
             90-Day Dopamine Reboot
           </h3>
         </div>
-        <span className="text-xs font-mono font-bold text-emerald-400">{currentCleanDays}/90 Days</span>
+        <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">{currentCleanDays}/90 Days</span>
       </div>
 
       <ProgressBar

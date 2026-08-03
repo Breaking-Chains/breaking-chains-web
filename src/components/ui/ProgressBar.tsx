@@ -29,18 +29,18 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   return (
     <div className={cn('w-full space-y-1.5', className)} {...props}>
       {(label || showPercentage) && (
-        <div className="flex justify-between items-center text-xs font-medium text-slate-300">
+        <div className="flex justify-between items-center text-xs font-medium text-slate-655 dark:text-slate-300">
           <span>{label}</span>
-          {showPercentage && <span className="font-bold font-mono text-emerald-400">{clampedValue.toFixed(1)}%</span>}
+          {showPercentage && <span className="font-bold font-mono text-emerald-600 dark:text-emerald-400">{clampedValue.toFixed(1)}%</span>}
         </div>
       )}
-      <div className="w-full bg-slate-900/90 border border-slate-800 rounded-full h-3 p-0.5 overflow-hidden">
+      <div className="w-full bg-slate-200 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-800 rounded-full h-3 p-0.5 overflow-hidden">
         <div
           className={cn('h-full rounded-full transition-all duration-500 ease-out', barVariants[variant])}
           style={{ width: `${clampedValue}%` }} // Note: width property for percentage layout, clean class-based bar styling
         />
       </div>
-      {subLabel && <p className="text-[11px] text-slate-400 font-normal">{subLabel}</p>}
+      {subLabel && <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal">{subLabel}</p>}
     </div>
   );
 };

@@ -62,18 +62,18 @@ export const NafsProgressTracker: React.FC<NafsProgressTrackerProps> = ({
             return (
               <div
                 key={stg.id}
-                className="p-3 rounded-xl border bg-slate-900/90 border-emerald-500 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50 transition-all"
+                className="p-3 rounded-xl border bg-white dark:bg-slate-900/90 border-slate-200 dark:border-emerald-500 shadow-sm dark:shadow-md dark:shadow-emerald-950/40 dark:ring-1 dark:ring-emerald-500/50 transition-all"
               >
                 <div className="flex items-center justify-between mb-1">
                   <div className="flex items-center gap-2">
-                    <Icon className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-bold text-slate-100">{stg.title}</span>
+                    <Icon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100">{stg.title}</span>
                   </div>
                   <Badge variant={stg.badgeColor} size="sm">
                     {stg.subtitle.split('(')[1]?.replace(')', '') || ''}
                   </Badge>
                 </div>
-                <p className="text-[11px] text-slate-300 leading-normal pl-6">{stg.description}</p>
+                <p className="text-[11px] text-slate-650 dark:text-slate-300 leading-normal pl-6">{stg.description}</p>
               </div>
             );
           })}
