@@ -138,27 +138,38 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           
           {isImpactOpen && (
             <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-teal-950 text-teal-400">
-                    <Clock className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Time Reclaimed</span>
-                    <span className="text-xs font-bold text-slate-100 font-mono">{hoursSaved} Hours</span>
-                  </div>
+              {currentStreak < 7 ? (
+                <div className="p-4 bg-slate-950/40 rounded-xl border border-slate-900 text-center">
+                  <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                    You’ve already started reclaiming time and saving money — keep going!
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-1 leading-normal">
+                    Numerical impact metrics will unlock after a 7-day clean streak.
+                  </p>
                 </div>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-teal-950 text-teal-400">
+                      <Clock className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-medium">Time Reclaimed</span>
+                      <span className="text-xs font-bold text-slate-100 font-mono">{hoursSaved} Hours</span>
+                    </div>
+                  </div>
 
-                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-amber-950 text-amber-400">
-                    <DollarSign className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block font-medium">Sadaqah Potential</span>
-                    <span className="text-xs font-bold text-slate-100 font-mono">${moneySaved} Saved</span>
+                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-950 text-amber-400">
+                      <DollarSign className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block font-medium">Sadaqah Potential</span>
+                      <span className="text-xs font-bold text-slate-100 font-mono">${moneySaved} Saved</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {onTabChange && (
                 <Button

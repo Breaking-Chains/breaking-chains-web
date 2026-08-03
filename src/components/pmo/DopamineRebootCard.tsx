@@ -42,28 +42,6 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
         label={`Current Biological Stage: ${stageInfo.title}`}
         variant="emerald"
       />
-
-      <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800/80">
-        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-teal-950 text-teal-400">
-            <Clock className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 block font-medium">Time Reclaimed</span>
-            <span className="text-xs font-bold text-slate-100 font-mono">{estimatedHoursSaved} Hours</span>
-          </div>
-        </div>
-
-        <div className="p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center gap-2.5">
-          <div className="p-2 rounded-lg bg-amber-950 text-amber-400">
-            <DollarSign className="w-4 h-4" />
-          </div>
-          <div>
-            <span className="text-[10px] text-slate-400 block font-medium">Money/Charity Impact</span>
-            <span className="text-xs font-bold text-slate-100 font-mono">${estimatedMoneySaved} Saved</span>
-          </div>
-        </div>
-      </div>
     </Card>
   );
 };
