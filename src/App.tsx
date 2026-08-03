@@ -71,6 +71,7 @@ function ProtectedAppContent() {
         <DashboardPage
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onTriggerSos={handleTriggerSos}
+          onTabChange={setActiveTab}
         />
       )}
 
@@ -99,6 +100,7 @@ function ProtectedAppContent() {
         <DashboardPage
           onOpenCheckIn={() => setIsCheckInOpen(true)}
           onTriggerSos={handleTriggerSos}
+          onTabChange={setActiveTab}
         />
       )}
 

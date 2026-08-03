@@ -17,10 +17,10 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
   const progressPercent = Math.min(100, (currentCleanDays / 90) * 100);
 
   const getDopamineStageText = (days: number) => {
-    if (days <= 3) return { title: 'Acute Withdrawal', desc: 'Dopamine receptors are beginning to recover. Expect craving waves.' };
+    if (days <= 3) return { title: 'Early Recovery', desc: 'Early recovery stage: cravings may feel stronger.' };
     if (days <= 14) return { title: 'Flatline & Rebalancing', desc: 'Temporary low energy / brain fog. Brain chemistry is restoring balance.' };
     if (days <= 40) return { title: 'Neural Pathway Rewiring', desc: 'New healthy habits forming. High mental clarity restoration.' };
-    return { title: 'Complete Reboot', desc: 'Baseline dopamine sensitivity restored. High self-mastery.' };
+    return { title: 'Restored Balance', desc: 'Baseline dopamine sensitivity restored. High self-mastery.' };
   };
 
   const stageInfo = getDopamineStageText(currentCleanDays);

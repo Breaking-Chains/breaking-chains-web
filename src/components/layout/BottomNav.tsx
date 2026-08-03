@@ -28,7 +28,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'checkin', label: 'Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   return (
@@ -50,7 +49,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
                   <AlertTriangle className="w-7 h-7 text-white stroke-[2.5]" />
                 </div>
                 <span className="text-[10px] font-bold text-rose-400 mt-1 uppercase tracking-wider">
-                  SOS Panic
+                  SOS Helper
                 </span>
               </button>
             );

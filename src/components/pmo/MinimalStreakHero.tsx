@@ -34,9 +34,15 @@ export const MinimalStreakHero: React.FC<MinimalStreakHeroProps> = ({
         {/* Clean Ratio Badge Pill */}
         <div className="absolute -bottom-2.5 bg-slate-900 border border-emerald-500/30 px-3 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span className="text-[11px] font-mono font-bold text-emerald-300">
-            {cleanRatioPercent}% Ratio
-          </span>
+          {cleanRatioPercent === 0 ? (
+            <span className="text-[11px] font-bold text-emerald-300">
+              Progress: Just starting out
+            </span>
+          ) : (
+            <span className="text-[11px] font-mono font-bold text-emerald-300">
+              {cleanRatioPercent}% Ratio
+            </span>
+          )}
         </div>
       </div>
 

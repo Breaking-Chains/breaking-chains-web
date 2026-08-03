@@ -1,24 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MinimalStreakHero } from '../components/pmo/MinimalStreakHero';
 import { ChaserEffectBanner } from '../components/pmo/ChaserEffectBanner';
 import { NafsProgressTracker } from '../components/pmo/NafsProgressTracker';
 import { DopamineRebootCard } from '../components/pmo/DopamineRebootCard';
 import { GuardingGazeCard } from '../components/pmo/GuardingGazeCard';
 import { usePmo } from '../context/PmoContext';
-
 import { Card } from '../components/ui/Card';
-import { Sparkles, ShieldCheck } from 'lucide-react';
+import { Button } from '../components/ui/Button';
+import { Sparkles, ShieldCheck, ChevronDown, ChevronUp, Brain, Compass, BarChart3, Clock, DollarSign } from 'lucide-react';
+import type { NavTab } from '../components/layout/BottomNav';
 
 interface DashboardPageProps {
   onOpenCheckIn: () => void;
   onTriggerSos: () => void;
+  onTabChange?: (tab: NavTab) => void;
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   onOpenCheckIn,
   onTriggerSos,
+  onTabChange,
 }) => {
   const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics, apiError, counselNotes } = usePmo();
+  
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(true);
+  const [isSpiritualOpen, setIsSpiritualOpen] = useState(false);
+  const [isImpactOpen, setIsImpactOpen] = useState(false);
 
   const hoursSaved = analytics?.estimatedHoursSaved ?? currentStreak * 2;
   const moneySaved = analytics?.estimatedMoneySaved ?? currentStreak * 3;
@@ -69,22 +76,103 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         onTriggerSos={onTriggerSos}
       />
 
-      {/* Responsive Grid Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main 2-Column Section */}
-        <div className="lg:col-span-2 space-y-6">
-          <DopamineRebootCard
-            currentCleanDays={currentStreak}
-            estimatedHoursSaved={hoursSaved}
-            estimatedMoneySaved={moneySaved}
-          />
-
-          <GuardingGazeCard cleanGazeDays={currentStreak} />
+      {/* Collapsible Sections Layout */}
+      <div className="space-y-4 max-w-2xl mx-auto">
+        {/* 1. Recovery Progress */}
+        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+          <button
+            onClick={() => setIsRecoveryOpen(!isRecoveryOpen)}
+            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <Brain className="w-5 h-5 text-emerald-400" />
+              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Recovery Progress</span>
+            </div>
+            {isRecoveryOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+          </button>
+          
+          {isRecoveryOpen && (
+            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+              <DopamineRebootCard
+                currentCleanDays={currentStreak}
+                estimatedHoursSaved={hoursSaved}
+                estimatedMoneySaved={moneySaved}
+              />
+            </div>
+          )}
         </div>
 
-        {/* Side Column Section */}
-        <div className="space-y-6">
-          <NafsProgressTracker currentStage={nafsStage} currentCleanDays={currentStreak} />
+        {/* 2. Spiritual Growth */}
+        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+          <button
+            onClick={() => setIsSpiritualOpen(!isSpiritualOpen)}
+            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <Compass className="w-5 h-5 text-amber-400" />
+              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Spiritual Growth</span>
+            </div>
+            {isSpiritualOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+          </button>
+          
+          {isSpiritualOpen && (
+            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+              <GuardingGazeCard cleanGazeDays={currentStreak} />
+              <NafsProgressTracker currentStage={nafsStage} currentCleanDays={currentStreak} />
+            </div>
+          )}
+        </div>
+
+        {/* 3. Impact & Analytics */}
+        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+          <button
+            onClick={() => setIsImpactOpen(!isImpactOpen)}
+            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+          >
+            <div className="flex items-center gap-2.5">
+              <BarChart3 className="w-5 h-5 text-teal-400" />
+              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Impact & Analytics</span>
+            </div>
+            {isImpactOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+          </button>
+          
+          {isImpactOpen && (
+            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-teal-950 text-teal-400">
+                    <Clock className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-medium">Time Reclaimed</span>
+                    <span className="text-xs font-bold text-slate-100 font-mono">{hoursSaved} Hours</span>
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-amber-950 text-amber-400">
+                    <DollarSign className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block font-medium">Sadaqah Potential</span>
+                    <span className="text-xs font-bold text-slate-100 font-mono">${moneySaved} Saved</span>
+                  </div>
+                </div>
+              </div>
+
+              {onTabChange && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onTabChange('analytics')}
+                  className="w-full flex items-center justify-center gap-2 border-slate-800 text-teal-400 hover:border-teal-500/40"
+                >
+                  <BarChart3 className="w-4 h-4" />
+                  <span>Open Detailed Analytics</span>
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
