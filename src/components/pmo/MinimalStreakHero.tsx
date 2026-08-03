@@ -59,7 +59,7 @@ export const MinimalStreakHero: React.FC<MinimalStreakHeroProps> = ({
           className="flex items-center justify-center gap-2 py-3 text-sm font-bold"
         >
           <AlertTriangle className="w-4 h-4" />
-          <span>SOS Panic</span>
+          <span>SOS Helper</span>
         </Button>
       </div>
     </Card>

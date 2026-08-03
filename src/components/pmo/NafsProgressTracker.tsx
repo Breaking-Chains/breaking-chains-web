@@ -55,32 +55,28 @@ export const NafsProgressTracker: React.FC<NafsProgressTrackerProps> = ({
       </div>
 
       <div className="space-y-2.5">
-        {stages.map((stg) => {
-          const Icon = stg.icon;
-          const isActive = currentStage === stg.id;
-
-          return (
-            <div
-              key={stg.id}
-              className={`p-3 rounded-xl border transition-all ${
-                isActive
-                  ? 'bg-slate-900/90 border-emerald-500 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50'
-                  : 'bg-slate-950/40 border-slate-800/80 opacity-60'
-              }`}
-            >
-              <div className="flex items-center justify-between mb-1">
-                <div className="flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-500'}`} />
-                  <span className="text-xs font-bold text-slate-100">{stg.title}</span>
+        {stages
+          .filter((stg) => currentStage === stg.id)
+          .map((stg) => {
+            const Icon = stg.icon;
+            return (
+              <div
+                key={stg.id}
+                className="p-3 rounded-xl border bg-slate-900/90 border-emerald-500 shadow-md shadow-emerald-950/40 ring-1 ring-emerald-500/50 transition-all"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <Icon className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-slate-100">{stg.title}</span>
+                  </div>
+                  <Badge variant={stg.badgeColor} size="sm">
+                    {stg.subtitle.split('(')[1]?.replace(')', '') || ''}
+                  </Badge>
                 </div>
-                <Badge variant={stg.badgeColor} size="sm">
-                  {stg.subtitle.split('(')[1]?.replace(')', '') || ''}
-                </Badge>
+                <p className="text-[11px] text-slate-300 leading-normal pl-6">{stg.description}</p>
               </div>
-              <p className="text-[11px] text-slate-300 leading-normal pl-6">{stg.description}</p>
-            </div>
-          );
-        })}
+            );
+          })}
       </div>
     </Card>
   );

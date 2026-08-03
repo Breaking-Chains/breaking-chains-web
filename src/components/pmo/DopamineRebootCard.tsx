@@ -40,7 +40,6 @@ export const DopamineRebootCard: React.FC<DopamineRebootCardProps> = ({
       <ProgressBar
         value={progressPercent}
         label={`Current Biological Stage: ${stageInfo.title}`}
-        subLabel={stageInfo.desc}
         variant="emerald"
       />
 
