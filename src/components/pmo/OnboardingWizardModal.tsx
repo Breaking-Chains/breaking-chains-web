@@ -50,12 +50,12 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
     <Modal isOpen={isOpen} onClose={onClose} title="Welcome to Breaking Chains">
       <div className="space-y-5">
         {errorMsg && (
-          <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+          <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
             {errorMsg}
           </div>
         )}
 
-        <p className="text-xs text-slate-400 leading-relaxed">
+        <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
           Let's set up your personal recovery track. All progress starts here. You can refine these settings at any time.
         </p>
 
@@ -69,7 +69,7 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
           />
 
           <div>
-            <label className="text-xs font-semibold text-slate-300 block mb-1.5">
+            <label className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1.5">
               Privacy & Confidentiality
             </label>
             <div className="space-y-2">
@@ -89,16 +89,16 @@ export const OnboardingWizardModal: React.FC<OnboardingWizardModalProps> = ({
                   key={item.level}
                   type="button"
                   onClick={() => setPrivacyLevel(item.level)}
-                  className={`w-full p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 ${
+                  className={`w-full p-3 rounded-xl border text-left transition-all flex items-start gap-2.5 cursor-pointer ${
                     privacyLevel === item.level
-                      ? 'bg-slate-900/90 border-emerald-500 text-slate-100 ring-1 ring-emerald-500/40'
-                      : 'bg-slate-950/40 border-slate-900 text-slate-400 hover:border-slate-800'
+                      ? 'bg-emerald-50/40 dark:bg-slate-900/90 border-emerald-500 text-slate-900 dark:text-slate-100 ring-1 ring-emerald-500/40'
+                      : 'bg-slate-50 dark:bg-slate-950/40 border-slate-200 dark:border-slate-900 text-slate-500 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-800'
                   }`}
                 >
-                  <Lock className={`w-4 h-4 mt-0.5 shrink-0 ${privacyLevel === item.level ? 'text-emerald-400' : 'text-slate-500'}`} />
+                  <Lock className={`w-4 h-4 mt-0.5 shrink-0 ${privacyLevel === item.level ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`} />
                   <div>
-                    <h5 className="text-xs font-bold text-slate-200">{item.title}</h5>
-                    <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">{item.desc}</p>
+                    <h5 className={`text-xs font-bold ${privacyLevel === item.level ? 'text-slate-900 dark:text-slate-100' : 'text-slate-700 dark:text-slate-300'}`}>{item.title}</h5>
+                    <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.desc}</p>
                   </div>
                 </button>
               ))}

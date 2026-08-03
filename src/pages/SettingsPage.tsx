@@ -47,19 +47,19 @@ export const SettingsPage: React.FC = () => {
   return (
     <div className="space-y-6 animate-fade-in">
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-rose-950/50 border border-rose-800 text-rose-300 text-xs font-medium text-center animate-fade-in">
+        <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-250 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
           {errorMsg}
         </div>
       )}
       <div className="max-w-2xl mx-auto space-y-6">
-        <Card variant="dark" className="p-5 space-y-4 border-slate-800">
+        <Card variant="dark" className="p-5 space-y-4">
           <div className="flex items-center gap-2">
-            <User className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-wider">
+            <User className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Account Profile
             </h3>
           </div>
-          <div className="text-xs text-slate-300 space-y-2 leading-relaxed">
+          <div className="text-xs text-slate-700 dark:text-slate-300 space-y-2 leading-relaxed">
             <p><strong>Logged in as:</strong> {user?.fullName || 'Guest Recoverer'}</p>
             <p><strong>Email:</strong> {user?.email || 'guest@example.com'}</p>
             <p><strong>Account Status:</strong> {isDemoSession ? 'Offline Demo Session' : 'Active Account Session'}</p>
@@ -74,7 +74,7 @@ export const SettingsPage: React.FC = () => {
                   <Clock className="w-3 h-3" /> PENDING REVIEW
                 </Badge>
               ) : (
-                <span className="text-slate-400">Standard User</span>
+                <span className="text-slate-500 dark:text-slate-400">Standard User</span>
               )}
             </p>
           </div>
@@ -99,11 +99,11 @@ export const SettingsPage: React.FC = () => {
       </div>
 
       {/* Admin / Dev Review Panel */}
-      <Card variant="glass" className="p-5 space-y-4 border-slate-800">
+      <Card variant="glass" className="p-5 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Award className="w-5 h-5 text-amber-400" />
-            <h3 className="text-sm font-bold text-white uppercase tracking-wider">
+            <Award className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
               Admin & Dev Control: Mentor Applications
             </h3>
           </div>
@@ -119,28 +119,28 @@ export const SettingsPage: React.FC = () => {
         {showAdminPanel && (
           <div className="space-y-3 pt-2">
             {allApplications.length === 0 ? (
-              <p className="text-xs text-slate-400 italic">No mentor applications registered yet.</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 italic">No mentor applications registered yet.</p>
             ) : (
               allApplications.map((app) => (
                 <div
                   key={app.id}
-                  className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  className="p-3.5 rounded-xl bg-slate-100/60 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <strong className="text-slate-100 text-sm">{app.fullName}</strong>
-                      <span className="text-slate-500">(@{app.username})</span>
+                      <strong className="text-slate-900 dark:text-slate-100 text-sm">{app.fullName}</strong>
+                      <span className="text-slate-550 dark:text-slate-500">(@{app.username})</span>
                       {app.status === 'APPROVED' && <Badge variant="emerald">APPROVED</Badge>}
                       {app.status === 'PENDING' && <Badge variant="amber">PENDING</Badge>}
                       {app.status === 'REJECTED' && <Badge variant="rose">REJECTED</Badge>}
                     </div>
-                    <p className="text-slate-300">
+                    <p className="text-slate-700 dark:text-slate-300">
                       <strong>Qualification:</strong> {app.qualification} ({app.yearsOfExperience} yrs exp)
                     </p>
-                    <p className="text-slate-400">
+                    <p className="text-slate-600 dark:text-slate-400">
                       <strong>Specialization:</strong> {app.specialization} {app.organization ? `| ${app.organization}` : ''}
                     </p>
-                    <p className="text-slate-400 italic">"{app.bio}"</p>
+                    <p className="text-slate-600 dark:text-slate-400 italic">"{app.bio}"</p>
                   </div>
 
                   <div className="flex gap-2 flex-shrink-0">
