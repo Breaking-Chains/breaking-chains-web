@@ -40,7 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   return (
-    <aside className="hidden md:flex flex-col w-64 bg-slate-950 border-r border-slate-900 p-5 h-screen sticky top-0 justify-between shrink-0">
+    <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 p-5 h-screen sticky top-0 justify-between shrink-0">
       <div className="space-y-6">
         {/* Sleek App Brand */}
         <div className="flex items-center gap-3 px-1 py-1">
@@ -57,18 +57,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* User Badge */}
         {user && (
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-900/60 border border-slate-800/80">
-            <div className="w-7 h-7 rounded-lg bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-emerald-300 font-bold text-xs">
-              <UserIcon className="w-4 h-4 text-emerald-400" />
+          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80">
+            <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 border border-emerald-500/30 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-300 font-bold text-xs">
+              <UserIcon className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
             </div>
             <div className="overflow-hidden text-left flex-1">
-              <span className="text-xs font-bold text-slate-100 block truncate">{user.fullName}</span>
-              <span className="text-[10px] text-slate-400 block truncate">@{user.username}</span>
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">{user.fullName}</span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">@{user.username}</span>
             </div>
             <button
               onClick={logout}
               title="Sign Out"
-              className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-slate-800 rounded-lg transition-colors"
+              className="p-1.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -76,17 +76,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         {/* Minimalist Live Streak Metric */}
-        <div className="bg-slate-900/60 border border-slate-800/60 p-3 rounded-xl space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-400 font-medium">
+        <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
             <span>Current Streak</span>
-            <div className="flex items-center gap-1 text-amber-400 font-mono font-bold">
-              <Flame className="w-3.5 h-3.5 fill-amber-400" />
+            <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 font-mono font-bold">
+              <Flame className="w-3.5 h-3.5 fill-amber-500 dark:fill-amber-400" />
               {currentStreak} Days
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-400 font-medium pt-1.5 border-t border-slate-800/80">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
             <span>Clean Ratio</span>
-            <span className="font-mono font-bold text-emerald-400">{cleanRatioPercent}%</span>
+            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{cleanRatioPercent}%</span>
           </div>
         </div>
 
@@ -116,8 +116,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 className={cn(
                   'w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-all duration-200',
                   isActive
-                    ? 'bg-slate-900 border border-slate-800 text-emerald-400 font-bold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/40'
+                    ? 'bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-emerald-600 dark:text-emerald-400 font-bold'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-950 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900/40'
                 )}
               >
                 <Icon className={cn('w-4 h-4', isActive ? 'text-emerald-400' : 'text-slate-500')} />

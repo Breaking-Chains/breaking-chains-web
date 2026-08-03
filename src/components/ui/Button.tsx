@@ -29,15 +29,15 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       gold:
         'bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow-sm',
       subtle:
-        'bg-slate-800/80 hover:bg-slate-800 text-slate-200 border border-slate-700/60 font-medium',
+        'bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 font-medium',
       danger:
         'bg-rose-600 hover:bg-rose-500 text-white font-semibold',
       ghost:
-        'bg-transparent hover:bg-slate-800/50 text-slate-300',
+        'bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-650 dark:text-slate-300',
       outline:
-        'bg-transparent hover:bg-slate-900 text-emerald-400 border border-emerald-500/30',
+        'bg-transparent hover:bg-emerald-50 dark:hover:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30',
       sos:
-        'bg-rose-600 hover:bg-rose-500 text-white font-bold tracking-wide shadow-md shadow-rose-950/40',
+        'bg-rose-600 hover:bg-rose-500 text-white font-bold tracking-wide shadow-md dark:shadow-rose-950/40',
     };
 
     const sizeStyles = {

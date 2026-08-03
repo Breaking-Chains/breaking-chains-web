@@ -79,20 +79,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Collapsible Sections Layout */}
       <div className="space-y-4 max-w-2xl mx-auto">
         {/* 1. Recovery Progress */}
-        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+        <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-slate-100/40 dark:bg-slate-950/40">
           <button
             onClick={() => setIsRecoveryOpen(!isRecoveryOpen)}
-            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+            className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <Brain className="w-5 h-5 text-emerald-400" />
-              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Recovery Progress</span>
+              <Brain className="w-5 h-5 text-emerald-500 dark:text-emerald-400" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Recovery Progress</span>
             </div>
             {isRecoveryOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
           </button>
           
           {isRecoveryOpen && (
-            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-900 animate-fade-in space-y-4 bg-slate-50/20 dark:bg-slate-950/20">
               <DopamineRebootCard
                 currentCleanDays={currentStreak}
               />
@@ -101,20 +101,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {/* 2. Spiritual Growth */}
-        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+        <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-slate-100/40 dark:bg-slate-950/40">
           <button
             onClick={() => setIsSpiritualOpen(!isSpiritualOpen)}
-            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+            className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <Compass className="w-5 h-5 text-amber-400" />
-              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Spiritual Growth</span>
+              <Compass className="w-5 h-5 text-amber-500 dark:text-amber-400" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Spiritual Growth</span>
             </div>
             {isSpiritualOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
           </button>
           
           {isSpiritualOpen && (
-            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-900 animate-fade-in space-y-4 bg-slate-50/20 dark:bg-slate-950/20">
               <GuardingGazeCard cleanGazeDays={currentStreak} />
               <NafsProgressTracker currentStage={nafsStage} currentCleanDays={currentStreak} />
             </div>
@@ -122,23 +122,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {/* 3. Impact & Analytics */}
-        <div className="border border-slate-900 rounded-2xl overflow-hidden bg-slate-950/40">
+        <div className="border border-slate-200 dark:border-slate-900 rounded-2xl overflow-hidden bg-slate-100/40 dark:bg-slate-950/40">
           <button
             onClick={() => setIsImpactOpen(!isImpactOpen)}
-            className="w-full flex items-center justify-between p-4 bg-slate-950 hover:bg-slate-900/60 transition-colors text-left"
+            className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-950 hover:bg-slate-50 dark:hover:bg-slate-900/60 transition-colors text-left cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <BarChart3 className="w-5 h-5 text-teal-400" />
-              <span className="text-xs font-bold text-slate-100 uppercase tracking-wider">Impact & Analytics</span>
+              <BarChart3 className="w-5 h-5 text-teal-500 dark:text-teal-400" />
+              <span className="text-xs font-bold text-slate-800 dark:text-slate-100 uppercase tracking-wider">Impact & Analytics</span>
             </div>
             {isImpactOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
           </button>
           
           {isImpactOpen && (
-            <div className="p-4 border-t border-slate-900 animate-fade-in space-y-4 bg-slate-950/20">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-900 animate-fade-in space-y-4 bg-slate-50/20 dark:bg-slate-950/20">
               {currentStreak < 7 ? (
-                <div className="p-4 bg-slate-950/40 rounded-xl border border-slate-900 text-center">
-                  <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                <div className="p-4 bg-slate-100/50 dark:bg-slate-950/40 rounded-xl border border-slate-200 dark:border-slate-900 text-center">
+                  <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
                     You’ve already started reclaiming time and saving money — keep going!
                   </p>
                   <p className="text-[10px] text-slate-500 mt-1 leading-normal">
@@ -147,23 +147,23 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </div>
               ) : (
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-teal-950 text-teal-400">
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-teal-100 dark:bg-teal-950 text-teal-600 dark:text-teal-400">
                       <Clock className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Time Reclaimed</span>
-                      <span className="text-xs font-bold text-slate-100 font-mono">{hoursSaved} Hours</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Time Reclaimed</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-mono">{hoursSaved} Hours</span>
                     </div>
                   </div>
 
-                  <div className="p-3 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-amber-950 text-amber-400">
+                  <div className="p-3 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
                       <DollarSign className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Sadaqah Potential</span>
-                      <span className="text-xs font-bold text-slate-100 font-mono">${moneySaved} Saved</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">Sadaqah Potential</span>
+                      <span className="text-xs font-bold text-slate-900 dark:text-slate-100 font-mono">${moneySaved} Saved</span>
                     </div>
                   </div>
                 </div>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PmoProvider, usePmo } from './context/PmoContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { MobileLayout } from './components/layout/MobileLayout';
 import type { NavTab } from './components/layout/BottomNav';
 import { DashboardPage } from './pages/DashboardPage';
@@ -129,7 +130,7 @@ function ControlledAccessGuard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-300 space-y-3">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center text-slate-600 dark:text-slate-300 space-y-3">
         <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         <span className="text-xs">Securing your connection...</span>
       </div>
@@ -149,9 +150,11 @@ function ControlledAccessGuard() {
 
 export function App() {
   return (
-    <AuthProvider>
-      <ControlledAccessGuard />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <ControlledAccessGuard />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 
