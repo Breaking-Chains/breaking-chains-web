@@ -169,7 +169,7 @@ export const AuthPage: React.FC = () => {
                 variant="subtle"
                 size="sm"
                 onClick={() => loginAsGuest('USER')}
-                className="text-[10px] py-2.5 px-1 text-slate-800 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold cursor-pointer"
+                className="text-[10px] py-2.5 px-1 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold cursor-pointer"
               >
                 Recoverer
               </Button>
