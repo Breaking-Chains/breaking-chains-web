@@ -250,6 +250,14 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             Enter the unique <strong>Invite Code</strong> provided by your assigned spiritual mentor or recovery coach.
           </p>
 
+          <Input
+            label="Mentor Invite Code"
+            placeholder="e.g. MENTOR-BC-7890"
+            value={inviteCodeInput}
+            onChange={(e) => setInviteCodeInput(e.target.value)}
+            required
+          />
+
           {connectErrorMsg && (
             <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
               {connectErrorMsg}
@@ -262,14 +270,6 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
               {connectSuccessMsg}
             </div>
           )}
-
-          <Input
-            label="Mentor Invite Code"
-            placeholder="e.g. MENTOR-BC-7890"
-            value={inviteCodeInput}
-            onChange={(e) => setInviteCodeInput(e.target.value)}
-            required
-          />
 
           <Button type="submit" variant="emerald" size="lg" className="w-full text-xs">
             Connect & Start Guidance
