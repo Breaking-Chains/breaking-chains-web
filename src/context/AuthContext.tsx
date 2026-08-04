@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, TokenResponse } from '../types/user';
 import { loginUser, registerUser, getCurrentUser } from '../services/authService';
-import { getMyMentorProfile } from '../services/mentorService';
 import { apiFetch } from '../services/apiClient';
 
 interface AuthContextType {
@@ -48,27 +47,6 @@ const DEMO_ADMIN: User = {
   createdAt: '2026-07-14T00:00:00Z',
 };
 
-const resolveUserRole = async (userObj: User): Promise<User> => {
-  if (userObj.role) return userObj;
-
-  try {
-    const mentorProfile = await getMyMentorProfile();
-    if (mentorProfile && (mentorProfile.status === 'APPROVED' || mentorProfile.isVerified)) {
-      return { ...userObj, role: 'MENTOR' };
-    }
-  } catch {
-    // Ignore errors
-  }
-
-  const email = userObj.email?.toLowerCase() || '';
-  const username = userObj.username?.toLowerCase() || '';
-  if (email.startsWith('admin') || username.includes('admin')) {
-    return { ...userObj, role: 'ADMIN' };
-  }
-
-  return { ...userObj, role: 'USER' };
-};
-
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [tokens, setTokens] = useState<TokenResponse | null>(null);
@@ -81,8 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (storedToken) {
         try {
           const userData = await getCurrentUser();
-          const fullyResolvedUser = await resolveUserRole(userData);
-          setUser(fullyResolvedUser);
+          setUser(userData);
         } catch {
           // Token expired or server unreachable
           localStorage.removeItem('accessToken');
@@ -102,8 +79,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTokens(authData.tokens);
       }
       if (authData.user) {
-        const fullyResolvedUser = await resolveUserRole(authData.user);
-        setUser(fullyResolvedUser);
+        setUser(authData.user);
       }
       setIsDemoSession(false);
     } finally {
@@ -119,8 +95,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setTokens(authData.tokens);
       }
       if (authData.user) {
-        const fullyResolvedUser = await resolveUserRole(authData.user);
-        setUser(fullyResolvedUser);
+        setUser(authData.user);
       }
       setIsDemoSession(false);
     } finally {
