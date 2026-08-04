@@ -43,7 +43,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'checkin', label: 'Daily Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge Interrupter', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance & Mentors', icon: Users },
-    { id: 'mentees', label: 'My Mentees Roster', icon: ShieldCheck },
     { id: 'analytics', label: 'Analytics & Impact', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
