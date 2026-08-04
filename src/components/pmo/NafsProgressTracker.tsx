@@ -44,8 +44,8 @@ export const NafsProgressTracker: React.FC<NafsProgressTrackerProps> = ({
     <Card variant="emerald" className="space-y-3 p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-xs font-bold text-slate-100 uppercase tracking-wider">
+          <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          <h3 className="text-xs font-bold text-emerald-950 dark:text-slate-100 uppercase tracking-wider">
             Quranic Soul Progression (Nafs Stages)
           </h3>
         </div>

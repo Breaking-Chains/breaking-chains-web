@@ -34,12 +34,12 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
       {/* Header Summary Section */}
       <Card variant="emerald" className="p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <span className="text-emerald-300 text-sm font-bold select-none">✵</span>
+          <span className="text-emerald-600 dark:text-emerald-300 text-sm font-bold select-none">✵</span>
           <div>
-            <h2 className="text-xs font-bold text-white uppercase tracking-wider">
+            <h2 className="text-xs font-bold text-emerald-950 dark:text-white uppercase tracking-wider">
               PMO Recovery Analytics & Barakah Metrics
             </h2>
-            <p className="text-[10px] text-emerald-200 font-medium">Behavioral progress indicators and trigger maps</p>
+            <p className="text-[10px] text-emerald-700 dark:text-emerald-250 font-medium">Behavioral progress indicators and trigger maps</p>
           </div>
         </div>
 
