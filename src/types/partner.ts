@@ -18,7 +18,7 @@ export interface CounselNote {
   chainId: string;
   mentorUserId: string;
   mentorFullName: string;
-  noteContent: string;
+  counselText: string;
   createdAt: string;
 }
 

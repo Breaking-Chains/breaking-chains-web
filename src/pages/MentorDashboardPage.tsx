@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
-import { Users, ShieldCheck, Flame, HeartHandshake, Check, X, Compass } from 'lucide-react';
+import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
-import { getMentees } from '../services/partnerService';
+import { getMentees, getCounselNotes, sendCounselNote } from '../services/partnerService';
+import { getCheckInLogs } from '../services/logService';
+import { formatApiErrorMessage } from '../services/apiClient';
+import { 
+  Users, 
+  ShieldCheck, 
+  Flame, 
+  HeartHandshake, 
+  Check, 
+  X, 
+  Compass, 
+  Calendar, 
+  ChevronRight, 
+  AlertTriangle, 
+  TrendingUp, 
+  Send
+} from 'lucide-react';
 
 interface MenteeRequest {
   id: string;
@@ -17,8 +33,16 @@ export const MentorDashboardPage: React.FC = () => {
   const { isDemoSession } = useAuth();
   const [acceptingNewMentees, setAcceptingNewMentees] = useState(true);
   const [requests, setRequests] = useState<MenteeRequest[]>([]);
-
   const [activeMentees, setActiveMentees] = useState<any[]>([]);
+
+  // Drawer States
+  const [selectedMentee, setSelectedMentee] = useState<any | null>(null);
+  const [menteeLogs, setMenteeLogs] = useState<any[]>([]);
+  const [counselNotes, setCounselNotes] = useState<any[]>([]);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(false);
+  const [newNoteText, setNewNoteText] = useState('');
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+  const [drawerError, setDrawerError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isDemoSession) {
@@ -27,22 +51,24 @@ export const MentorDashboardPage: React.FC = () => {
         { id: 'req-2', name: 'Omar Farooq', username: 'omar_f', date: 'Yesterday', code: 'MENTOR-BC-7890' },
       ]);
       setActiveMentees([
-        { id: 'm-1', name: 'Zayd Malik', username: 'zayd_m', streak: 12, ratio: 95, lastStatus: 'CLEAN', lastCheckIn: '3 hrs ago' },
-        { id: 'm-2', name: 'Bilal Khan', username: 'bilal_k', streak: 4, ratio: 80, lastStatus: 'URGE_RESISTED', lastCheckIn: '5 hrs ago' },
-        { id: 'm-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
+        { id: 'm-1', chainId: 'c-1', name: 'Zayd Malik', username: 'zayd_m', streak: 12, ratio: 95, lastStatus: 'CLEAN', lastCheckIn: '3 hrs ago' },
+        { id: 'm-2', chainId: 'c-2', name: 'Bilal Khan', username: 'bilal_k', streak: 0, ratio: 80, lastStatus: 'SLIP_UP', lastCheckIn: '5 hrs ago' },
+        { id: 'm-3', chainId: 'c-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
       ]);
     } else {
       const loadRealMentees = async () => {
         try {
           const chains = await getMentees();
           const mapped = chains.map((c) => ({
-            id: c.id,
+            id: c.id, // Chain ID used to query logs and counsel notes
             name: `Recoverer #${c.userId.substring(0, 6)}`,
             username: `user_${c.userId.substring(0, 6)}`,
             streak: c.currentStreak,
+            longestStreak: c.longestStreak,
             ratio: c.cleanRatioPercent,
-            lastStatus: 'CLEAN',
-            lastCheckIn: 'Check-in active',
+            resilienceScore: c.resilienceScore,
+            lastStatus: c.currentStreak > 0 ? 'CLEAN' : 'SLIP_UP',
+            lastCheckIn: c.lastCheckInDate ? new Date(c.lastCheckInDate).toLocaleDateString() : 'No check-in yet',
           }));
           setActiveMentees(mapped);
         } catch {
@@ -52,6 +78,43 @@ export const MentorDashboardPage: React.FC = () => {
       loadRealMentees();
     }
   }, [isDemoSession]);
+
+  // Load detailed mentee metrics when drawer opens
+  useEffect(() => {
+    if (selectedMentee) {
+      const loadDetails = async () => {
+        setIsLoadingDetails(true);
+        setDrawerError(null);
+        try {
+          if (isDemoSession) {
+            // Mock check-in logs
+            setMenteeLogs([
+              { id: 'l-1', status: 'CLEAN', checkInDate: new Date(Date.now() - 86400000).toISOString() },
+              { id: 'l-2', status: 'URGE_RESISTED', checkInDate: new Date(Date.now() - 172800000).toISOString(), triggerTag: 'LATE_NIGHT_SOLITUDE' },
+              { id: 'l-3', status: 'SLIP_UP', checkInDate: new Date(Date.now() - 259200000).toISOString(), triggerTag: 'BOREDOM_IDLENESS' },
+              { id: 'l-4', status: 'CLEAN', checkInDate: new Date(Date.now() - 345600000).toISOString() },
+            ]);
+            // Mock counsel notes
+            setCounselNotes([
+              { id: 'n-1', mentorFullName: 'Shaykh Ahmad', counselText: 'Keep up with evening Adhkar. Try going to sleep immediately after Isha.', createdAt: new Date(Date.now() - 172800000).toISOString() },
+            ]);
+          } else {
+            const [logs, notes] = await Promise.all([
+              getCheckInLogs(selectedMentee.id),
+              getCounselNotes(selectedMentee.id),
+            ]);
+            setMenteeLogs(logs);
+            setCounselNotes(notes);
+          }
+        } catch (err: unknown) {
+          setDrawerError(formatApiErrorMessage(err));
+        } finally {
+          setIsLoadingDetails(false);
+        }
+      };
+      loadDetails();
+    }
+  }, [selectedMentee, isDemoSession]);
 
   const handleAccept = (reqId: string, name: string, username: string) => {
     setRequests((prev) => prev.filter((r) => r.id !== reqId));
@@ -64,6 +127,47 @@ export const MentorDashboardPage: React.FC = () => {
   const handleDecline = (reqId: string) => {
     setRequests((prev) => prev.filter((r) => r.id !== reqId));
   };
+
+  const handlePostNote = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNoteText.trim() || !selectedMentee) return;
+    setIsSubmittingNote(true);
+    setDrawerError(null);
+    try {
+      if (isDemoSession) {
+        const addedNote = {
+          id: `n-${Date.now()}`,
+          mentorFullName: 'Shaykh Ahmad',
+          counselText: newNoteText.trim(),
+          createdAt: new Date().toISOString(),
+        };
+        setCounselNotes((prev) => [addedNote, ...prev]);
+        setNewNoteText('');
+      } else {
+        const addedNote = await sendCounselNote(selectedMentee.id, newNoteText.trim());
+        setCounselNotes((prev) => [addedNote, ...prev]);
+        setNewNoteText('');
+      }
+    } catch (err: unknown) {
+      setDrawerError(formatApiErrorMessage(err));
+    } finally {
+      setIsSubmittingNote(false);
+    }
+  };
+
+  // Helper to count trigger reasons
+  const getTriggerBreakdown = () => {
+    const counts: Record<string, number> = {};
+    menteeLogs.forEach((log) => {
+      if (log.triggerTag) {
+        const formatted = log.triggerTag.replace(/_/g, ' ');
+        counts[formatted] = (counts[formatted] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  };
+
+  const triggerStats = getTriggerBreakdown();
 
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-12">
@@ -154,7 +258,7 @@ export const MentorDashboardPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDecline(req.id)}
-                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 cursor-pointer"
+                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-450 cursor-pointer"
                         title="Decline Request"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -175,23 +279,35 @@ export const MentorDashboardPage: React.FC = () => {
 
           <div className="space-y-3">
             {activeMentees.map((mentee) => (
-              <Card key={mentee.id} variant="dark" className="p-4 space-y-3 border-slate-150 dark:border-slate-800 shadow-xs">
+              <Card 
+                key={mentee.id} 
+                variant="dark" 
+                className="p-4 space-y-3 border-slate-150 dark:border-slate-800 shadow-xs hover:border-emerald-500/30 transition-all cursor-pointer group"
+                onClick={() => setSelectedMentee(mentee)}
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2.5">
                     <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 flex items-center justify-center text-slate-800 dark:text-slate-200 font-black text-xs">
                       {mentee.name.charAt(0)}
                     </div>
                     <div>
-                      <strong className="text-slate-900 dark:text-slate-100 text-xs font-bold">{mentee.name}</strong>
+                      <strong className="text-slate-900 dark:text-slate-100 text-xs font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                        {mentee.name}
+                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0" />
+                      </strong>
                       <span className="text-[10px] text-slate-700 dark:text-slate-400 block font-mono">@{mentee.username}</span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
                     <span className="text-[10px] text-slate-700 dark:text-slate-400 font-mono font-medium">Last active: {mentee.lastCheckIn}</span>
-                    <Badge variant={mentee.lastStatus === 'CLEAN' ? 'emerald' : 'amber'}>
-                      {mentee.lastStatus.replace('_', ' ')}
-                    </Badge>
+                    {mentee.lastStatus === 'SLIP_UP' ? (
+                      <Badge variant="rose" className="font-extrabold animate-pulse">🔴 RELAPSE ALERT</Badge>
+                    ) : mentee.lastStatus === 'PEEKED_EDGED' ? (
+                      <Badge variant="amber" className="font-extrabold">⚠️ URGE WARNING</Badge>
+                    ) : (
+                      <Badge variant="emerald">🟢 STABLE</Badge>
+                    )}
                   </div>
                 </div>
 
@@ -206,7 +322,7 @@ export const MentorDashboardPage: React.FC = () => {
                   <div>
                     <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-semibold">Clean Ratio Score</span>
                     <div className="flex items-center gap-1 mt-0.5 text-emerald-700 dark:text-emerald-450 font-black font-mono">
-                      <HeartHandshake className="w-3.5 h-3.5 text-emerald-600 animate-pulse" />
+                      <HeartHandshake className="w-3.5 h-3.5 text-emerald-600" />
                       {mentee.ratio}% Purity
                     </div>
                   </div>
@@ -216,6 +332,193 @@ export const MentorDashboardPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Sliding Mentee Details Drawer */}
+      {selectedMentee && (
+        <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true">
+          <div className="absolute inset-0 overflow-hidden">
+            {/* Backdrop overlay */}
+            <div 
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity cursor-pointer"
+              onClick={() => setSelectedMentee(null)}
+            ></div>
+
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex max-w-full pl-10">
+              <div className="pointer-events-auto w-screen max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-900 flex flex-col h-full animate-slide-in">
+                {/* Header */}
+                <div className="p-5 border-b border-slate-150 dark:border-slate-900 flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-xs shrink-0">
+                      {selectedMentee.name.charAt(0)}
+                    </div>
+                    <div>
+                      <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">{selectedMentee.name}</h3>
+                      <p className="text-[10px] text-slate-700 dark:text-slate-400 font-mono">@{selectedMentee.username}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedMentee(null)}
+                    className="p-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-900 dark:hover:bg-slate-850 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-slate-700 cursor-pointer"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Content Area */}
+                <div className="flex-grow overflow-y-auto p-5 space-y-6">
+                  {drawerError && (
+                    <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-400 text-xs font-semibold text-center">
+                      {drawerError}
+                    </div>
+                  )}
+
+                  {isLoadingDetails ? (
+                    <div className="py-20 text-center space-y-2">
+                      <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                      <p className="text-[10px] text-slate-400 font-mono">Loading complete analytics...</p>
+                    </div>
+                  ) : (
+                    <>
+                      {/* Section: Extended KPIs */}
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
+                          <span className="text-[9px] text-slate-700 dark:text-slate-500 uppercase tracking-wider font-bold">Longest Streak</span>
+                          <span className="text-sm font-black text-slate-800 dark:text-slate-200 font-mono block mt-1">
+                            {selectedMentee.longestStreak || selectedMentee.streak} Days
+                          </span>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
+                          <span className="text-[9px] text-slate-700 dark:text-slate-500 uppercase tracking-wider font-bold">Resilience Rating</span>
+                          <span className="text-sm font-black text-slate-850 dark:text-amber-400 font-mono block mt-1">
+                            {selectedMentee.resilienceScore || 85}%
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Section: 30-Day Check-in Heatmap */}
+                      <div className="space-y-3.5">
+                        <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-emerald-600" /> check-in logs history
+                        </h4>
+                        
+                        {menteeLogs.length === 0 ? (
+                          <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
+                            <p className="text-[10px] text-slate-500 italic">No check-in logs recorded in database.</p>
+                          </div>
+                        ) : (
+                          <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-850 space-y-3">
+                            <div className="flex flex-wrap gap-1.5 justify-center">
+                              {/* Render check-in log blocks */}
+                              {menteeLogs.map((log) => (
+                                <div
+                                  key={log.id}
+                                  className={`w-6 h-6 rounded-md flex items-center justify-center text-[8px] font-bold text-white shrink-0 ${
+                                    log.status === 'CLEAN' || log.status === 'URGE_RESISTED'
+                                      ? 'bg-emerald-500'
+                                      : log.status === 'PEEKED_EDGED'
+                                      ? 'bg-amber-500'
+                                      : 'bg-rose-500'
+                                  }`}
+                                  title={`Status: ${log.status} | Date: ${new Date(log.logTimestamp || log.checkInDate).toLocaleDateString()}`}
+                                >
+                                  {log.status.charAt(0)}
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex items-center justify-between text-[8px] uppercase tracking-wider font-bold text-slate-600 dark:text-slate-500 pt-1">
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-500 inline-block"></span> Clean</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-amber-500 inline-block"></span> Edging</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-500 inline-block"></span> Slip-up</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Section: Trigger breakdown */}
+                      <div className="space-y-3">
+                        <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
+                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Relapse & Urge Triggers
+                        </h4>
+
+                        {triggerStats.length === 0 ? (
+                          <p className="text-[10px] text-slate-500 italic text-center py-2 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-850">No triggers reported.</p>
+                        ) : (
+                          <div className="space-y-2.5">
+                            {triggerStats.map(([trigger, count]) => (
+                              <div key={trigger} className="space-y-1">
+                                <div className="flex items-center justify-between text-[10px] font-bold text-slate-700 dark:text-slate-400">
+                                  <span>{trigger}</span>
+                                  <span className="font-mono">{count} times</span>
+                                </div>
+                                <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-1.5">
+                                  <div 
+                                    className="bg-amber-500 h-1.5 rounded-full" 
+                                    style={{ width: `${Math.min(100, (count / menteeLogs.length) * 100)}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Section: Counsel Notes (Nasiha) */}
+                      <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-900">
+                        <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
+                          <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> Log Spiritual Counsel (Nasiha)
+                        </h4>
+
+                        <form onSubmit={handlePostNote} className="space-y-2">
+                          <textarea
+                            placeholder="Write official advisor counsel, instructions, or Quranic references..."
+                            value={newNoteText}
+                            onChange={(e) => setNewNoteText(e.target.value)}
+                            rows={3}
+                            className="w-full p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-250 dark:border-slate-850 text-[11px] focus:outline-none placeholder:text-slate-500 text-slate-900 dark:text-slate-100 shadow-xs"
+                            required
+                          />
+                          <Button 
+                            type="submit" 
+                            variant="emerald" 
+                            size="sm" 
+                            isLoading={isSubmittingNote}
+                            className="w-full text-xs font-bold py-2 flex items-center justify-center gap-1.5"
+                          >
+                            <Send className="w-3.5 h-3.5" /> Publish Nasiha
+                          </Button>
+                        </form>
+
+                        {/* Counsel Timeline */}
+                        <div className="space-y-3">
+                          <span className="text-[9px] uppercase tracking-wider font-bold text-slate-600 dark:text-slate-500 block">Past counsel logs</span>
+                          {counselNotes.length === 0 ? (
+                            <p className="text-[10px] text-slate-500 italic text-center py-4 bg-slate-50 dark:bg-slate-900/20 rounded-xl">No counsel notes recorded yet.</p>
+                          ) : (
+                            <div className="space-y-3 border-l border-slate-100 dark:border-slate-900 pl-3 ml-2.5">
+                              {counselNotes.map((note) => (
+                                <div key={note.id} className="relative space-y-1">
+                                  <div className="absolute -left-[19px] top-1 w-2 h-2 rounded-full bg-emerald-500 ring-4 ring-white dark:ring-slate-950"></div>
+                                  <div className="flex items-center justify-between text-[8px] font-bold text-slate-600 dark:text-slate-500">
+                                    <span>{note.mentorFullName || 'Advisor'}</span>
+                                    <span>{new Date(note.createdAt).toLocaleDateString()}</span>
+                                  </div>
+                                  <p className="text-[10px] leading-relaxed text-slate-800 dark:text-slate-350 italic bg-slate-50 dark:bg-slate-900/30 p-2 rounded-lg border border-slate-100 dark:border-slate-850">
+                                    "{note.counselText || note.noteContent}"
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

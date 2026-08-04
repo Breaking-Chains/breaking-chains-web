@@ -61,7 +61,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 </div>
               </div>
               <p className="text-xs text-amber-900 dark:text-amber-100/95 leading-relaxed italic font-serif pl-6 border-l-2 border-amber-450/40">
-                "{note.noteContent}"
+                "{note.counselText}"
               </p>
             </Card>
           ))}

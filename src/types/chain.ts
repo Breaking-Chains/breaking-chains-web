@@ -17,6 +17,7 @@ export interface HabitChain {
   resilienceScore: number;
   cleanRatioPercent: number;
   status: 'ACTIVE' | 'ARCHIVED';
+  lastCheckInDate?: string | null;
   createdAt: string;
   updatedAt: string;
 }

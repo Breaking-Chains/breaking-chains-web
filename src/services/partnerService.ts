@@ -16,10 +16,10 @@ export async function getCounselNotes(chainId: string): Promise<CounselNote[]> {
   return Array.isArray(res) ? res : [];
 }
 
-export async function sendCounselNote(chainId: string, noteContent: string): Promise<CounselNote> {
+export async function sendCounselNote(chainId: string, counselText: string): Promise<CounselNote> {
   return apiFetch<CounselNote>(`/api/v1/chains/${chainId}/counsel-notes`, {
     method: 'POST',
-    body: JSON.stringify({ noteContent }),
+    body: JSON.stringify({ counselText, isPrivate: false }),
   });
 }
 

@@ -59,7 +59,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
                 <span className="text-xs font-bold text-amber-850 dark:text-amber-200">{note.mentorFullName}</span>
                 <span className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">Today</span>
               </div>
-              <p className="text-sm text-amber-900/90 dark:text-amber-100/90 leading-relaxed italic font-serif">"{note.noteContent}"</p>
+              <p className="text-sm text-amber-900/90 dark:text-amber-100/90 leading-relaxed italic font-serif">"{note.counselText}"</p>
             </Card>
           ))}
         </div>
