@@ -39,3 +39,10 @@ export async function sendPartnershipMessage(
     body: JSON.stringify({ messageContent }),
   });
 }
+
+export async function connectWithMentorCode(inviteCode: string): Promise<any> {
+  return apiFetch<any>('/api/v1/partners/accept', {
+    method: 'POST',
+    body: JSON.stringify({ inviteCode }),
+  });
+}

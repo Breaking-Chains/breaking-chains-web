@@ -8,6 +8,7 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { Users, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
+import { connectWithMentorCode } from '../services/partnerService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
 import type { MentorshipChatMessage } from '../types/partner';
@@ -77,15 +78,31 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
     }
   };
 
-  const handleConnectMentor = (e: React.FormEvent) => {
+  const handleConnectMentor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteCodeInput.trim()) return;
-    setConnectSuccessMsg(`Successfully connected to mentor with code ${inviteCodeInput.trim()}!`);
-    setInviteCodeInput('');
-    setTimeout(() => {
-      setConnectSuccessMsg(null);
-      setIsConnectModalOpen(false);
-    }, 2000);
+    setErrorMsg(null);
+    try {
+      if (isDemoSession) {
+        setConnectSuccessMsg(`Successfully connected to mentor with code ${inviteCodeInput.trim()}!`);
+        setInviteCodeInput('');
+        setTimeout(() => {
+          setConnectSuccessMsg(null);
+          setIsConnectModalOpen(false);
+        }, 2000);
+      } else {
+        await connectWithMentorCode(inviteCodeInput.trim());
+        setConnectSuccessMsg(`Successfully connected! Partnership established.`);
+        setInviteCodeInput('');
+        loadMentors();
+        setTimeout(() => {
+          setConnectSuccessMsg(null);
+          setIsConnectModalOpen(false);
+        }, 2000);
+      }
+    } catch (err: unknown) {
+      setErrorMsg(formatApiErrorMessage(err));
+    }
   };
 
   const handleSendMessage = (text: string) => {
