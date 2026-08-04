@@ -111,10 +111,10 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           <div className="flex items-center gap-2">
             <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
             <div>
-              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
                 Community Mentors
               </h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Spiritual Guides & Recovery Coaches</p>
+              <p className="text-[10px] text-slate-700 dark:text-slate-400 font-medium">Spiritual Guides & Recovery Coaches</p>
             </div>
           </div>
 
@@ -198,11 +198,11 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                       VERIFIED
                     </span>
                   </div>
-                  <span className="text-[9px] text-slate-500 dark:text-slate-450 font-mono font-medium">{mentor.yearsOfExperience} yrs exp</span>
+                  <span className="text-[9px] text-slate-700 dark:text-slate-450 font-mono font-bold">{mentor.yearsOfExperience} yrs exp</span>
                 </div>
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">{mentor.specialization}</p>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
-                <p className="text-[11px] text-slate-600 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-50 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
+                <p className="text-[10px] text-emerald-700 dark:text-emerald-450 font-extrabold uppercase tracking-wide">{mentor.specialization}</p>
+                <p className="text-[10px] text-slate-700 dark:text-slate-400 font-medium leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
+                <p className="text-[11px] text-slate-800 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
               </div>
             ))}
           </div>

@@ -27,34 +27,34 @@ export const EmergencyPage: React.FC<EmergencyPageProps> = ({ onTriggerSosModal 
       </Card>
 
       <div className="space-y-3">
-        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+        <h3 className="text-sm font-black text-slate-900 dark:text-slate-100 uppercase tracking-wider">
           Immediate Physical & Psychological Circuit Breakers
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Card variant="dark" className="p-5 space-y-2">
-            <div className="flex items-center gap-2 text-rose-600 dark:text-rose-400 font-bold text-sm">
+            <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 font-bold text-sm">
               <Shield className="w-5 h-5" /> 1. Physical Break Rule
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
               Never stay in bed or behind a closed door with a screen while experiencing an urge. Stand up immediately.
             </p>
           </Card>
 
           <Card variant="dark" className="p-5 space-y-2">
-            <div className="flex items-center gap-2 text-teal-600 dark:text-teal-400 font-bold text-sm">
+            <div className="flex items-center gap-2 text-teal-750 dark:text-teal-400 font-bold text-sm">
               <Droplets className="w-5 h-5" /> 2. Hydrotherapy Wudu Reset
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
               Cold water on your face and arms activates the dive reflex, slowing heart rate and resetting emotional arousal.
             </p>
           </Card>
 
           <Card variant="dark" className="p-5 space-y-2">
-            <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-bold text-sm">
+            <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-400 font-bold text-sm">
               <Wind className="w-5 h-5" /> 3. 60-Second Box Breathing
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed font-medium">
               Inhale 4s, hold 4s, exhale 4s, hold 4s. Re-engages the prefrontal cortex for self-mastery.
             </p>
           </Card>

@@ -112,18 +112,18 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
               )}
             </div>
 
-            <div className="text-xs space-y-1.5 p-3 rounded-xl bg-slate-100/60 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 leading-relaxed">
-              <p><span className="text-slate-500 dark:text-slate-400">Qualification:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.qualification}</strong></p>
-              <p><span className="text-slate-500 dark:text-slate-400">Specialization:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.specialization}</strong></p>
-              <p><span className="text-slate-500 dark:text-slate-400">Experience:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.yearsOfExperience} years</strong></p>
+            <div className="text-xs space-y-1.5 p-3 rounded-xl bg-slate-100/60 dark:bg-slate-950/40 border border-slate-200 dark:border-slate-900 leading-relaxed font-semibold">
+              <p><span className="text-slate-700 dark:text-slate-400 font-semibold">Qualification:</span> <strong className="text-slate-900 dark:text-slate-100 font-black">{existingProfile.qualification}</strong></p>
+              <p><span className="text-slate-700 dark:text-slate-400 font-semibold">Specialization:</span> <strong className="text-slate-900 dark:text-slate-100 font-black">{existingProfile.specialization}</strong></p>
+              <p><span className="text-slate-700 dark:text-slate-400 font-semibold">Experience:</span> <strong className="text-slate-900 dark:text-slate-100 font-black">{existingProfile.yearsOfExperience} years</strong></p>
               {existingProfile.organization && (
-                <p><span className="text-slate-500 dark:text-slate-400">Organization:</span> <strong className="text-slate-800 dark:text-slate-200">{existingProfile.organization}</strong></p>
+                <p><span className="text-slate-700 dark:text-slate-400 font-semibold">Organization:</span> <strong className="text-slate-900 dark:text-slate-100 font-black">{existingProfile.organization}</strong></p>
               )}
-              <p className="pt-1 text-slate-700 dark:text-slate-300 italic">"{existingProfile.bio}"</p>
+              <p className="pt-1 text-slate-800 dark:text-slate-300 italic">"{existingProfile.bio}"</p>
             </div>
 
             {existingProfile.status === 'APPROVED' && (
-              <div className="p-3 bg-emerald-55/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs text-emerald-850 dark:text-emerald-300 flex items-start gap-2">
+              <div className="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/50 rounded-xl text-xs text-emerald-950 dark:text-emerald-300 flex items-start gap-2 font-medium">
                 <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
                 <span>You are verified to leave Counsel Notes (*Nasiha*) and mentor struggling recoverers across the platform.</span>
               </div>
@@ -135,7 +135,7 @@ export const BecomeMentorModal: React.FC<BecomeMentorModalProps> = ({
           </Card>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex items-center gap-2 p-3 bg-emerald-55/60 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 rounded-xl text-xs text-emerald-850 dark:text-emerald-300">
+            <div className="flex items-center gap-2 p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 rounded-xl text-xs text-emerald-950 dark:text-emerald-300 font-medium">
               <Award className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
               <span>Register as a verified Spiritual Counselor or Recovery Mentor to support recoverers on their Tazkiyah journey.</span>
             </div>

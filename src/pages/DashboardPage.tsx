@@ -50,17 +50,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <Card key={note.id} variant="gold" className="p-4 space-y-2 border-amber-500/40 shadow-lg animate-fade-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-400" />
-                  <span className="text-xs font-bold text-amber-200 uppercase tracking-wider">
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-bold text-amber-950 dark:text-amber-200 uppercase tracking-wider">
                     Mentor Counsel Note (Nasiha)
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-amber-300 font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                <div className="flex items-center gap-1.5 text-[10px] text-amber-850 dark:text-amber-300 font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>{note.mentorFullName || 'Verified Mentor'}</span>
                 </div>
               </div>
-              <p className="text-xs text-amber-100/95 leading-relaxed italic font-serif pl-6 border-l-2 border-amber-400/40">
+              <p className="text-xs text-amber-900 dark:text-amber-100/95 leading-relaxed italic font-serif pl-6 border-l-2 border-amber-450/40">
                 "{note.noteContent}"
               </p>
             </Card>
@@ -174,7 +174,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   variant="outline"
                   size="sm"
                   onClick={() => onTabChange('analytics')}
-                  className="w-full flex items-center justify-center gap-2 border-slate-800 text-teal-400 hover:border-teal-500/40"
+                  className="w-full flex items-center justify-center gap-2 border-slate-200 dark:border-slate-800 text-teal-600 dark:text-teal-400 hover:border-teal-500/40 hover:bg-slate-50 dark:hover:bg-slate-900"
                 >
                   <BarChart3 className="w-4 h-4" />
                   <span>Open Detailed Analytics</span>
