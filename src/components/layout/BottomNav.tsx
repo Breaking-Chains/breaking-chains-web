@@ -40,13 +40,13 @@ export const BottomNav: React.FC<BottomNavProps> = ({
               <button
                 key={tab.id}
                 onClick={onTriggerSos}
-                className="flex flex-col items-center justify-center -mt-6 group focus:outline-none"
+                className="flex flex-col items-center justify-center -mt-4 group focus:outline-none cursor-pointer"
                 aria-label="Trigger 1-Tap SOS Emergency Interrupter"
               >
-                <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-rose-600 via-rose-500 to-amber-500 p-0.5 shadow-xl shadow-rose-950/70 border-2 border-white dark:border-slate-950 flex items-center justify-center animate-pulse-glow group-active:scale-90 transition-transform">
-                  <AlertTriangle className="w-7 h-7 text-white stroke-[2.5]" />
+                <div className="w-12 h-12 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-300 dark:border-rose-500/40 shadow-md shadow-rose-500/10 dark:shadow-rose-950/30 flex items-center justify-center group-active:scale-95 transition-transform hover:shadow-rose-500/20">
+                  <AlertTriangle className="w-5 h-5 text-rose-600 dark:text-rose-400 stroke-[2.2]" />
                 </div>
-                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 mt-1 uppercase tracking-wider">
+                <span className="text-[9px] font-bold text-rose-700 dark:text-rose-400 mt-1.5 uppercase tracking-wider">
                   SOS Helper
                 </span>
               </button>

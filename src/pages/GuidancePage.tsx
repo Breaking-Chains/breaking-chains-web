@@ -106,23 +106,25 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       )}
 
       {/* Verified Mentor Directory Section */}
-      <Card variant="glass" className="p-4 space-y-3">
-        <div className="flex items-center justify-between">
+      <Card variant="glass" className="p-4 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-900/60">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
             <div>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">Verified Community Mentors</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Islamic Spiritual Guides & Certified Recovery Coaches</p>
+              <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                Community Mentors
+              </h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Spiritual Guides & Recovery Coaches</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 self-end sm:self-auto">
             {!isApprovedMentor && (
               <Button
                 variant="subtle"
                 size="sm"
                 onClick={() => setIsConnectModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 hover:border-amber-500/40 cursor-pointer"
+                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-medium"
               >
                 <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
               </Button>
@@ -133,12 +135,12 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 variant="emerald"
                 size="sm"
                 onClick={handleOpenMentees}
-                className="flex items-center gap-1.5 text-xs font-bold shadow-md dark:shadow-lg dark:shadow-emerald-950/50"
+                className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md shadow-emerald-500/5 dark:shadow-emerald-950/20"
               >
                 <Users className="w-4 h-4" /> View My Mentees
               </Button>
             ) : isPendingMentor ? (
-              <Badge variant="amber" className="flex items-center gap-1 py-1 px-2.5 text-xs font-semibold">
+              <Badge variant="amber" className="flex items-center gap-1 py-1 px-2.5 text-xs font-semibold rounded-xl">
                 <Clock className="w-3.5 h-3.5" /> Review Pending
               </Badge>
             ) : (
@@ -146,7 +148,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 variant="emerald"
                 size="sm"
                 onClick={() => setIsBecomeMentorOpen(true)}
-                className="flex items-center gap-1.5 text-xs"
+                className="flex items-center gap-1.5 text-xs rounded-xl font-medium"
               >
                 <Award className="w-4 h-4" /> Become a Mentor
               </Button>
@@ -187,18 +189,20 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             {mentorList.map((mentor) => (
               <div
                 key={mentor.id}
-                className="p-3 rounded-xl bg-slate-100/60 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-850 space-y-1.5 text-xs"
+                className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 space-y-2 text-xs shadow-xs hover:shadow-sm transition-shadow duration-200"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <strong className="text-slate-900 dark:text-slate-100">{mentor.fullName}</strong>
-                    <Badge variant="emerald" className="text-[9px] py-0 px-1.5">VERIFIED</Badge>
+                    <strong className="text-slate-900 dark:text-slate-100 text-xs font-black">{mentor.fullName}</strong>
+                    <span className="text-[8px] tracking-wider font-semibold py-0.5 px-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400">
+                      VERIFIED
+                    </span>
                   </div>
-                  <span className="text-[10px] text-slate-600 dark:text-slate-500 font-mono">{mentor.yearsOfExperience} yrs exp</span>
+                  <span className="text-[9px] text-slate-500 dark:text-slate-450 font-mono font-medium">{mentor.yearsOfExperience} yrs exp</span>
                 </div>
-                <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-semibold">{mentor.specialization}</p>
-                <p className="text-[10px] text-slate-600 dark:text-slate-400">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
-                <p className="text-[10px] text-slate-700 dark:text-slate-300 italic line-clamp-2">"{mentor.bio}"</p>
+                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wide">{mentor.specialization}</p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
+                <p className="text-[11px] text-slate-600 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-50 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
               </div>
             ))}
           </div>
