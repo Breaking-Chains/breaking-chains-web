@@ -41,39 +41,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-900 p-5 h-screen sticky top-0 justify-between shrink-0">
-      <div className="space-y-6">
-        {/* Sleek App Brand */}
-        <div className="flex items-center gap-3 px-1 py-1">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center">
-            <ShieldCheck className="w-5 h-5 text-emerald-400 stroke-[2.2]" />
+      <div className="space-y-4">
+        {/* Sleek App Brand Header block */}
+        <div className="space-y-4 pb-4 border-b border-slate-150 dark:border-slate-900/60 bg-slate-50/50 dark:bg-slate-950/20 -mx-5 px-5 pt-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-250 dark:border-emerald-500/30 flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 stroke-[2.2]" />
+            </div>
+            <div>
+              <h1 className="text-xs font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-1.5 uppercase">
+                Breaking Chains <span className="text-emerald-650 dark:text-emerald-400 select-none text-[10px]">✵</span>
+              </h1>
+              <p className="text-[9px] text-slate-700 dark:text-slate-400 font-bold uppercase tracking-wider">PMO Recovery Platform</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-extrabold text-slate-100 tracking-tight">
-              Breaking Chains
-            </h1>
-            <p className="text-[11px] text-slate-400 font-medium">PMO Recovery Platform</p>
-          </div>
-        </div>
 
-        {/* User Badge */}
-        {user && (
-          <div className="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/80">
-            <div className="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-950 border border-emerald-500/30 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-300 font-bold text-xs">
-              <UserIcon className="w-4 h-4 text-emerald-500 dark:text-emerald-400" />
+          {/* User Badge */}
+          {user && (
+            <div className="flex items-center gap-2.5 py-0.5">
+              <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250 dark:border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 font-bold text-xs shrink-0 shadow-xs">
+                <UserIcon className="w-4 h-4 text-emerald-650 dark:text-emerald-450" />
+              </div>
+              <div className="overflow-hidden text-left flex-1 min-w-0">
+                <span className="text-xs font-black text-slate-900 dark:text-slate-100 block truncate leading-tight">{user.fullName}</span>
+                <span className="text-[10px] text-slate-700 dark:text-slate-400 block truncate leading-tight font-semibold">@{user.username}</span>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign Out"
+                className="p-1.5 text-slate-700 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-450 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-colors cursor-pointer"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <div className="overflow-hidden text-left flex-1">
-              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 block truncate">{user.fullName}</span>
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 block truncate">@{user.username}</span>
-            </div>
-            <button
-              onClick={logout}
-              title="Sign Out"
-              className="p-1.5 text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Minimalist Live Streak Metric */}
         <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-2">
