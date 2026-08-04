@@ -53,7 +53,7 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
             <h2 className="text-sm font-black text-slate-900 dark:text-slate-100 capitalize flex items-center gap-1.5">
               <span className="text-emerald-600 dark:text-emerald-400 select-none">✵</span> {activeTab === 'dashboard' ? 'PMO Recovery Dashboard' : activeTab === 'guidance' ? 'Community Guidance' : activeTab}
             </h2>
-            <p className="text-[10px] text-slate-550 dark:text-slate-400 font-medium">
+            <p className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">
               {activeTab === 'dashboard' 
                 ? 'Your healing progress & daily reflection' 
                 : activeTab === 'guidance' 

@@ -129,7 +129,7 @@ export const SettingsPage: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <strong className="text-slate-900 dark:text-slate-100 text-sm">{app.fullName}</strong>
-                      <span className="text-slate-550 dark:text-slate-500">(@{app.username})</span>
+                      <span className="text-slate-600 dark:text-slate-500">(@{app.username})</span>
                       {app.status === 'APPROVED' && <Badge variant="emerald">APPROVED</Badge>}
                       {app.status === 'PENDING' && <Badge variant="amber">PENDING</Badge>}
                       {app.status === 'REJECTED' && <Badge variant="rose">REJECTED</Badge>}

@@ -48,9 +48,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[110px]">
             <ShieldCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400 mx-auto" />
             <div className="mt-2 flex-1 flex flex-col justify-center">
-              <span className="text-[10px] text-slate-500 dark:text-slate-450 block uppercase tracking-wider font-semibold">Clean Ratio Score</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 block uppercase tracking-wider font-bold">Clean Ratio Score</span>
               {cleanRatioPercent === 0 ? (
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic mt-1.5 block">First Check-in Pending</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-500 italic mt-1.5 block">First Check-in Pending</span>
               ) : (
                 <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 block">{cleanRatioPercent}%</span>
               )}
@@ -61,9 +61,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[110px]">
             <Flame className="w-5 h-5 text-amber-550 dark:text-amber-400 fill-amber-500 dark:fill-amber-400" />
             <div className="mt-2 flex-1 flex flex-col justify-center">
-              <span className="text-[10px] text-slate-500 dark:text-slate-450 block uppercase tracking-wider font-semibold">Current Streak</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 block uppercase tracking-wider font-bold">Current Streak</span>
               {currentStreak === 0 ? (
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic mt-1.5 block">No Active Streak</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-500 italic mt-1.5 block">No Active Streak</span>
               ) : (
                 <span className="text-xl font-black text-amber-600 dark:text-amber-300 font-mono mt-0.5 block">{currentStreak} Days</span>
               )}
@@ -74,9 +74,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[110px]">
             <Clock className="w-5 h-5 text-teal-650 dark:text-teal-400 animate-pulse" />
             <div className="mt-2 flex-1 flex flex-col justify-center">
-              <span className="text-[10px] text-slate-500 dark:text-slate-450 block uppercase tracking-wider font-semibold">Time Reclaimed</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 block uppercase tracking-wider font-bold">Time Reclaimed</span>
               {hoursSaved === 0 ? (
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic mt-1.5 block">Save Hours Tomorrow</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-500 italic mt-1.5 block">Save Hours Tomorrow</span>
               ) : (
                 <span className="text-xl font-black text-teal-600 dark:text-teal-450 font-mono mt-0.5 block">{hoursSaved} Hours</span>
               )}
@@ -87,9 +87,9 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[110px]">
             <Heart className="w-5 h-5 text-rose-600 dark:text-rose-455" />
             <div className="mt-2 flex-1 flex flex-col justify-center">
-              <span className="text-[10px] text-slate-500 dark:text-slate-450 block uppercase tracking-wider font-semibold">Sadaqah Potential</span>
+              <span className="text-[10px] text-slate-600 dark:text-slate-400 block uppercase tracking-wider font-bold">Sadaqah Potential</span>
               {moneySaved === 0 ? (
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 italic mt-1.5 block">Charity Pool Starting</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-500 italic mt-1.5 block">Charity Pool Starting</span>
               ) : (
                 <span className="text-xl font-black text-rose-600 dark:text-rose-400 font-mono mt-0.5 block">${moneySaved} Saved</span>
               )}
@@ -122,7 +122,7 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
                 <circle cx="65" cy="30" r="2.5" fill="#f59e0b" className="opacity-40 animate-pulse" />
                 <circle cx="45" cy="70" r="3.5" fill="#ec4899" className="opacity-40 animate-pulse" />
               </svg>
-              <p className="text-[11px] text-slate-500 dark:text-slate-450 text-center max-w-[240px] leading-normal font-medium italic">
+              <p className="text-[11px] text-slate-650 dark:text-slate-400 text-center max-w-[240px] leading-normal font-semibold italic">
                 No trigger data logged yet. Complete daily check-ins to map your triggers here.
               </p>
             </div>
@@ -203,14 +203,14 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
                   </div>
                   {/* Status node */}
                   <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${
-                    bdg.achieved ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-slate-200 text-slate-500 dark:bg-slate-800 dark:text-slate-400'
+                    bdg.achieved ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
                   }`}>
                     {bdg.achieved ? 'Achieved' : 'Locked'}
                   </span>
                 </div>
                 <div>
                   <h4 className="text-xs font-extrabold tracking-tight">{bdg.title}</h4>
-                  <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-snug mt-1 font-medium">{bdg.desc}</p>
+                  <p className="text-[10px] text-slate-650 dark:text-slate-400 leading-snug mt-1 font-semibold">{bdg.desc}</p>
                 </div>
               </div>
             ))}

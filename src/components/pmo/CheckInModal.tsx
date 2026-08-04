@@ -72,7 +72,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
               {errorMsg}
             </div>
           )}
-          <p className="text-xs text-slate-650 dark:text-slate-400 font-medium">
+          <p className="text-xs text-slate-700 dark:text-slate-400 font-semibold">
             Select your status for today. Honest reflection (*Muhasabah*) is key to recovery.
           </p>
 
@@ -213,7 +213,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
             <h4 className="text-xs font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">
               Immediate Post-Slip Tawbah Action Steps:
             </h4>
-            <ul className="text-xs text-slate-650 dark:text-slate-300 space-y-1.5 list-disc pl-4 font-medium">
+            <ul className="text-xs text-slate-700 dark:text-slate-300 space-y-1.5 list-disc pl-4 font-medium">
               <li>Make Wudu with cold water to wash away visual traces.</li>
               <li>Pray 2 Raka'at <strong>Salat al-Tawbah</strong> (Prayer of Repentance).</li>
               <li>Give <strong>$1–$5 Sadaqah</strong> (Charity erases bad deeds: <em>Al-Hasanat yudhibna al-sayyi'at</em>).</li>
