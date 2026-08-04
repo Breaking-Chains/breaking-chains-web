@@ -1,5 +1,5 @@
 import React from 'react';
-import { User as UserIcon, RefreshCw, LogOut } from 'lucide-react';
+import { User as UserIcon, LogOut } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -35,9 +35,6 @@ export const SettingsPage: React.FC = () => {
             </p>
           </div>
           <div className="space-y-2 pt-2">
-            <Button variant="outline" size="sm" className="w-full">
-              <RefreshCw className="w-4 h-4 mr-2" /> Sync progress with cloud
-            </Button>
             <Button variant="danger" size="sm" onClick={logout} className="w-full">
               <LogOut className="w-4 h-4 mr-2" /> Sign Out
             </Button>
