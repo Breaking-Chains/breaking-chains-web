@@ -3,10 +3,10 @@ import { MentorshipChat } from '../components/pmo/MentorshipChat';
 import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
+import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
-import { Award, Users, Clock, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { Users, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
@@ -17,6 +17,8 @@ interface GuidancePageProps {
 }
 
 export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage }) => {
+  const { user } = useAuth();
+  const role = user?.role || 'USER';
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
   const [isBecomeMentorOpen, setIsBecomeMentorOpen] = useState(false);
@@ -63,8 +65,6 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   }, []);
 
   const mentorList = Array.isArray(verifiedMentors) ? verifiedMentors : [];
-  const isApprovedMentor = myProfile?.status === 'APPROVED' || myProfile?.isVerified === true;
-  const isPendingMentor = myProfile?.status === 'PENDING';
 
   const handleOpenMentees = () => {
     if (onOpenMenteesPage) {
@@ -119,18 +119,18 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
 
           <div className="flex items-center gap-2 self-end sm:self-auto">
-            {!isApprovedMentor && (
+            {role === 'USER' && (
               <Button
                 variant="subtle"
                 size="sm"
                 onClick={() => setIsConnectModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-medium"
+                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
               >
                 <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
               </Button>
             )}
 
-            {isApprovedMentor ? (
+            {role === 'MENTOR' && (
               <Button
                 variant="emerald"
                 size="sm"
@@ -138,19 +138,6 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md shadow-emerald-500/5 dark:shadow-emerald-950/20"
               >
                 <Users className="w-4 h-4" /> View My Mentees
-              </Button>
-            ) : isPendingMentor ? (
-              <Badge variant="amber" className="flex items-center gap-1 py-1 px-2.5 text-xs font-semibold rounded-xl">
-                <Clock className="w-3.5 h-3.5" /> Review Pending
-              </Badge>
-            ) : (
-              <Button
-                variant="emerald"
-                size="sm"
-                onClick={() => setIsBecomeMentorOpen(true)}
-                className="flex items-center gap-1.5 text-xs rounded-xl font-medium"
-              >
-                <Award className="w-4 h-4" /> Become a Mentor
               </Button>
             )}
           </div>
@@ -162,25 +149,17 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
             <Users className="w-6 h-6 text-slate-600 mx-auto" />
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              {isApprovedMentor
+              {role === 'MENTOR'
                 ? 'You are a verified mentor! No other mentors registered yet.'
                 : 'No verified mentors listed yet.'}
             </p>
-            {isApprovedMentor ? (
+            {role === 'MENTOR' && (
               <Button
                 variant="emerald"
                 size="sm"
                 onClick={handleOpenMentees}
               >
                 View My Mentees Roster Page
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setIsBecomeMentorOpen(true)}
-              >
-                Be the first to register as a mentor!
               </Button>
             )}
           </div>
@@ -211,7 +190,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
 
       {/* Active Mentorship Chat & Counsel Notes */}
       <MentorshipChat
-        partnerName={isApprovedMentor ? 'Recoveree Student Roster' : 'Shaykh Ahmad (Spiritual Mentor)'}
+        partnerName={role === 'MENTOR' ? 'Recoveree Student Roster' : 'Shaykh Ahmad (Spiritual Mentor)'}
         inviteCode="MENTOR-BC-7890"
         messages={chatMessages}
         onSendMessage={handleSendMessage}
