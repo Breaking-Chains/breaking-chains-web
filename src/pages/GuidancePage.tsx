@@ -26,6 +26,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [connectSuccessMsg, setConnectSuccessMsg] = useState<string | null>(null);
+  const [connectErrorMsg, setConnectErrorMsg] = useState<string | null>(null);
 
   const [isLoadingMentors, setIsLoadingMentors] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -78,10 +79,18 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
     }
   };
 
+  useEffect(() => {
+    if (!isConnectModalOpen) {
+      setInviteCodeInput('');
+      setConnectSuccessMsg(null);
+      setConnectErrorMsg(null);
+    }
+  }, [isConnectModalOpen]);
+
   const handleConnectMentor = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteCodeInput.trim()) return;
-    setErrorMsg(null);
+    setConnectErrorMsg(null);
     try {
       if (isDemoSession) {
         setConnectSuccessMsg(`Successfully connected to mentor with code ${inviteCodeInput.trim()}!`);
@@ -101,7 +110,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         }, 2000);
       }
     } catch (err: unknown) {
-      setErrorMsg(formatApiErrorMessage(err));
+      setConnectErrorMsg(formatApiErrorMessage(err));
     }
   };
 
@@ -240,6 +249,12 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           <p className="text-xs text-slate-600 dark:text-slate-300">
             Enter the unique <strong>Invite Code</strong> provided by your assigned spiritual mentor or recovery coach.
           </p>
+
+          {connectErrorMsg && (
+            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
+              {connectErrorMsg}
+            </div>
+          )}
 
           {connectSuccessMsg && (
             <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/80 border border-emerald-250 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
