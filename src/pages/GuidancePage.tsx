@@ -17,7 +17,7 @@ interface GuidancePageProps {
 }
 
 export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage }) => {
-  const { user } = useAuth();
+  const { user, isDemoSession } = useAuth();
   const role = user?.role || 'USER';
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
@@ -29,18 +29,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [isLoadingMentors, setIsLoadingMentors] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([
-    {
-      id: 'msg-1',
-      partnershipId: 'p-1',
-      senderId: 'mentor-1',
-      senderFullName: 'Shaykh Ahmad',
-      senderUsername: 'shaykh_ahmad',
-      messageContent: 'Assalamu alaikum! Remember to guard your gaze and keep up your daily Muhasabah check-ins.',
-      isRead: true,
-      createdAt: new Date(Date.now() - 3600000).toISOString(),
-    },
-  ]);
+  const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
 
   const loadMentors = async () => {
     setIsLoadingMentors(true);
@@ -62,7 +51,23 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
 
   useEffect(() => {
     loadMentors();
-  }, []);
+    if (isDemoSession) {
+      setChatMessages([
+        {
+          id: 'msg-1',
+          partnershipId: 'p-1',
+          senderId: 'mentor-1',
+          senderFullName: 'Shaykh Ahmad',
+          senderUsername: 'shaykh_ahmad',
+          messageContent: 'Assalamu alaikum! Remember to guard your gaze and keep up your daily Muhasabah check-ins.',
+          isRead: true,
+          createdAt: new Date(Date.now() - 3600000).toISOString(),
+        },
+      ]);
+    } else {
+      setChatMessages([]);
+    }
+  }, [isDemoSession]);
 
   const mentorList = Array.isArray(verifiedMentors) ? verifiedMentors : [];
 
@@ -189,12 +194,22 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       </Card>
 
       {/* Active Mentorship Chat & Counsel Notes */}
-      <MentorshipChat
-        partnerName={role === 'MENTOR' ? 'Recoveree Student Roster' : 'Shaykh Ahmad (Spiritual Mentor)'}
-        inviteCode="MENTOR-BC-7890"
-        messages={chatMessages}
-        onSendMessage={handleSendMessage}
-      />
+      {isDemoSession || chatMessages.length > 0 ? (
+        <MentorshipChat
+          partnerName={role === 'MENTOR' ? 'Recoveree Student Roster' : 'Shaykh Ahmad (Spiritual Mentor)'}
+          inviteCode="MENTOR-BC-7890"
+          messages={chatMessages}
+          onSendMessage={handleSendMessage}
+        />
+      ) : (
+        <Card variant="glass" className="p-6 text-center space-y-3">
+          <Users className="w-8 h-8 text-slate-400 mx-auto" />
+          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Confidential Advisory Chat</h4>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+            Connect with a verified mentor using their invite code in the directory above to initiate a secure, encrypted guidance conversation.
+          </p>
+        </Card>
+      )}
 
       <BecomeMentorModal
         isOpen={isBecomeMentorOpen}
