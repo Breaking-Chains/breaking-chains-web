@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Users, ShieldCheck, Flame, HeartHandshake, Check, X, Compass } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { getMentees } from '../services/partnerService';
 
 interface MenteeRequest {
   id: string;
@@ -12,17 +14,44 @@ interface MenteeRequest {
 }
 
 export const MentorDashboardPage: React.FC = () => {
+  const { isDemoSession } = useAuth();
   const [acceptingNewMentees, setAcceptingNewMentees] = useState(true);
-  const [requests, setRequests] = useState<MenteeRequest[]>([
-    { id: 'req-1', name: 'Zayd Malik', username: 'zayd_m', date: 'Today', code: 'MENTOR-BC-7890' },
-    { id: 'req-2', name: 'Omar Farooq', username: 'omar_f', date: 'Yesterday', code: 'MENTOR-BC-7890' },
-  ]);
+  const [requests, setRequests] = useState<MenteeRequest[]>([]);
 
-  const [activeMentees, setActiveMentees] = useState([
-    { id: 'm-1', name: 'Zayd Malik', username: 'zayd_m', streak: 12, ratio: 95, lastStatus: 'CLEAN', lastCheckIn: '3 hrs ago' },
-    { id: 'm-2', name: 'Bilal Khan', username: 'bilal_k', streak: 4, ratio: 80, lastStatus: 'URGE_RESISTED', lastCheckIn: '5 hrs ago' },
-    { id: 'm-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
-  ]);
+  const [activeMentees, setActiveMentees] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (isDemoSession) {
+      setRequests([
+        { id: 'req-1', name: 'Zayd Malik', username: 'zayd_m', date: 'Today', code: 'MENTOR-BC-7890' },
+        { id: 'req-2', name: 'Omar Farooq', username: 'omar_f', date: 'Yesterday', code: 'MENTOR-BC-7890' },
+      ]);
+      setActiveMentees([
+        { id: 'm-1', name: 'Zayd Malik', username: 'zayd_m', streak: 12, ratio: 95, lastStatus: 'CLEAN', lastCheckIn: '3 hrs ago' },
+        { id: 'm-2', name: 'Bilal Khan', username: 'bilal_k', streak: 4, ratio: 80, lastStatus: 'URGE_RESISTED', lastCheckIn: '5 hrs ago' },
+        { id: 'm-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
+      ]);
+    } else {
+      const loadRealMentees = async () => {
+        try {
+          const chains = await getMentees();
+          const mapped = chains.map((c) => ({
+            id: c.id,
+            name: `Recoverer #${c.userId.substring(0, 6)}`,
+            username: `user_${c.userId.substring(0, 6)}`,
+            streak: c.currentStreak,
+            ratio: c.cleanRatioPercent,
+            lastStatus: 'CLEAN',
+            lastCheckIn: 'Check-in active',
+          }));
+          setActiveMentees(mapped);
+        } catch {
+          // Ignore
+        }
+      };
+      loadRealMentees();
+    }
+  }, [isDemoSession]);
 
   const handleAccept = (reqId: string, name: string, username: string) => {
     setRequests((prev) => prev.filter((r) => r.id !== reqId));
