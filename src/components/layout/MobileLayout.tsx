@@ -4,6 +4,7 @@ import { BottomNav } from './BottomNav';
 import { Sidebar } from './Sidebar';
 import type { NavTab } from './BottomNav';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
 import { Sun, Moon } from 'lucide-react';
 
 interface MobileLayoutProps {
@@ -24,6 +25,31 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   cleanRatioPercent = 94.7,
 }) => {
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
+  const role = user?.role || 'USER';
+
+  const getHeaderTitle = () => {
+    if (role === 'ADMIN') {
+      return activeTab === 'dashboard' ? 'System Overview Panel' : activeTab === 'guidance' ? 'Mentor Audit & Compliance' : activeTab;
+    }
+    if (role === 'MENTOR') {
+      return activeTab === 'dashboard' ? 'Mentees Roster Dashboard' : activeTab === 'guidance' ? 'Confidential Recovery Counsel' : activeTab;
+    }
+    return activeTab === 'dashboard' ? 'PMO Recovery Dashboard' : activeTab === 'guidance' ? 'Community Guidance' : activeTab;
+  };
+
+  const getHeaderSubtitle = () => {
+    if (role === 'ADMIN') {
+      return activeTab === 'dashboard' ? 'Global statistics & active guides engagement' : 'Audit logs, applications & policy triggers';
+    }
+    if (role === 'MENTOR') {
+      return activeTab === 'dashboard' ? 'Active recoverees & wudu check-in monitors' : 'Encrypted direct Nasiha advisory chat';
+    }
+    if (activeTab === 'dashboard') return 'Your healing progress & daily reflection';
+    if (activeTab === 'guidance') return 'Confidential spiritual counsel & guidance';
+    if (activeTab === 'analytics') return 'Spiritual psychology & reboot metrics';
+    return 'Urge circuit breakers & emergency resets';
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex selection:bg-emerald-500/30">
@@ -51,16 +77,10 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
         <header className="hidden md:flex items-center justify-between px-8 py-3.5 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-900/40 sticky top-0 z-30">
           <div className="space-y-0.5">
             <h2 className="text-sm font-black text-slate-900 dark:text-slate-100 capitalize flex items-center gap-1.5">
-              <span className="text-emerald-600 dark:text-emerald-400 select-none">✵</span> {activeTab === 'dashboard' ? 'PMO Recovery Dashboard' : activeTab === 'guidance' ? 'Community Guidance' : activeTab}
+              <span className="text-emerald-600 dark:text-emerald-400 select-none">✵</span> {getHeaderTitle()}
             </h2>
             <p className="text-[10px] text-slate-600 dark:text-slate-400 font-medium">
-              {activeTab === 'dashboard' 
-                ? 'Your healing progress & daily reflection' 
-                : activeTab === 'guidance' 
-                ? 'Confidential spiritual counsel & guidance' 
-                : activeTab === 'analytics' 
-                ? 'Spiritual psychology & reboot metrics' 
-                : 'Urge circuit breakers & emergency resets'}
+              {getHeaderSubtitle()}
             </p>
           </div>
           <div className="flex items-center gap-2.5">
@@ -72,12 +92,14 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
               {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            <button
-              onClick={onTriggerSos}
-              className="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-350 dark:border-rose-500/40 text-rose-700 dark:text-rose-450 font-bold text-xs rounded-xl shadow-md shadow-rose-500/10 dark:shadow-rose-950/30 cursor-pointer group-active:scale-95 transition-all"
-            >
-              1-Tap SOS Urge Interrupter
-            </button>
+            {role === 'USER' && (
+              <button
+                onClick={onTriggerSos}
+                className="px-4 py-2 bg-rose-50 dark:bg-rose-950/40 border border-rose-350 dark:border-rose-500/40 text-rose-700 dark:text-rose-455 font-bold text-xs rounded-xl shadow-md shadow-rose-500/10 dark:shadow-rose-950/30 cursor-pointer group-active:scale-95 transition-all animate-pulse-glow"
+              >
+                1-Tap SOS Urge Interrupter
+              </button>
+            )}
           </div>
         </header>
 

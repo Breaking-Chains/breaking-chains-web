@@ -11,7 +11,7 @@ interface AuthContextType {
   isDemoSession: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName: string, username: string) => Promise<void>;
-  loginAsGuest: () => void;
+  loginAsGuest: (role?: 'USER' | 'MENTOR' | 'ADMIN') => void;
   logout: () => Promise<void>;
 }
 
@@ -23,6 +23,27 @@ const DEMO_USER: User = {
   fullName: 'Guest Recoverer',
   username: 'pmo_warrior',
   authProvider: 'LOCAL',
+  role: 'USER',
+  createdAt: '2026-07-14T00:00:00Z',
+};
+
+const DEMO_MENTOR: User = {
+  id: 'demo-mentor-1',
+  email: 'guest.mentor@example.com',
+  fullName: 'Shaykh Ahmad',
+  username: 'shaykh_ahmad',
+  authProvider: 'LOCAL',
+  role: 'MENTOR',
+  createdAt: '2026-07-14T00:00:00Z',
+};
+
+const DEMO_ADMIN: User = {
+  id: 'demo-admin-1',
+  email: 'guest.admin@example.com',
+  fullName: 'Admin Director',
+  username: 'admin_director',
+  authProvider: 'LOCAL',
+  role: 'ADMIN',
   createdAt: '2026-07-14T00:00:00Z',
 };
 
@@ -82,8 +103,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginAsGuest = () => {
-    setUser(DEMO_USER);
+  const loginAsGuest = (role: 'USER' | 'MENTOR' | 'ADMIN' = 'USER') => {
+    if (role === 'MENTOR') {
+      setUser(DEMO_MENTOR);
+    } else if (role === 'ADMIN') {
+      setUser(DEMO_ADMIN);
+    } else {
+      setUser(DEMO_USER);
+    }
     setIsDemoSession(true);
   };
 

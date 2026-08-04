@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Mail, Lock, User as UserIcon, LogIn, UserPlus, Sparkles, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, User as UserIcon, LogIn, UserPlus } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
@@ -158,18 +158,41 @@ export const AuthPage: React.FC = () => {
             <div className="flex-grow border-t border-slate-200 dark:border-slate-900"></div>
           </div>
 
-          {/* Guest / Demo Access Button */}
-          <Button
-            type="button"
-            variant="subtle"
-            size="md"
-            onClick={loginAsGuest}
-            className="w-full text-xs font-semibold flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 hover:border-amber-500/40"
-          >
-            <Sparkles className="w-4 h-4 text-amber-500 dark:text-amber-400" />
-            <span>Try Offline Demo Session</span>
-            <ArrowRight className="w-3.5 h-3.5 ml-auto" />
-          </Button>
+          {/* Guest / Demo Access Buttons */}
+          <div className="space-y-2 pt-1">
+            <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-750 dark:text-slate-500 text-center mb-1.5">
+              Select Demo Access Role
+            </span>
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                type="button"
+                variant="subtle"
+                size="sm"
+                onClick={() => loginAsGuest('USER')}
+                className="text-[10px] py-2.5 px-1 text-slate-800 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold cursor-pointer"
+              >
+                Recoverer
+              </Button>
+              <Button
+                type="button"
+                variant="subtle"
+                size="sm"
+                onClick={() => loginAsGuest('MENTOR')}
+                className="text-[10px] py-2.5 px-1 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-xl font-bold cursor-pointer"
+              >
+                Mentor
+              </Button>
+              <Button
+                type="button"
+                variant="subtle"
+                size="sm"
+                onClick={() => loginAsGuest('ADMIN')}
+                className="text-[10px] py-2.5 px-1 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 border border-amber-250 dark:border-amber-900/50 rounded-xl font-bold cursor-pointer"
+              >
+                Admin
+              </Button>
+            </div>
+          </div>
         </Card>
 
         {/* Confidentiality Footer */}

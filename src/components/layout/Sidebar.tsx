@@ -28,8 +28,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
   cleanRatioPercent = 94.7,
 }) => {
   const { user, logout } = useAuth();
+  const role = user?.role || 'USER';
 
-  const navItems: NavItem[] = [
+  const navItems: NavItem[] = role === 'ADMIN' ? [
+    { id: 'dashboard', label: 'System Overview', icon: Home },
+    { id: 'guidance', label: 'Audit & Approvals', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ] : role === 'MENTOR' ? [
+    { id: 'dashboard', label: 'Mentee Roster', icon: Home },
+    { id: 'guidance', label: 'Counsel Chat', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
+  ] : [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'checkin', label: 'Daily Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge Interrupter', icon: AlertTriangle, isSos: true },
@@ -50,7 +59,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             <div>
               <h1 className="text-xs font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-1.5 uppercase">
-                Breaking Chains <span className="text-emerald-650 dark:text-emerald-400 select-none text-[10px]">✵</span>
+                Breaking Chains <span className="text-emerald-655 dark:text-emerald-400 select-none text-[10px]">✵</span>
               </h1>
               <p className="text-[9px] text-slate-700 dark:text-slate-400 font-bold uppercase tracking-wider">PMO Recovery Platform</p>
             </div>
@@ -60,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {user && (
             <div className="flex items-center gap-2.5 py-0.5">
               <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250 dark:border-emerald-500/40 flex items-center justify-center text-emerald-700 dark:text-emerald-300 font-bold text-xs shrink-0 shadow-xs">
-                <UserIcon className="w-4 h-4 text-emerald-650 dark:text-emerald-450" />
+                <UserIcon className="w-4 h-4 text-emerald-655 dark:text-emerald-450" />
               </div>
               <div className="overflow-hidden text-left flex-1 min-w-0">
                 <span className="text-xs font-black text-slate-900 dark:text-slate-100 block truncate leading-tight">{user.fullName}</span>
@@ -69,7 +78,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={logout}
                 title="Sign Out"
-                className="p-1.5 text-slate-700 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-450 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-colors cursor-pointer"
+                className="p-1.5 text-slate-700 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-455 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full transition-colors cursor-pointer"
               >
                 <LogOut className="w-3.5 h-3.5" />
               </button>
@@ -78,19 +87,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Minimalist Live Streak Metric */}
-        <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-2">
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
-            <span>Current Streak</span>
-            <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 font-mono font-bold">
-              <Flame className="w-3.5 h-3.5 fill-amber-500 dark:fill-amber-400" />
-              {currentStreak} Days
+        {role === 'USER' ? (
+          <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-2">
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+              <span>Current Streak</span>
+              <div className="flex items-center gap-1 text-amber-500 dark:text-amber-400 font-mono font-bold">
+                <Flame className="w-3.5 h-3.5 fill-amber-500 dark:fill-amber-400" />
+                {currentStreak} Days
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
+              <span>Clean Ratio</span>
+              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{cleanRatioPercent}%</span>
             </div>
           </div>
-          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium pt-1.5 border-t border-slate-200 dark:border-slate-800/80">
-            <span>Clean Ratio</span>
-            <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">{cleanRatioPercent}%</span>
+        ) : role === 'MENTOR' ? (
+          <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-1 text-xs text-slate-700 dark:text-slate-400">
+            <div className="flex justify-between font-semibold">
+              <span>Mentees Cap</span>
+              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">3/10 Active</span>
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-1 text-xs text-slate-700 dark:text-slate-400">
+            <div className="flex justify-between font-semibold">
+              <span>System Health</span>
+              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">100% Online</span>
+            </div>
+          </div>
+        )}
 
         {/* Minimal Navigation List */}
         <nav className="space-y-1">

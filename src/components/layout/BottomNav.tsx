@@ -1,6 +1,7 @@
 import { Home, AlertTriangle, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
+import { useAuth } from '../../context/AuthContext';
 
 export type NavTab = 'dashboard' | 'checkin' | 'emergency' | 'guidance' | 'mentees' | 'analytics' | 'settings';
 
@@ -22,7 +23,16 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onTabChange,
   onTriggerSos,
 }) => {
-  const tabs: TabItem[] = [
+  const { user } = useAuth();
+  const role = user?.role || 'USER';
+
+  const tabs: TabItem[] = role === 'ADMIN' ? [
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'guidance', label: 'Audit', icon: Users },
+  ] : role === 'MENTOR' ? [
+    { id: 'dashboard', label: 'Home', icon: Home },
+    { id: 'guidance', label: 'Chat', icon: Users },
+  ] : [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'emergency', label: 'SOS Urge', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance', icon: Users },

@@ -4,6 +4,7 @@ export interface User {
   fullName: string;
   username: string;
   authProvider?: string;
+  role?: 'USER' | 'MENTOR' | 'ADMIN';
   createdAt: string;
 }
 

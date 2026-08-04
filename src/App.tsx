@@ -11,6 +11,8 @@ import { GuidancePage } from './pages/GuidancePage';
 import { MenteesPage } from './pages/MenteesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AuthPage } from './pages/AuthPage';
+import { MentorDashboardPage } from './pages/MentorDashboardPage';
+import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
 import { CheckInModal } from './components/pmo/CheckInModal';
 import { OnboardingWizardModal } from './components/pmo/OnboardingWizardModal';
@@ -22,6 +24,9 @@ function ProtectedAppContent() {
   const [isSosOpen, setIsSosOpen] = useState<boolean>(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState<boolean>(false);
   const [isOnboardingDismissed, setIsOnboardingDismissed] = useState<boolean>(false);
+
+  const { user } = useAuth();
+  const role = user?.role || 'USER';
 
   const { chain, isApiLoading, currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos, createCustomChain } = usePmo();
 
@@ -68,41 +73,62 @@ function ProtectedAppContent() {
       currentStreak={currentStreak}
       cleanRatioPercent={cleanRatioPercent}
     >
-      {activeTab === 'dashboard' && (
-        <DashboardPage
-          onOpenCheckIn={() => setIsCheckInOpen(true)}
-          onTriggerSos={handleTriggerSos}
-          onTabChange={setActiveTab}
-        />
-      )}
+      {role === 'ADMIN' ? (
+        <>
+          {activeTab === 'dashboard' && <AdminDashboardPage />}
+          {activeTab === 'guidance' && <AdminDashboardPage />}
+          {activeTab === 'settings' && <SettingsPage />}
+        </>
+      ) : role === 'MENTOR' ? (
+        <>
+          {activeTab === 'dashboard' && <MentorDashboardPage />}
+          {activeTab === 'guidance' && (
+            <GuidancePage onOpenMenteesPage={() => setActiveTab('mentees')} />
+          )}
+          {activeTab === 'mentees' && (
+            <MenteesPage onBack={() => setActiveTab('guidance')} />
+          )}
+          {activeTab === 'settings' && <SettingsPage />}
+        </>
+      ) : (
+        <>
+          {activeTab === 'dashboard' && (
+            <DashboardPage
+              onOpenCheckIn={() => setIsCheckInOpen(true)}
+              onTriggerSos={handleTriggerSos}
+              onTabChange={setActiveTab}
+            />
+          )}
 
-      {activeTab === 'emergency' && (
-        <EmergencyPage onTriggerSosModal={handleTriggerSos} />
-      )}
+          {activeTab === 'emergency' && (
+            <EmergencyPage onTriggerSosModal={handleTriggerSos} />
+          )}
 
-      {activeTab === 'analytics' && (
-        <AnalyticsPage
-          currentStreak={currentStreak}
-          cleanRatioPercent={cleanRatioPercent}
-        />
-      )}
+          {activeTab === 'analytics' && (
+            <AnalyticsPage
+              currentStreak={currentStreak}
+              cleanRatioPercent={cleanRatioPercent}
+            />
+          )}
 
-      {activeTab === 'guidance' && (
-        <GuidancePage onOpenMenteesPage={() => setActiveTab('mentees')} />
-      )}
+          {activeTab === 'guidance' && (
+            <GuidancePage onOpenMenteesPage={() => setActiveTab('mentees')} />
+          )}
 
-      {activeTab === 'mentees' && (
-        <MenteesPage onBack={() => setActiveTab('guidance')} />
-      )}
+          {activeTab === 'mentees' && (
+            <MenteesPage onBack={() => setActiveTab('guidance')} />
+          )}
 
-      {activeTab === 'settings' && <SettingsPage />}
+          {activeTab === 'settings' && <SettingsPage />}
 
-      {activeTab === 'checkin' && (
-        <DashboardPage
-          onOpenCheckIn={() => setIsCheckInOpen(true)}
-          onTriggerSos={handleTriggerSos}
-          onTabChange={setActiveTab}
-        />
+          {activeTab === 'checkin' && (
+            <DashboardPage
+              onOpenCheckIn={() => setIsCheckInOpen(true)}
+              onTriggerSos={handleTriggerSos}
+              onTabChange={setActiveTab}
+            />
+          )}
+        </>
       )}
 
       {/* Emergency SOS Modal */}
