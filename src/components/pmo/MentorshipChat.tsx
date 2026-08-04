@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, UserCheck, Lock, Sparkles } from 'lucide-react';
+import { Send, UserCheck } from 'lucide-react';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
