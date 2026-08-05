@@ -52,7 +52,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'settings', label: 'Settings', icon: Settings },
   ] : role === 'MENTOR' ? [
     { id: 'dashboard', label: 'Mentee Roster', icon: Home },
-    { id: 'guidance', label: 'Counsel Chat', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
   ] : [
     { id: 'dashboard', label: 'Dashboard', icon: Home },

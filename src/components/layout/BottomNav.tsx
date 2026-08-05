@@ -1,4 +1,4 @@
-import { Home, AlertTriangle, Users } from 'lucide-react';
+import { Home, AlertTriangle, Users, Settings } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import { useAuth } from '../../context/AuthContext';
@@ -31,7 +31,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     { id: 'guidance', label: 'Audit', icon: Users },
   ] : role === 'MENTOR' ? [
     { id: 'dashboard', label: 'Home', icon: Home },
-    { id: 'guidance', label: 'Chat', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ] : [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'emergency', label: 'SOS Urge', icon: AlertTriangle, isSos: true },
