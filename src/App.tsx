@@ -30,7 +30,7 @@ function ProtectedAppContent() {
 
   const { chain, isApiLoading, currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos, createCustomChain } = usePmo();
 
-  const showOnboarding = chain === null && !isApiLoading && !isOnboardingDismissed;
+  const showOnboarding = role === 'USER' && chain === null && !isApiLoading && !isOnboardingDismissed;
 
   const handleTriggerSos = async () => {
     await startSos();
