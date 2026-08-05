@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { MinimalStreakHero } from '../components/pmo/MinimalStreakHero';
 import { ChaserEffectBanner } from '../components/pmo/ChaserEffectBanner';
+import { NafsProgressTracker } from '../components/pmo/NafsProgressTracker';
 import { DopamineRebootCard } from '../components/pmo/DopamineRebootCard';
+import { GuardingGazeCard } from '../components/pmo/GuardingGazeCard';
 import { usePmo } from '../context/PmoContext';
 import { Button } from '../components/ui/Button';
 import { ChevronDown, ChevronUp, Brain, Compass, BarChart3, Clock, DollarSign } from 'lucide-react';
