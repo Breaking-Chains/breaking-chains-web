@@ -18,6 +18,7 @@ export interface HabitChain {
   cleanRatioPercent: number;
   status: 'ACTIVE' | 'ARCHIVED';
   lastCheckInDate?: string | null;
+  partnershipId?: string;
   createdAt: string;
   updatedAt: string;
 }

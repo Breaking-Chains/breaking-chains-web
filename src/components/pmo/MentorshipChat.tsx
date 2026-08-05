@@ -11,6 +11,7 @@ interface MentorshipChatProps {
   notes?: CounselNote[];
   messages?: MentorshipChatMessage[];
   onSendMessage?: (text: string) => void;
+  currentUserId?: string;
 }
 
 export const MentorshipChat: React.FC<MentorshipChatProps> = ({
@@ -19,6 +20,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
   notes = [],
   messages = [],
   onSendMessage,
+  currentUserId,
 }) => {
   const [inputText, setInputText] = useState('');
 
@@ -83,7 +85,9 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
             </p>
           ) : (
             safeMessages.map((msg) => {
-              const isMe = msg.senderId === 'user1' || msg.senderId === 'me';
+              const isMe = currentUserId 
+                ? msg.senderId === currentUserId 
+                : (msg.senderId === 'user1' || msg.senderId === 'me');
               return (
                 <div
                   key={msg.id}

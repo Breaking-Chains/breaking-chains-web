@@ -3,9 +3,11 @@ import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
-import { getMentees, getCounselNotes, sendCounselNote } from '../services/partnerService';
+import { getMentees, getCounselNotes, sendCounselNote, getPartnershipMessages, sendPartnershipMessage } from '../services/partnerService';
 import { getMyMentorProfile } from '../services/mentorService';
 import type { MentorProfile } from '../types/mentor';
+import type { MentorshipChatMessage } from '../types/partner';
+import { MentorshipChat } from '../components/pmo/MentorshipChat';
 import { getCheckInLogs } from '../services/logService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import { 
@@ -46,6 +48,8 @@ export const MentorDashboardPage: React.FC = () => {
   const [newNoteText, setNewNoteText] = useState('');
   const [isSubmittingNote, setIsSubmittingNote] = useState(false);
   const [drawerError, setDrawerError] = useState<string | null>(null);
+  const [drawerTab, setDrawerTab] = useState<'analytics' | 'chat'>('analytics');
+  const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
 
   useEffect(() => {
     if (isDemoSession) {
@@ -70,6 +74,7 @@ export const MentorDashboardPage: React.FC = () => {
 
           const mapped = chains.map((c) => ({
             id: c.id, // Chain ID used to query logs and counsel notes
+            partnershipId: c.partnershipId,
             name: `Recoveree #${c.userId.substring(0, 6)}`,
             username: `user_${c.userId.substring(0, 6)}`,
             streak: c.currentStreak,
@@ -141,6 +146,77 @@ export const MentorDashboardPage: React.FC = () => {
       loadDetails();
     }
   }, [selectedMentee, isDemoSession]);
+
+  // Reset drawer tab when a new mentee is opened
+  useEffect(() => {
+    if (selectedMentee) {
+      setDrawerTab('analytics');
+    }
+  }, [selectedMentee]);
+
+  // Load chat messages and poll in background when on chat tab
+  useEffect(() => {
+    if (!selectedMentee || drawerTab !== 'chat') {
+      setChatMessages([]);
+      return;
+    }
+
+    if (isDemoSession) {
+      setChatMessages([
+        {
+          id: 'msg-mock-1',
+          partnershipId: 'p-1',
+          senderId: selectedMentee.id,
+          senderFullName: selectedMentee.name,
+          senderUsername: selectedMentee.username,
+          messageContent: 'Assalamu alaikum Sheikh, I had some strong urges today but wudu helped.',
+          isRead: true,
+          createdAt: new Date(Date.now() - 3600000).toISOString(),
+        }
+      ]);
+      return;
+    }
+
+    if (!selectedMentee.partnershipId) return;
+
+    const fetchChat = async () => {
+      try {
+        const msgs = await getPartnershipMessages(selectedMentee.partnershipId);
+        setChatMessages(msgs);
+      } catch (err) {
+        console.warn('Failed to load mentee chat messages:', err);
+      }
+    };
+
+    fetchChat();
+    const interval = setInterval(fetchChat, 5000);
+    return () => clearInterval(interval);
+  }, [selectedMentee, drawerTab, isDemoSession]);
+
+  const handleSendChatMessage = async (text: string) => {
+    if (!text.trim() || !selectedMentee) return;
+
+    if (isDemoSession) {
+      const newMsg: MentorshipChatMessage = {
+        id: `msg-${Date.now()}`,
+        partnershipId: 'p-1',
+        senderId: 'me',
+        senderFullName: user?.fullName || 'Sheikh Ahmad',
+        senderUsername: user?.username || 'sheikh_ahmad',
+        messageContent: text,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      };
+      setChatMessages((prev) => [...prev, newMsg]);
+    } else if (selectedMentee.partnershipId) {
+      try {
+        const sent = await sendPartnershipMessage(selectedMentee.partnershipId, text.trim());
+        setChatMessages((prev) => [...prev, sent]);
+      } catch (err) {
+        console.warn('Failed to send chat message to mentee:', err);
+      }
+    }
+  };
 
   const handleAccept = (reqId: string, name: string, username: string) => {
     setRequests((prev) => prev.filter((r) => r.id !== reqId));
@@ -382,6 +458,30 @@ export const MentorDashboardPage: React.FC = () => {
                   </button>
                 </div>
 
+                {/* Drawer Tabs */}
+                <div className="flex border-b border-slate-150 dark:border-slate-900 bg-slate-50 dark:bg-slate-900/40 p-1.5 gap-1 shrink-0">
+                  <button
+                    onClick={() => setDrawerTab('analytics')}
+                    className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      drawerTab === 'analytics'
+                        ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-405 shadow-xs border border-slate-100 dark:border-slate-800'
+                        : 'text-slate-600 hover:text-slate-805 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    📈 Analytics & Nasiha
+                  </button>
+                  <button
+                    onClick={() => setDrawerTab('chat')}
+                    className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                      drawerTab === 'chat'
+                        ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-405 shadow-xs border border-slate-100 dark:border-slate-800'
+                        : 'text-slate-600 hover:text-slate-805 dark:text-slate-400 dark:hover:text-slate-200'
+                    }`}
+                  >
+                    💬 Live Chat
+                  </button>
+                </div>
+
                 {/* Content Area */}
                 <div className="flex-grow overflow-y-auto p-5 space-y-6">
                   {drawerError && (
@@ -395,6 +495,14 @@ export const MentorDashboardPage: React.FC = () => {
                       <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
                       <p className="text-[10px] text-slate-400 font-mono">Loading complete analytics...</p>
                     </div>
+                  ) : drawerTab === 'chat' ? (
+                    <MentorshipChat
+                      partnerName={selectedMentee.name}
+                      inviteCode="MENTOR-BC-7890"
+                      messages={chatMessages}
+                      onSendMessage={handleSendChatMessage}
+                      currentUserId={isDemoSession ? 'me' : user?.id}
+                    />
                   ) : (
                     <>
                       {/* Section: Extended KPIs */}
