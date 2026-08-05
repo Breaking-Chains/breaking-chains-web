@@ -37,8 +37,8 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
   const [connectingMentorId, setConnectingMentorId] = useState<string | null>(null);
   const [userPartnerships, setUserPartnerships] = useState<AccountabilityPartnership[]>([]);
-  const [isChatExpanded, setIsChatExpanded] = useState(true);
-  const [isNasihaExpanded, setIsNasihaExpanded] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isNasihaOpen, setIsNasihaOpen] = useState(false);
 
   const loadMentors = async () => {
     setIsLoadingMentors(true);
@@ -243,98 +243,52 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
 
           {activeMentorship ? (
-            <div className="space-y-4">
-              {/* Connected Mentor Info Card */}
-              <Card variant="glass" className="p-5 space-y-4 border-emerald-500/20 dark:border-emerald-500/10">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800/40">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950 flex items-center justify-center text-emerald-600 dark:text-emerald-400 text-sm font-black uppercase">
-                      {(activeMentorship.partnerFullName || 'M')[0]}
-                    </div>
-                    <div>
+            <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-base font-black uppercase shrink-0">
+                    {(activeMentorship.partnerFullName || 'M')[0]}
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
                         {activeMentorship.partnerFullName || 'Verified Mentor'}
                       </h4>
-                      <p className="text-[10px] text-slate-500 dark:text-slate-450 font-medium">Your Active Spiritual Guide</p>
+                      <span className="text-[8px] font-bold py-0.5 px-2 rounded-full bg-emerald-55 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-transparent uppercase tracking-wider">
+                        Active Guide
+                      </span>
                     </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Button
-                      variant={isChatExpanded ? 'emerald' : 'outline'}
-                      size="sm"
-                      onClick={() => setIsChatExpanded(!isChatExpanded)}
-                      className="text-[10px] font-bold rounded-xl flex items-center gap-1"
-                    >
-                      💬 Chat with Mentor
-                    </Button>
-                    <Button
-                      variant={isNasihaExpanded ? 'emerald' : 'outline'}
-                      size="sm"
-                      onClick={() => setIsNasihaExpanded(!isNasihaExpanded)}
-                      className="text-[10px] font-bold rounded-xl flex items-center gap-1"
-                    >
-                      ✵ View Nasiha
-                    </Button>
+                    {(() => {
+                      const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
+                      return (
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wide">
+                          {details?.specialization || 'Spiritual Counselor & Tazkiyah Guide'}
+                        </p>
+                      );
+                    })()}
+                    <p className="text-[10px] text-slate-500 dark:text-slate-450 max-w-md italic">
+                      "Your recovery and spiritual journey is kept strictly confidential."
+                    </p>
                   </div>
                 </div>
 
-                {/* Additional profile details from list if match is found */}
-                {(() => {
-                  const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
-                  if (!details) return null;
-                  return (
-                    <div className="text-xs space-y-2 pt-1 text-slate-700 dark:text-slate-350 leading-relaxed font-medium">
-                      <p className="font-extrabold text-emerald-600 dark:text-emerald-400 text-[10px] uppercase tracking-wide">
-                        {details.specialization}
-                      </p>
-                      <p className="text-[10px] italic">
-                        "{details.bio}"
-                      </p>
-                    </div>
-                  );
-                })()}
-              </Card>
-
-              {/* Toggleable Nasiha (Counsel Notes) Feed */}
-              {isNasihaExpanded && notesList.length > 0 && (
-                <div className="space-y-2.5 animate-fade-in">
-                  <div className="flex items-center gap-1.5 text-[10px] font-black text-amber-800 dark:text-amber-300 uppercase tracking-wider px-1">
-                    <span className="text-amber-500 dark:text-amber-450 select-none">✵</span> Counsel Feed (Nasiha)
-                  </div>
-                  {notesList.map((note) => (
-                    <Card key={note.id} variant="gold" className="p-4 space-y-2 border-amber-500/40 shadow-sm">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                          <span className="text-[10px] font-bold text-amber-955 dark:text-amber-250 uppercase tracking-wider">
-                            Nasiha Guidance
-                          </span>
-                        </div>
-                        <span className="text-[9px] text-amber-600 dark:text-amber-400 font-mono">
-                          {new Date(note.createdAt).toLocaleDateString()}
-                        </span>
-                      </div>
-                      <p className="text-xs text-amber-900 dark:text-amber-100/95 leading-relaxed italic font-serif pl-5 border-l-2 border-amber-450/40">
-                        "{note.counselText}"
-                      </p>
-                    </Card>
-                  ))}
+                {/* Minimal Label Actions */}
+                <div className="flex items-center gap-3 self-stretch md:self-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-slate-800/40">
+                  <button
+                    onClick={() => setIsNasihaOpen(true)}
+                    className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-emerald-650 dark:hover:text-emerald-400 bg-slate-100/50 dark:bg-slate-900 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 rounded-xl transition-all duration-200 border border-slate-200/50 dark:border-slate-850 cursor-pointer"
+                  >
+                    ✵ Nasiha
+                  </button>
+                  <button
+                    onClick={() => setIsChatOpen(true)}
+                    className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-750 rounded-xl shadow-md shadow-emerald-500/10 transition-all duration-200 cursor-pointer"
+                  >
+                    💬 Chat
+                  </button>
                 </div>
-              )}
-
-              {/* Toggleable Mentorship Chat Box */}
-              {isChatExpanded && (
-                <div className="animate-fade-in">
-                  <MentorshipChat
-                    partnerName={activeMentorship.partnerFullName || 'Spiritual Mentor'}
-                    inviteCode={activeMentorship.inviteCode}
-                    messages={chatMessages}
-                    onSendMessage={handleSendMessage}
-                  />
-                </div>
-              )}
-            </div>
+              </div>
+            </Card>
           ) : (
             /* Unconnected Mentor Card */
             <Card variant="glass" className="p-6 text-center space-y-3 border-slate-200 dark:border-slate-900 bg-slate-100/20 dark:bg-slate-950/20">
@@ -493,6 +447,104 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </Button>
         </form>
       </Modal>
+
+      {/* --- SLIDE-IN SIDEBAR: NASIHA FEED --- */}
+      {activeMentorship && (
+        <>
+          <div 
+            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity duration-300 ${
+              isNasihaOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={() => setIsNasihaOpen(false)}
+          />
+          <div 
+            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-transform duration-300 ease-in-out ${
+              isNasihaOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-500 dark:text-amber-455 text-sm font-bold select-none">✵</span>
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Spiritual Counsel (Nasiha)
+                </h3>
+              </div>
+              <button 
+                onClick={() => setIsNasihaOpen(false)}
+                className="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              {notesList.length === 0 ? (
+                <div className="text-center py-12 text-xs text-slate-450 italic">
+                  No Nasiha counsel notes posted yet by your mentor.
+                </div>
+              ) : (
+                <div className="relative pl-5 border-l border-emerald-500/20 dark:border-emerald-500/10 space-y-6">
+                  {notesList.map((note) => (
+                    <div key={note.id} className="relative space-y-2">
+                      <div className="absolute -left-[26px] top-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-950" />
+                      
+                      <div className="flex items-center justify-between text-[9px] text-slate-400 font-mono font-bold uppercase tracking-wider">
+                        <span>{activeMentorship.partnerFullName || 'Spiritual Mentor'}</span>
+                        <span>{new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                      </div>
+                      
+                      <div className="p-4 rounded-2xl bg-amber-55/10 dark:bg-amber-950/20 border border-amber-500/15 dark:border-amber-500/10 text-xs text-slate-800 dark:text-slate-200 leading-relaxed italic font-serif shadow-xs">
+                        "{note.counselText}"
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* --- SLIDE-IN SIDEBAR: MENTORSHIP CHAT --- */}
+      {activeMentorship && (
+        <>
+          <div 
+            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity duration-300 ${
+              isChatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+            }`}
+            onClick={() => setIsChatOpen(false)}
+          />
+          <div 
+            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-transform duration-300 ease-in-out ${
+              isChatOpen ? 'translate-x-0' : 'translate-x-full'
+            }`}
+          >
+            <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="text-emerald-600 dark:text-emerald-450 text-sm font-bold select-none">✵</span>
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Mentor Chat
+                </h3>
+              </div>
+              <button 
+                onClick={() => setIsChatOpen(false)}
+                className="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4 bg-slate-55/10 dark:bg-slate-950/20">
+              <MentorshipChat
+                partnerName={activeMentorship.partnerFullName || 'Spiritual Mentor'}
+                inviteCode={activeMentorship.inviteCode}
+                messages={chatMessages}
+                onSendMessage={handleSendMessage}
+              />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
