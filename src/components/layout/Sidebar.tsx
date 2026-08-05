@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Home, AlertTriangle, CalendarCheck, Users, BarChart3, Settings, ShieldCheck, Flame, LogOut, User as UserIcon } from 'lucide-react';
+import { Home, AlertTriangle, CalendarCheck, Users, Settings, ShieldCheck, Flame, LogOut, User as UserIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import type { NavTab } from './BottomNav';
@@ -58,7 +58,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'checkin', label: 'Daily Check-In', icon: CalendarCheck },
     { id: 'emergency', label: 'SOS Urge Interrupter', icon: AlertTriangle, isSos: true },
     { id: 'guidance', label: 'Guidance & Mentors', icon: Users },
-    { id: 'analytics', label: 'Analytics & Impact', icon: BarChart3 },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
