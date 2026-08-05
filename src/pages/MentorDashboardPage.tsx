@@ -4,20 +4,16 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { getMentees, getCounselNotes, sendCounselNote, getPartnershipMessages, sendPartnershipMessage } from '../services/partnerService';
-import { getMyMentorProfile } from '../services/mentorService';
-import type { MentorProfile } from '../types/mentor';
 import type { MentorshipChatMessage } from '../types/partner';
 import { MentorshipChat } from '../components/pmo/MentorshipChat';
 import { getCheckInLogs } from '../services/logService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import { 
   Users, 
-  ShieldCheck, 
   Flame, 
   HeartHandshake, 
   Check, 
   X, 
-  Compass, 
   Calendar, 
   ChevronRight, 
   AlertTriangle, 
@@ -35,10 +31,8 @@ interface MenteeRequest {
 
 export const MentorDashboardPage: React.FC = () => {
   const { user, isDemoSession } = useAuth();
-  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
   const [requests, setRequests] = useState<MenteeRequest[]>([]);
   const [activeMentees, setActiveMentees] = useState<any[]>([]);
-  const [nasihaCount, setNasihaCount] = useState<number>(0);
 
   // Drawer States
   const [selectedMentee, setSelectedMentee] = useState<any | null>(null);
@@ -50,6 +44,7 @@ export const MentorDashboardPage: React.FC = () => {
   const [drawerError, setDrawerError] = useState<string | null>(null);
   const [drawerTab, setDrawerTab] = useState<'analytics' | 'chat'>('analytics');
   const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
+  const [activeRosterTab, setActiveRosterTab] = useState<'mentees' | 'requests'>('mentees');
 
   useEffect(() => {
     if (isDemoSession) {
@@ -62,16 +57,10 @@ export const MentorDashboardPage: React.FC = () => {
         { id: 'm-2', chainId: 'c-2', name: 'Bilal Khan', username: 'bilal_k', streak: 0, ratio: 80, lastStatus: 'SLIP_UP', lastCheckIn: '5 hrs ago' },
         { id: 'm-3', chainId: 'c-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
       ]);
-      setNasihaCount(14);
     } else {
       const loadRealMentees = async () => {
         try {
-          const [profile, chains] = await Promise.all([
-            getMyMentorProfile().catch(() => null),
-            getMentees().catch(() => []),
-          ]);
-          if (profile) setMentorProfile(profile);
-
+          const chains = await getMentees().catch(() => []);
           const mapped = chains.map((c) => ({
             id: c.id, // Chain ID used to query logs and counsel notes
             partnershipId: c.partnershipId,
@@ -85,23 +74,6 @@ export const MentorDashboardPage: React.FC = () => {
             lastCheckIn: c.lastCheckInDate ? new Date(c.lastCheckInDate).toLocaleDateString() : 'No check-in yet',
           }));
           setActiveMentees(mapped);
-
-          // Dynamically count counsel notes across all mentees
-          if (mapped.length > 0) {
-            const notesCounts = await Promise.all(
-              mapped.map(async (mentee) => {
-                try {
-                  const notes = await getCounselNotes(mentee.id);
-                  return notes.length;
-                } catch {
-                  return 0;
-                }
-              })
-            );
-            setNasihaCount(notesCounts.reduce((sum, count) => sum + count, 0));
-          } else {
-            setNasihaCount(0);
-          }
         } catch {
           // Ignore
         }
@@ -271,66 +243,123 @@ export const MentorDashboardPage: React.FC = () => {
 
   const triggerStats = getTriggerBreakdown();
 
-  const aggregateCleanRatio = activeMentees.length > 0
-    ? (activeMentees.reduce((acc, m) => acc + (m.ratio || 0), 0) / activeMentees.length).toFixed(1)
-    : '100';
-
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-12">
-      {/* Mentor Profile Overview Header */}
-      <Card variant="emerald" className="p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-bold text-lg shadow-xs shrink-0">
-              <ShieldCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h2 className="text-base font-black text-slate-900 dark:text-white">
-                  {isDemoSession ? 'Shaykh Ahmad (Spiritual Mentor)' : (mentorProfile?.fullName || user?.fullName || 'Spiritual Mentor')}
-                </h2>
-                {(isDemoSession || mentorProfile?.isVerified) && (
-                  <Badge variant="emerald" className="text-[10px] font-bold">
-                    VERIFIED GUIDE
-                  </Badge>
-                )}
-              </div>
-              <p className="text-xs text-slate-700 dark:text-slate-400 font-semibold mt-0.5">
-                Specialization: <strong className="text-slate-900 dark:text-slate-200 font-black">{isDemoSession ? 'Spiritual Counsel (Tazkiyah) & Sobriety' : (mentorProfile?.specialization || 'Spiritual Counsel (Tazkiyah)')}</strong>
+      {/* Segmented Tab Bar Selector */}
+      <div className="flex items-center gap-1.5 p-1 bg-slate-150/30 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 max-w-xs sm:max-w-sm shrink-0">
+        <button
+          onClick={() => setActiveRosterTab('mentees')}
+          className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer ${
+            activeRosterTab === 'mentees'
+              ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-405 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+          }`}
+        >
+          👥 Mentees ({activeMentees.length})
+        </button>
+        <button
+          onClick={() => setActiveRosterTab('requests')}
+          className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5 ${
+            activeRosterTab === 'requests'
+              ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-405 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+              : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+          }`}
+        >
+          <span>📩 Requests ({requests.length})</span>
+          {requests.length > 0 && (
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+          )}
+        </button>
+      </div>
+
+      {activeRosterTab === 'mentees' ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
+            <h3 className="text-xs font-black text-slate-900 dark:text-slate-205 uppercase tracking-wider">
+              Connected Mentees Active Roster
+            </h3>
+          </div>
+
+          {activeMentees.length === 0 ? (
+            <Card variant="glass" className="p-8 text-center space-y-3 border-slate-200 dark:border-slate-900 bg-slate-100/20 dark:bg-slate-950/20">
+              <Users className="w-8 h-8 text-slate-400 mx-auto" />
+              <h4 className="text-xs font-bold text-slate-850 dark:text-slate-200 uppercase tracking-wider">No Mentees Connected Yet</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
+                Provide your advisor invite code to recoverees so they can connect with your mentorship roster.
               </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[90px]">
-            <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase tracking-wider font-bold">Total Connected Mentees</span>
-            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">{activeMentees.length}</span>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[90px]">
-            <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase tracking-wider font-bold">Aggregate Clean Ratio</span>
-            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">{aggregateCleanRatio}%</span>
-          </div>
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[90px]">
-            <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase tracking-wider font-bold">Nasiha Prompts Sent</span>
-            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">{nasihaCount} Notes</span>
-          </div>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Connection Requests */}
-        <div className="lg:col-span-1 space-y-4">
-          <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Pending Requests ({requests.length})
-          </h3>
-
-          {requests.length === 0 ? (
-            <Card variant="glass" className="p-6 text-center space-y-2">
-              <p className="text-xs text-slate-400 font-medium italic">No pending connection requests.</p>
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activeMentees.map((mentee) => (
+                <Card 
+                  key={mentee.id} 
+                  variant="dark" 
+                  className="p-4 space-y-3 border-slate-150 dark:border-slate-800 shadow-xs hover:border-emerald-500/30 transition-all cursor-pointer group"
+                  onClick={() => setSelectedMentee(mentee)}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-slate-105 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 flex items-center justify-center text-slate-800 dark:text-slate-200 font-black text-xs">
+                        {mentee.name.charAt(0)}
+                      </div>
+                      <div>
+                        <strong className="text-slate-905 dark:text-slate-100 text-xs font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                          {mentee.name}
+                          <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0" />
+                        </strong>
+                        <span className="text-[10px] text-slate-700 dark:text-slate-400 block font-mono">@{mentee.username}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="text-[10px] text-slate-700 dark:text-slate-400 font-mono font-medium">Last active: {mentee.lastCheckIn}</span>
+                      {mentee.lastStatus === 'SLIP_UP' ? (
+                        <Badge variant="rose" className="font-extrabold animate-pulse">🔴 RELAPSE ALERT</Badge>
+                      ) : mentee.lastStatus === 'PEEKED_EDGED' ? (
+                        <Badge variant="amber" className="font-extrabold">⚠️ URGE WARNING</Badge>
+                      ) : (
+                        <Badge variant="emerald">🟢 STABLE</Badge>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 bg-white dark:bg-slate-950/70 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs">
+                    <div>
+                      <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-semibold">Active Streak</span>
+                      <div className="flex items-center gap-1 mt-0.5 text-emerald-700 dark:text-amber-400 font-black font-mono">
+                        <Flame className="w-3.5 h-3.5 fill-emerald-600" />
+                        {mentee.streak} Days Clean
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-semibold">Clean Ratio Score</span>
+                      <div className="flex items-center gap-1 mt-0.5 text-emerald-700 dark:text-emerald-450 font-black font-mono">
+                        <HeartHandshake className="w-3.5 h-3.5 text-emerald-600" />
+                        {mentee.ratio}% Purity
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <span className="text-amber-500 dark:text-amber-450 text-sm font-bold select-none">✵</span>
+            <h3 className="text-xs font-black text-slate-900 dark:text-slate-205 uppercase tracking-wider">
+              Pending Connection Requests
+            </h3>
+          </div>
+
+          {requests.length === 0 ? (
+            <Card variant="glass" className="p-8 text-center space-y-2 border-slate-200 dark:border-slate-900 bg-slate-100/20 dark:bg-slate-950/20">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium italic">No pending connection requests.</p>
+            </Card>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {requests.map((req) => (
                 <Card key={req.id} variant="gold" className="p-3.5 space-y-3 border-amber-500/20 shadow-xs">
                   <div className="flex items-start justify-between">
@@ -352,7 +381,7 @@ export const MentorDashboardPage: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDecline(req.id)}
-                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-450 cursor-pointer"
+                        className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-455 cursor-pointer"
                         title="Decline Request"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -364,68 +393,7 @@ export const MentorDashboardPage: React.FC = () => {
             </div>
           )}
         </div>
-
-        {/* Right: Roster Summaries */}
-        <div className="lg:col-span-2 space-y-4">
-          <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
-            <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> Connected Mentees Active Roster
-          </h3>
-
-          <div className="space-y-3">
-            {activeMentees.map((mentee) => (
-              <Card 
-                key={mentee.id} 
-                variant="dark" 
-                className="p-4 space-y-3 border-slate-150 dark:border-slate-800 shadow-xs hover:border-emerald-500/30 transition-all cursor-pointer group"
-                onClick={() => setSelectedMentee(mentee)}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-850 flex items-center justify-center text-slate-800 dark:text-slate-200 font-black text-xs">
-                      {mentee.name.charAt(0)}
-                    </div>
-                    <div>
-                      <strong className="text-slate-900 dark:text-slate-100 text-xs font-bold group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                        {mentee.name}
-                        <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-all transform translate-x-[-4px] group-hover:translate-x-0" />
-                      </strong>
-                      <span className="text-[10px] text-slate-700 dark:text-slate-400 block font-mono">@{mentee.username}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3">
-                    <span className="text-[10px] text-slate-700 dark:text-slate-400 font-mono font-medium">Last active: {mentee.lastCheckIn}</span>
-                    {mentee.lastStatus === 'SLIP_UP' ? (
-                      <Badge variant="rose" className="font-extrabold animate-pulse">🔴 RELAPSE ALERT</Badge>
-                    ) : mentee.lastStatus === 'PEEKED_EDGED' ? (
-                      <Badge variant="amber" className="font-extrabold">⚠️ URGE WARNING</Badge>
-                    ) : (
-                      <Badge variant="emerald">🟢 STABLE</Badge>
-                    )}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 bg-white dark:bg-slate-950/70 p-3 rounded-xl border border-slate-100 dark:border-slate-850 text-xs">
-                  <div>
-                    <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-semibold">Active Streak</span>
-                    <div className="flex items-center gap-1 mt-0.5 text-emerald-700 dark:text-amber-400 font-black font-mono">
-                      <Flame className="w-3.5 h-3.5 fill-emerald-600" />
-                      {mentee.streak} Days Clean
-                    </div>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-semibold">Clean Ratio Score</span>
-                    <div className="flex items-center gap-1 mt-0.5 text-emerald-700 dark:text-emerald-450 font-black font-mono">
-                      <HeartHandshake className="w-3.5 h-3.5 text-emerald-600" />
-                      {mentee.ratio}% Purity
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Sliding Mentee Details Drawer */}
       {selectedMentee && (
