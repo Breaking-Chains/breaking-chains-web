@@ -3,10 +3,10 @@ import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { RecoveryAnalytics } from '../components/pmo/RecoveryAnalytics';
 import { getMentees, getCounselNotes, sendCounselNote, getPartnershipMessages, sendPartnershipMessage } from '../services/partnerService';
 import type { MentorshipChatMessage } from '../types/partner';
 import { MentorshipChat } from '../components/pmo/MentorshipChat';
-import { getCheckInLogs } from '../services/logService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import { 
   Users, 
@@ -14,9 +14,7 @@ import {
   HeartHandshake, 
   Check, 
   X, 
-  Calendar, 
   ChevronRight, 
-  AlertTriangle, 
   TrendingUp, 
   Send
 } from 'lucide-react';
@@ -36,7 +34,6 @@ export const MentorDashboardPage: React.FC = () => {
 
   // Drawer States
   const [selectedMentee, setSelectedMentee] = useState<any | null>(null);
-  const [menteeLogs, setMenteeLogs] = useState<any[]>([]);
   const [counselNotes, setCounselNotes] = useState<any[]>([]);
   const [isLoadingDetails, setIsLoadingDetails] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
@@ -90,23 +87,12 @@ export const MentorDashboardPage: React.FC = () => {
         setDrawerError(null);
         try {
           if (isDemoSession) {
-            // Mock check-in logs
-            setMenteeLogs([
-              { id: 'l-1', status: 'CLEAN', checkInDate: new Date(Date.now() - 86400000).toISOString() },
-              { id: 'l-2', status: 'URGE_RESISTED', checkInDate: new Date(Date.now() - 172800000).toISOString(), triggerTag: 'LATE_NIGHT_SOLITUDE' },
-              { id: 'l-3', status: 'SLIP_UP', checkInDate: new Date(Date.now() - 259200000).toISOString(), triggerTag: 'BOREDOM_IDLENESS' },
-              { id: 'l-4', status: 'CLEAN', checkInDate: new Date(Date.now() - 345600000).toISOString() },
-            ]);
             // Mock counsel notes
             setCounselNotes([
               { id: 'n-1', mentorFullName: 'Shaykh Ahmad', counselText: 'Keep up with evening Adhkar. Try going to sleep immediately after Isha.', createdAt: new Date(Date.now() - 172800000).toISOString() },
             ]);
           } else {
-            const [logs, notes] = await Promise.all([
-              getCheckInLogs(selectedMentee.id),
-              getCounselNotes(selectedMentee.id),
-            ]);
-            setMenteeLogs(logs);
+            const notes = await getCounselNotes(selectedMentee.id);
             setCounselNotes(notes);
           }
         } catch (err: unknown) {
@@ -229,19 +215,6 @@ export const MentorDashboardPage: React.FC = () => {
     }
   };
 
-  // Helper to count trigger reasons
-  const getTriggerBreakdown = () => {
-    const counts: Record<string, number> = {};
-    menteeLogs.forEach((log) => {
-      if (log.triggerTag) {
-        const formatted = log.triggerTag.replace(/_/g, ' ');
-        counts[formatted] = (counts[formatted] || 0) + 1;
-      }
-    });
-    return Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  };
-
-  const triggerStats = getTriggerBreakdown();
 
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-12">
@@ -466,98 +439,16 @@ export const MentorDashboardPage: React.FC = () => {
                   ) : drawerTab === 'chat' ? (
                     <MentorshipChat
                       partnerName={selectedMentee.name}
-                      inviteCode="MENTOR-BC-7890"
                       messages={chatMessages}
                       onSendMessage={handleSendChatMessage}
                       currentUserId={isDemoSession ? 'me' : user?.id}
                     />
                   ) : (
                     <>
-                      {/* Section: Extended KPIs */}
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
-                          <span className="text-[9px] text-slate-700 dark:text-slate-500 uppercase tracking-wider font-bold">Longest Streak</span>
-                          <span className="text-sm font-black text-slate-800 dark:text-slate-200 font-mono block mt-1">
-                            {selectedMentee.longestStreak || selectedMentee.streak} Days
-                          </span>
-                        </div>
-                        <div className="bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-850 text-center">
-                          <span className="text-[9px] text-slate-700 dark:text-slate-500 uppercase tracking-wider font-bold">Resilience Rating</span>
-                          <span className="text-sm font-black text-slate-850 dark:text-amber-400 font-mono block mt-1">
-                            {selectedMentee.resilienceScore || 85}%
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Section: 30-Day Check-in Heatmap */}
-                      <div className="space-y-3.5">
-                        <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-emerald-600" /> check-in logs history
-                        </h4>
-                        
-                        {menteeLogs.length === 0 ? (
-                          <div className="p-4 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 text-center">
-                            <p className="text-[10px] text-slate-500 italic">No check-in logs recorded in database.</p>
-                          </div>
-                        ) : (
-                          <div className="p-3 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-850 space-y-3">
-                            <div className="flex flex-wrap gap-1.5 justify-center">
-                              {/* Render check-in log blocks */}
-                              {menteeLogs.map((log) => (
-                                <div
-                                  key={log.id}
-                                  className={`w-6 h-6 rounded-md flex items-center justify-center text-[8px] font-bold text-white shrink-0 ${
-                                    log.status === 'CLEAN' || log.status === 'URGE_RESISTED'
-                                      ? 'bg-emerald-500'
-                                      : log.status === 'PEEKED_EDGED'
-                                      ? 'bg-amber-500'
-                                      : 'bg-rose-500'
-                                  }`}
-                                  title={`Status: ${log.status} | Date: ${new Date(log.logTimestamp || log.checkInDate).toLocaleDateString()}`}
-                                >
-                                  {log.status.charAt(0)}
-                                </div>
-                              ))}
-                            </div>
-                            <div className="flex items-center justify-between text-[8px] uppercase tracking-wider font-bold text-slate-600 dark:text-slate-500 pt-1">
-                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-emerald-500 inline-block"></span> Clean</span>
-                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-amber-500 inline-block"></span> Edging</span>
-                              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-rose-500 inline-block"></span> Slip-up</span>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Section: Trigger breakdown */}
-                      <div className="space-y-3">
-                        <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-500" /> Relapse & Urge Triggers
-                        </h4>
-
-                        {triggerStats.length === 0 ? (
-                          <p className="text-[10px] text-slate-500 italic text-center py-2 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-slate-850">No triggers reported.</p>
-                        ) : (
-                          <div className="space-y-2.5">
-                            {triggerStats.map(([trigger, count]) => (
-                              <div key={trigger} className="space-y-1">
-                                <div className="flex items-center justify-between text-[10px] font-bold text-slate-700 dark:text-slate-400">
-                                  <span>{trigger}</span>
-                                  <span className="font-mono">{count} times</span>
-                                </div>
-                                <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-1.5">
-                                  <div 
-                                    className="bg-amber-500 h-1.5 rounded-full" 
-                                    style={{ width: `${Math.min(100, (count / menteeLogs.length) * 100)}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
+                      <RecoveryAnalytics chainId={selectedMentee.id} isDemo={isDemoSession} />
 
                       {/* Section: Counsel Notes (Nasiha) */}
-                      <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-900">
+                      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-900">
                         <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5">
                           <TrendingUp className="w-3.5 h-3.5 text-emerald-600" /> Log Spiritual Counsel (Nasiha)
                         </h4>

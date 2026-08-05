@@ -1,7 +1,8 @@
 import React from 'react';
-import { Award, ShieldCheck, Flame, Clock, Heart } from 'lucide-react';
+import { Award, ShieldCheck, Flame, Clock, Heart, BarChart3 } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { usePmo } from '../context/PmoContext';
+import { RecoveryAnalytics } from '../components/pmo/RecoveryAnalytics';
 
 interface AnalyticsPageProps {
   currentStreak?: number;
@@ -9,7 +10,7 @@ interface AnalyticsPageProps {
 }
 
 export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
-  const { analytics, currentStreak, cleanRatioPercent } = usePmo();
+  const { analytics, currentStreak, cleanRatioPercent, chain, isOfflineDemo } = usePmo();
 
   const totalTriggersCount = analytics?.topTriggers?.reduce((sum, t) => sum + t.count, 0) || 1;
 
@@ -97,6 +98,18 @@ export const AnalyticsPage: React.FC<AnalyticsPageProps> = () => {
           </div>
         </div>
       </Card>
+
+      {chain && (
+        <Card variant="dark" className="p-5 space-y-4">
+          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800/85 pb-3">
+            <BarChart3 className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+            <h3 className="text-xs font-black text-slate-905 dark:text-slate-205 uppercase tracking-wider">
+              Detailed Recovery Log Workspace & Heatmap
+            </h3>
+          </div>
+          <RecoveryAnalytics chainId={chain.id} isDemo={isOfflineDemo} />
+        </Card>
+      )}
 
       {/* Multi-Column Desktop Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
