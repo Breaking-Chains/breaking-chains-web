@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, AlertTriangle, CalendarCheck, Users, BarChart3, Settings, ShieldCheck, Flame, LogOut, User as UserIcon } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import type { NavTab } from './BottomNav';
 import { useAuth } from '../../context/AuthContext';
+import { getMentees } from '../../services/partnerService';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -27,8 +28,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
   currentStreak = 18,
   cleanRatioPercent = 94.7,
 }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, isDemoSession } = useAuth();
   const role = user?.role || 'USER';
+  const [activeMenteesCount, setActiveMenteesCount] = useState<number>(3);
+
+  useEffect(() => {
+    if (role === 'MENTOR') {
+      if (isDemoSession) {
+        setActiveMenteesCount(3);
+      } else {
+        getMentees()
+          .then((chains) => {
+            setActiveMenteesCount(chains.length);
+          })
+          .catch(() => {});
+      }
+    }
+  }, [role, isDemoSession]);
 
   const navItems: NavItem[] = role === 'ADMIN' ? [
     { id: 'dashboard', label: 'System Overview', icon: Home },
@@ -104,7 +120,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="bg-slate-100/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800/60 p-3 rounded-xl space-y-1 text-xs text-slate-700 dark:text-slate-400">
             <div className="flex justify-between font-semibold">
               <span>Mentees Cap</span>
-              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">3/10 Active</span>
+              <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                {activeMenteesCount}/10 Active
+              </span>
             </div>
           </div>
         ) : (

@@ -4,6 +4,8 @@ import { Badge } from '../components/ui/Badge';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
 import { getMentees, getCounselNotes, sendCounselNote } from '../services/partnerService';
+import { getMyMentorProfile } from '../services/mentorService';
+import type { MentorProfile } from '../types/mentor';
 import { getCheckInLogs } from '../services/logService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import { 
@@ -30,10 +32,11 @@ interface MenteeRequest {
 }
 
 export const MentorDashboardPage: React.FC = () => {
-  const { isDemoSession } = useAuth();
-  const [acceptingNewMentees, setAcceptingNewMentees] = useState(true);
+  const { user, isDemoSession } = useAuth();
+  const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
   const [requests, setRequests] = useState<MenteeRequest[]>([]);
   const [activeMentees, setActiveMentees] = useState<any[]>([]);
+  const [nasihaCount, setNasihaCount] = useState<number>(0);
 
   // Drawer States
   const [selectedMentee, setSelectedMentee] = useState<any | null>(null);
@@ -55,13 +58,19 @@ export const MentorDashboardPage: React.FC = () => {
         { id: 'm-2', chainId: 'c-2', name: 'Bilal Khan', username: 'bilal_k', streak: 0, ratio: 80, lastStatus: 'SLIP_UP', lastCheckIn: '5 hrs ago' },
         { id: 'm-3', chainId: 'c-3', name: 'Tariq Ali', username: 'tariq_a', streak: 27, ratio: 100, lastStatus: 'CLEAN', lastCheckIn: '1 day ago' },
       ]);
+      setNasihaCount(14);
     } else {
       const loadRealMentees = async () => {
         try {
-          const chains = await getMentees();
+          const [profile, chains] = await Promise.all([
+            getMyMentorProfile().catch(() => null),
+            getMentees().catch(() => []),
+          ]);
+          if (profile) setMentorProfile(profile);
+
           const mapped = chains.map((c) => ({
             id: c.id, // Chain ID used to query logs and counsel notes
-            name: `Recoverer #${c.userId.substring(0, 6)}`,
+            name: `Recoveree #${c.userId.substring(0, 6)}`,
             username: `user_${c.userId.substring(0, 6)}`,
             streak: c.currentStreak,
             longestStreak: c.longestStreak,
@@ -71,6 +80,23 @@ export const MentorDashboardPage: React.FC = () => {
             lastCheckIn: c.lastCheckInDate ? new Date(c.lastCheckInDate).toLocaleDateString() : 'No check-in yet',
           }));
           setActiveMentees(mapped);
+
+          // Dynamically count counsel notes across all mentees
+          if (mapped.length > 0) {
+            const notesCounts = await Promise.all(
+              mapped.map(async (mentee) => {
+                try {
+                  const notes = await getCounselNotes(mentee.id);
+                  return notes.length;
+                } catch {
+                  return 0;
+                }
+              })
+            );
+            setNasihaCount(notesCounts.reduce((sum, count) => sum + count, 0));
+          } else {
+            setNasihaCount(0);
+          }
         } catch {
           // Ignore
         }
@@ -169,6 +195,10 @@ export const MentorDashboardPage: React.FC = () => {
 
   const triggerStats = getTriggerBreakdown();
 
+  const aggregateCleanRatio = activeMentees.length > 0
+    ? (activeMentees.reduce((acc, m) => acc + (m.ratio || 0), 0) / activeMentees.length).toFixed(1)
+    : '100';
+
   return (
     <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-12">
       {/* Mentor Profile Overview Header */}
@@ -181,30 +211,18 @@ export const MentorDashboardPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-black text-slate-900 dark:text-white">
-                  Shaykh Ahmad (Spiritual Mentor)
+                  {isDemoSession ? 'Shaykh Ahmad (Spiritual Mentor)' : (mentorProfile?.fullName || user?.fullName || 'Spiritual Mentor')}
                 </h2>
-                <Badge variant="emerald" className="text-[10px] font-bold">
-                  VERIFIED GUIDE
-                </Badge>
+                {(isDemoSession || mentorProfile?.isVerified) && (
+                  <Badge variant="emerald" className="text-[10px] font-bold">
+                    VERIFIED GUIDE
+                  </Badge>
+                )}
               </div>
               <p className="text-xs text-slate-700 dark:text-slate-400 font-semibold mt-0.5">
-                Specialization: <strong className="text-slate-900 dark:text-slate-200 font-black">Spiritual Counsel (Tazkiyah) & Sobriety</strong>
+                Specialization: <strong className="text-slate-900 dark:text-slate-200 font-black">{isDemoSession ? 'Spiritual Counsel (Tazkiyah) & Sobriety' : (mentorProfile?.specialization || 'Spiritual Counsel (Tazkiyah)')}</strong>
               </p>
             </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <span className="text-xs text-slate-700 dark:text-slate-400 font-bold">Accepting Mentees:</span>
-            <button
-              onClick={() => setAcceptingNewMentees(!acceptingNewMentees)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                acceptingNewMentees
-                  ? 'bg-emerald-55 dark:bg-emerald-955/40 text-emerald-700 dark:text-emerald-400 border-emerald-250 dark:border-emerald-500/30'
-                  : 'bg-slate-100 border-slate-200 text-slate-500 dark:bg-slate-900 dark:text-slate-400'
-              }`}
-            >
-              {acceptingNewMentees ? 'Active & Open' : 'Roster Full'}
-            </button>
           </div>
         </div>
 
@@ -215,11 +233,11 @@ export const MentorDashboardPage: React.FC = () => {
           </div>
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[90px]">
             <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase tracking-wider font-bold">Aggregate Clean Ratio</span>
-            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">91.6%</span>
+            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">{aggregateCleanRatio}%</span>
           </div>
           <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-850/60 text-center shadow-xs flex flex-col items-center justify-between min-h-[90px]">
             <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase tracking-wider font-bold">Nasiha Prompts Sent</span>
-            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">14 Notes</span>
+            <span className="text-2xl font-black text-emerald-700 dark:text-emerald-400 font-mono mt-1 block">{nasihaCount} Notes</span>
           </div>
         </div>
       </Card>
