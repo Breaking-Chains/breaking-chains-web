@@ -4,9 +4,10 @@ import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { useAuth } from '../context/AuthContext';
+import { usePmo } from '../context/PmoContext';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
-import { Users, Link as LinkIcon, Sparkles } from 'lucide-react';
+import { Users, Link as LinkIcon, Sparkles, ShieldCheck } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
 import { connectWithMentorCode } from '../services/partnerService';
 import { formatApiErrorMessage } from '../services/apiClient';
@@ -19,7 +20,9 @@ interface GuidancePageProps {
 
 export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage }) => {
   const { user, isDemoSession } = useAuth();
+  const { counselNotes } = usePmo();
   const role = user?.role || 'USER';
+  const notesList = Array.isArray(counselNotes) ? counselNotes : [];
   const [verifiedMentors, setVerifiedMentors] = useState<MentorProfile[]>([]);
   const [myProfile, setMyProfile] = useState<MentorProfile | null>(null);
   const [isBecomeMentorOpen, setIsBecomeMentorOpen] = useState(false);
@@ -218,6 +221,37 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
         )}
       </Card>
+
+      {/* Mentor Counsel Feed (Nasiha) */}
+      {notesList.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <span className="text-amber-500 text-sm font-bold select-none">✵</span>
+            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+              Mentor Counsel Feed (Nasiha)
+            </h3>
+          </div>
+          {notesList.map((note) => (
+            <Card key={note.id} variant="gold" className="p-4 space-y-2 border-amber-500/40 shadow-lg animate-fade-in">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+                  <span className="text-xs font-bold text-amber-955 dark:text-amber-250 uppercase tracking-wider">
+                    Counsel Note
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[10px] text-amber-850 dark:text-amber-300 font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+                  <span>{note.mentorFullName || 'Verified Mentor'}</span>
+                </div>
+              </div>
+              <p className="text-xs text-amber-900 dark:text-amber-100/95 leading-relaxed italic font-serif pl-6 border-l-2 border-amber-450/40">
+                "{note.counselText}"
+              </p>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Active Mentorship Chat & Counsel Notes */}
       {isDemoSession || chatMessages.length > 0 ? (

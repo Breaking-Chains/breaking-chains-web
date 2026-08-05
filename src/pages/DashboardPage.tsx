@@ -1,13 +1,10 @@
 import React, { useState } from 'react';
 import { MinimalStreakHero } from '../components/pmo/MinimalStreakHero';
 import { ChaserEffectBanner } from '../components/pmo/ChaserEffectBanner';
-import { NafsProgressTracker } from '../components/pmo/NafsProgressTracker';
 import { DopamineRebootCard } from '../components/pmo/DopamineRebootCard';
-import { GuardingGazeCard } from '../components/pmo/GuardingGazeCard';
 import { usePmo } from '../context/PmoContext';
-import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Sparkles, ShieldCheck, ChevronDown, ChevronUp, Brain, Compass, BarChart3, Clock, DollarSign } from 'lucide-react';
+import { ChevronDown, ChevronUp, Brain, Compass, BarChart3, Clock, DollarSign } from 'lucide-react';
 import type { NavTab } from '../components/layout/BottomNav';
 
 interface DashboardPageProps {
@@ -21,7 +18,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   onTriggerSos,
   onTabChange,
 }) => {
-  const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics, apiError, counselNotes } = usePmo();
+  const { currentStreak, cleanRatioPercent, chaserEffectActive, analytics, apiError } = usePmo();
   
   const [isRecoveryOpen, setIsRecoveryOpen] = useState(true);
   const [isSpiritualOpen, setIsSpiritualOpen] = useState(false);
@@ -30,8 +27,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const hoursSaved = analytics?.estimatedHoursSaved ?? currentStreak * 2;
   const moneySaved = analytics?.estimatedMoneySaved ?? currentStreak * 3;
   const nafsStage = analytics?.nafsStage || (currentStreak <= 7 ? 'NAFS_AL_AMMARAH' : currentStreak <= 40 ? 'NAFS_AL_LAWWAMAH' : 'NAFS_AL_MUTMAINNAH');
-
-  const notesList = Array.isArray(counselNotes) ? counselNotes : [];
 
   return (
     <div className="space-y-6 animate-fade-in max-w-6xl mx-auto">
@@ -42,31 +37,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       )}
       {/* 48-Hour Chaser Effect Shield Banner */}
       <ChaserEffectBanner isActive={chaserEffectActive} hoursRemaining={chaserEffectActive ? 48 : 0} />
-
-      {/* Mentor Nasiha / Counsel Notes Banner */}
-      {notesList.length > 0 && (
-        <div className="space-y-3">
-          {notesList.map((note) => (
-            <Card key={note.id} variant="gold" className="p-4 space-y-2 border-amber-500/40 shadow-lg animate-fade-in">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                  <span className="text-xs font-bold text-amber-950 dark:text-amber-200 uppercase tracking-wider">
-                    Mentor Counsel Note (Nasiha)
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[10px] text-amber-850 dark:text-amber-300 font-semibold">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                  <span>{note.mentorFullName || 'Verified Mentor'}</span>
-                </div>
-              </div>
-              <p className="text-xs text-amber-900 dark:text-amber-100/95 leading-relaxed italic font-serif pl-6 border-l-2 border-amber-450/40">
-                "{note.counselText}"
-              </p>
-            </Card>
-          ))}
-        </div>
-      )}
 
       {/* Sleek Minimalist Hero Display */}
       <MinimalStreakHero
