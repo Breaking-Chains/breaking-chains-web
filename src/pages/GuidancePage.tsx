@@ -54,6 +54,8 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [cancelNotes, setCancelNotes] = useState('');
   const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
 
+  const [activeTab, setActiveTab] = useState<'my-mentor' | 'directory'>('my-mentor');
+
   const loadMentors = async () => {
     setIsLoadingMentors(true);
     setErrorMsg(null);
@@ -80,8 +82,13 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             createdAt: new Date().toISOString(),
           }
         ]);
+        setActiveTab('my-mentor');
       } else {
         setUserPartnerships(partnerships);
+        const hasActive = partnerships.some(
+          (p) => (p.role === 'MENTOR' || p.role === 'SPIRITUAL_MENTOR') && (p.status === 'ACCEPTED' || p.status === 'PENDING_TERMINATION')
+        );
+        setActiveTab(hasActive ? 'my-mentor' : 'directory');
       }
     } catch (err: unknown) {
       setVerifiedMentors([]);
@@ -93,7 +100,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   };
 
   const activeMentorship = userPartnerships.find(
-    (p) => (p.role === 'MENTOR' || p.role === 'SPIRITUAL_MENTOR') && p.status === 'ACCEPTED'
+    (p) => (p.role === 'MENTOR' || p.role === 'SPIRITUAL_MENTOR') && (p.status === 'ACCEPTED' || p.status === 'PENDING_TERMINATION')
   );
 
   useEffect(() => {
@@ -306,8 +313,33 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         </div>
       )}
 
-      {/* SECTION 1: My Mentor */}
       {role === 'USER' && (
+        <div className="flex items-center gap-1.5 p-1 bg-slate-150/30 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 max-w-xs sm:max-w-sm">
+          <button
+            onClick={() => setActiveTab('my-mentor')}
+            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'my-mentor'
+                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+            }`}
+          >
+            👤 My Mentor
+          </button>
+          <button
+            onClick={() => setActiveTab('directory')}
+            className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'directory'
+                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+                : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+            }`}
+          >
+            🔍 Browse Directory
+          </button>
+        </div>
+      )}
+
+      {/* SECTION 1: My Mentor */}
+      {role === 'USER' && activeTab === 'my-mentor' && (
         <div className="space-y-4">
           <div className="flex items-center gap-2 px-1">
             <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
@@ -416,110 +448,112 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       )}
 
       {/* SECTION 2: Community Mentors Directory */}
-      <Card variant="glass" className="p-4 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-900/60">
-          <div className="flex items-center gap-2">
-            <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
-            <div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Community Mentors
-              </h3>
-              <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium">Spiritual Guides & Recovery Coaches</p>
+      {(activeTab === 'directory' || role !== 'USER') && (
+        <Card variant="glass" className="p-4 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-900/60">
+            <div className="flex items-center gap-2">
+              <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
+              <div>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Community Mentors
+                </h3>
+                <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium">Spiritual Guides & Recovery Coaches</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              {role === 'USER' && (
+                <Button
+                  variant="subtle"
+                  size="sm"
+                  onClick={() => setIsConnectModalOpen(true)}
+                  className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
+                >
+                  <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
+                </Button>
+              )}
+
+              {role === 'MENTOR' && (
+                <Button
+                  variant="emerald"
+                  size="sm"
+                  onClick={handleOpenMentees}
+                  className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md shadow-emerald-500/5 dark:shadow-emerald-950/20"
+                >
+                  <Users className="w-4 h-4" /> View My Mentees
+                </Button>
+              )}
             </div>
           </div>
 
-          <div className="flex items-center gap-2 self-end sm:self-auto">
-            {role === 'USER' && (
-              <Button
-                variant="subtle"
-                size="sm"
-                onClick={() => setIsConnectModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
-              >
-                <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
-              </Button>
-            )}
-
-            {role === 'MENTOR' && (
-              <Button
-                variant="emerald"
-                size="sm"
-                onClick={handleOpenMentees}
-                className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md shadow-emerald-500/5 dark:shadow-emerald-950/20"
-              >
-                <Users className="w-4 h-4" /> View My Mentees
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {isLoadingMentors ? (
-          <div className="text-center py-4 text-xs text-slate-500">Loading verified mentors...</div>
-        ) : mentorList.length === 0 ? (
-          <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
-            <Users className="w-6 h-6 text-slate-600 mx-auto" />
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              {role === 'MENTOR'
-                ? 'You are a verified mentor! No other mentors registered yet.'
-                : 'No verified mentors listed yet.'}
-            </p>
-            {role === 'MENTOR' && (
-              <Button
-                variant="emerald"
-                size="sm"
-                onClick={handleOpenMentees}
-              >
-                View My Mentees Roster Page
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            {mentorList.map((mentor) => {
-              const isCurrentMentor = activeMentorship && (activeMentorship.partnerUserId === mentor.userId || activeMentorship.inviteCode === mentor.inviteCode);
-              const hasAnyMentor = !!activeMentorship;
-              
-              return (
-                <div
-                  key={mentor.id}
-                  className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 space-y-2 text-xs shadow-xs hover:shadow-sm transition-shadow duration-200"
+          {isLoadingMentors ? (
+            <div className="text-center py-4 text-xs text-slate-500">Loading verified mentors...</div>
+          ) : mentorList.length === 0 ? (
+            <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
+              <Users className="w-6 h-6 text-slate-600 mx-auto" />
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {role === 'MENTOR'
+                  ? 'You are a verified mentor! No other mentors registered yet.'
+                  : 'No verified mentors listed yet.'}
+              </p>
+              {role === 'MENTOR' && (
+                <Button
+                  variant="emerald"
+                  size="sm"
+                  onClick={handleOpenMentees}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <strong className="text-slate-900 dark:text-slate-100 text-xs font-black">{mentor.fullName}</strong>
-                      <span className="text-[8px] tracking-wider font-semibold py-0.5 px-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400">
-                        VERIFIED
-                      </span>
+                  View My Mentees Roster Page
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              {mentorList.map((mentor) => {
+                const isCurrentMentor = activeMentorship && (activeMentorship.partnerUserId === mentor.userId || activeMentorship.inviteCode === mentor.inviteCode);
+                const hasAnyMentor = !!activeMentorship;
+                
+                return (
+                  <div
+                    key={mentor.id}
+                    className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 space-y-2 text-xs shadow-xs hover:shadow-sm transition-shadow duration-200"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <strong className="text-slate-900 dark:text-slate-100 text-xs font-black">{mentor.fullName}</strong>
+                        <span className="text-[8px] tracking-wider font-semibold py-0.5 px-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400">
+                          VERIFIED
+                        </span>
+                      </div>
+                      <span className="text-[9px] text-slate-700 dark:text-slate-450 font-mono font-bold">{mentor.yearsOfExperience} yrs exp</span>
                     </div>
-                    <span className="text-[9px] text-slate-700 dark:text-slate-450 font-mono font-bold">{mentor.yearsOfExperience} yrs exp</span>
+                    <p className="text-[10px] text-emerald-700 dark:text-emerald-450 font-extrabold uppercase tracking-wide">{mentor.specialization}</p>
+                    <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
+                    <p className="text-[11px] text-slate-800 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 font-mono">Code: {mentor.inviteCode || 'N/A'}</span>
+                      {role === 'USER' && (
+                        <Button
+                          variant={isCurrentMentor ? "outline" : "emerald"}
+                          size="sm"
+                          disabled={connectingMentorId === mentor.id || (hasAnyMentor && !isCurrentMentor)}
+                          onClick={() => handleDirectConnect(mentor)}
+                          className="cursor-pointer font-bold text-[10px] rounded-lg px-2.5 py-1"
+                        >
+                          {connectingMentorId === mentor.id 
+                            ? 'Connecting...' 
+                            : isCurrentMentor 
+                              ? 'Connected' 
+                              : 'Connect'}
+                        </Button>
+                      )}
+                    </div>
                   </div>
-                  <p className="text-[10px] text-emerald-700 dark:text-emerald-450 font-extrabold uppercase tracking-wide">{mentor.specialization}</p>
-                  <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
-                  <p className="text-[11px] text-slate-800 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
-                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
-                    <span className="text-[10px] text-slate-500 font-mono">Code: {mentor.inviteCode || 'N/A'}</span>
-                    {role === 'USER' && (
-                      <Button
-                        variant={isCurrentMentor ? "outline" : "emerald"}
-                        size="sm"
-                        disabled={connectingMentorId === mentor.id || (hasAnyMentor && !isCurrentMentor)}
-                        onClick={() => handleDirectConnect(mentor)}
-                        className="cursor-pointer font-bold text-[10px] rounded-lg px-2.5 py-1"
-                      >
-                        {connectingMentorId === mentor.id 
-                          ? 'Connecting...' 
-                          : isCurrentMentor 
-                            ? 'Connected' 
-                            : 'Connect'}
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
+                );
+              })}
+            </div>
+          )}
+        </Card>
+      )}
 
       <BecomeMentorModal
         isOpen={isBecomeMentorOpen}
