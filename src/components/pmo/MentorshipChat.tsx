@@ -16,7 +16,6 @@ interface MentorshipChatProps {
 
 export const MentorshipChat: React.FC<MentorshipChatProps> = ({
   partnerName = 'No Active Mentor',
-  inviteCode = '',
   notes = [],
   messages = [],
   onSendMessage,
@@ -36,17 +35,13 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
 
   return (
     <div className="space-y-5">
-      <Card variant="glass" className="p-3.5 flex items-center justify-between">
+      <Card variant="glass" className="p-3.5 flex items-center justify-start">
         <div className="flex items-center gap-2">
           <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Confidential Guidance</h4>
             <p className="text-[10px] text-slate-500 dark:text-slate-400">Encrypted & Private</p>
           </div>
-        </div>
-        <div className="text-right">
-          <span className="text-[9px] text-slate-500 dark:text-slate-450 block uppercase tracking-wider font-semibold">Invite Code</span>
-          <span className="text-xs font-mono font-bold text-amber-600 dark:text-amber-400">{inviteCode}</span>
         </div>
       </Card>
 
