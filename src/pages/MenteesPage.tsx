@@ -4,7 +4,6 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import {
   ShieldCheck,
-  HeartHandshake,
   Send,
   Sparkles,
   Copy,
@@ -31,10 +30,17 @@ interface DisplayMentee {
   name: string;
   username: string;
   streakDays: number;
+  longestStreak: number;
+  resilienceScore: number;
+  cleanRatioPercent: number;
+  totalCleanDays: number;
   lastCheckIn: string;
   status: 'CLEAN' | 'SLIP_UP' | 'URGE_RESISTED';
   nafsStage: string;
   strategy?: string;
+  description?: string;
+  intentStatement?: string;
+  privacyLevel?: string;
 }
 
 export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
@@ -112,10 +118,19 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
     name: chain.title || `Recoveree ${idx + 1}`,
     username: `@recoveree_${idx + 1}`,
     streakDays: chain.currentStreak || 0,
-    lastCheckIn: 'Recently active',
+    longestStreak: chain.longestStreak || 0,
+    resilienceScore: chain.resilienceScore || 0,
+    cleanRatioPercent: chain.cleanRatioPercent ?? 100,
+    totalCleanDays: chain.totalCleanDays || 0,
+    lastCheckIn: chain.lastCheckInDate 
+      ? new Date(chain.lastCheckInDate).toLocaleDateString() 
+      : 'No check-in yet',
     status: (chain.currentStreak || 0) > 0 ? 'CLEAN' : 'URGE_RESISTED',
-    nafsStage: (chain.currentStreak || 0) > 21 ? 'Nafs al-Mutmainnah (Tranquil)' : (chain.currentStreak || 0) > 7 ? 'Nafs al-Lawwamah (Self-Reproaching)' : 'Nafs al-Ammarah (Inciting to Evil)',
+    nafsStage: (chain.currentStreak || 0) > 21 ? 'Nafs al-Mutmainnah' : (chain.currentStreak || 0) > 7 ? 'Nafs al-Lawwamah' : 'Nafs al-Ammarah',
     strategy: chain.strategy,
+    description: chain.description,
+    intentStatement: chain.intentStatement,
+    privacyLevel: chain.privacyLevel,
   }));
 
   return (
@@ -202,55 +217,6 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
         </div>
       )}
 
-      {/* Inline Counsel Note Composer */}
-      {selectedMentee && (
-        <Card variant="gold" className="p-5 space-y-4 border-amber-500/50 shadow-xl animate-fade-in">
-          <div className="flex items-center justify-between border-b border-amber-500/30 pb-3">
-            <div className="flex items-center gap-2 text-sm font-black text-amber-950 dark:text-amber-200">
-              <Sparkles className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-              <span>Send Spiritual Counsel Note (Nasiha) to {selectedMentee.name}</span>
-            </div>
-            <button
-              onClick={() => setSelectedMentee(null)}
-              className="text-xs text-amber-800 hover:text-amber-950 dark:text-amber-400 dark:hover:text-amber-250 font-bold underline cursor-pointer"
-            >
-              Cancel
-            </button>
-          </div>
-
-          <form onSubmit={handleSendCounselNote} className="space-y-3">
-            <div className="space-y-1">
-              <label className="text-xs font-bold text-amber-950 dark:text-amber-200/90">
-                Counsel Note Content (Visible to mentee on their chain dashboard):
-              </label>
-              <textarea
-                rows={4}
-                value={counselNoteText}
-                onChange={(e) => setCounselNoteText(e.target.value)}
-                placeholder="Write an encouraging Quranic verse, Hadith, or tailored spiritual advice for your mentee..."
-                className="w-full p-3 rounded-xl bg-white dark:bg-slate-950/90 border border-amber-450/40 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 resize-none shadow-xs"
-                required
-              />
-            </div>
-
-            <div className="flex items-center justify-between pt-1">
-              <span className="text-[10px] text-amber-900/85 dark:text-amber-300/80 italic font-medium">
-                * Mentee will receive a notification and counsel note card.
-              </span>
-              <Button
-                type="submit"
-                variant="emerald"
-                size="sm"
-                isLoading={isSubmittingNote}
-                className="flex items-center gap-2 text-xs px-4"
-              >
-                <Send className="w-4 h-4" /> Send Nasiha
-              </Button>
-            </div>
-          </form>
-        </Card>
-      )}
-
       {/* Mentees Grid / List */}
       <div className="space-y-3">
         <h3 className="text-sm font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider flex items-center gap-2">
@@ -275,61 +241,241 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
         )}
 
         {!isLoading && displayList.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {displayList.map((mentee) => (
               <Card
                 key={mentee.id}
                 variant="dark"
-                className="p-4 space-y-3 border-slate-150 dark:border-slate-800 hover:border-slate-200 dark:hover:border-slate-700 transition-all shadow-xs"
+                onClick={() => {
+                  setSelectedMentee(mentee);
+                  setErrorMsg(null);
+                  setNoteSentSuccess(null);
+                }}
+                className="p-4 border-slate-150 dark:border-slate-850 hover:border-emerald-500/40 hover:shadow-md cursor-pointer transition-all duration-200 bg-white dark:bg-slate-900/80 rounded-2xl flex flex-col justify-between gap-4"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-800 dark:text-slate-200 font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 font-black text-sm uppercase">
                       {mentee.name.charAt(0)}
                     </div>
                     <div>
-                      <h4 className="font-black text-slate-900 dark:text-slate-100 text-sm">{mentee.name}</h4>
-                      <span className="text-xs text-slate-700 dark:text-slate-400 font-mono font-bold">{mentee.username}</span>
+                      <h4 className="font-black text-slate-900 dark:text-slate-100 text-xs uppercase tracking-wider">{mentee.name}</h4>
+                      <span className="text-[10px] text-slate-505 dark:text-slate-450 font-mono">{mentee.username}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-1 text-emerald-700 dark:text-amber-450 font-mono font-bold text-xs bg-emerald-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-full border border-emerald-250 dark:border-amber-800/40">
-                    <Flame className="w-3.5 h-3.5 fill-emerald-600 dark:fill-amber-400" />
-                    {mentee.streakDays} Days
-                  </div>
+                  <span className={`text-[8px] font-black px-2 py-0.5 rounded-full border uppercase tracking-wider ${
+                    mentee.status === 'CLEAN'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-705 dark:text-emerald-450 border-emerald-100 dark:border-emerald-900/30'
+                      : 'bg-amber-50 dark:bg-amber-950/40 text-amber-705 dark:text-amber-450 border-amber-100 dark:border-amber-900/30'
+                  }`}>
+                    {mentee.status === 'CLEAN' ? 'Stable' : 'Vulnerable'}
+                  </span>
                 </div>
 
-                <div className="bg-white dark:bg-slate-950/70 p-3 rounded-xl border border-slate-100 dark:border-slate-850 space-y-1.5 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-700 dark:text-slate-405 font-medium">Nafs Recovery Stage:</span>
-                    <strong className="text-emerald-700 dark:text-emerald-305 text-[11px] font-black">{mentee.nafsStage}</strong>
-                  </div>
-                  {mentee.strategy && (
-                    <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-900">
-                      <span className="text-slate-750">Strategy:</span>
-                      <span className="text-slate-850 dark:text-slate-200 text-[11px] truncate max-w-[200px] font-bold">{mentee.strategy}</span>
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-150 dark:border-slate-800/40 text-slate-700 dark:text-slate-350">
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-500 block">Streak</span>
+                    <div className="flex items-center gap-1 text-[11px] font-black text-slate-800 dark:text-slate-205 font-mono">
+                      <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-505" />
+                      <span>{mentee.streakDays} Days</span>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-900 text-[10px] text-slate-700 dark:text-slate-500 font-medium">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3 text-slate-600" /> Last Check-In</span>
-                    <span>{mentee.lastCheckIn}</span>
+                  </div>
+                  <div className="space-y-0.5">
+                    <span className="text-[9px] uppercase font-bold text-slate-500 dark:text-slate-500 block">Clean Ratio</span>
+                    <span className="text-[11px] font-black text-slate-800 dark:text-slate-205 font-mono">
+                      {mentee.cleanRatioPercent}% Purity
+                    </span>
                   </div>
                 </div>
 
-                <Button
-                  variant="subtle"
-                  size="sm"
-                  onClick={() => setSelectedMentee(mentee)}
-                  className="w-full text-xs font-bold flex items-center justify-center gap-2 border-slate-200 dark:border-slate-800 text-emerald-700 dark:text-emerald-400 hover:border-emerald-500/50 py-2 hover:bg-slate-50 dark:hover:bg-slate-900 bg-white dark:bg-transparent shadow-xs"
-                >
-                  <HeartHandshake className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
-                  Send Spiritual Counsel Note (Nasiha)
-                </Button>
+                <div className="text-[9px] text-slate-500 dark:text-slate-455 text-right flex items-center justify-end gap-1 font-semibold uppercase tracking-wider">
+                  <span>View Details</span>
+                  <span>→</span>
+                </div>
               </Card>
             ))}
           </div>
         )}
       </div>
+
+      {/* --- DETAIL SLIDE-IN PANEL (CONTEXTUAL MENTEE PROFILE & CARE TERMINAL) --- */}
+      {selectedMentee && (
+        <>
+          <div 
+            className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity duration-300 opacity-100"
+            onClick={() => setSelectedMentee(null)}
+          />
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-transform duration-300 ease-in-out translate-x-0">
+            <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 font-black text-sm uppercase shrink-0">
+                  {selectedMentee.name.charAt(0)}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                      {selectedMentee.name}
+                    </h3>
+                    <span className="text-[8px] font-bold px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400">
+                      MENTEE
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-500 font-mono">{selectedMentee.username}</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setSelectedMentee(null)}
+                className="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
+              >
+                ✕ Close
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="space-y-2">
+                <span className="text-[9px] uppercase font-black tracking-wider text-slate-500">Mentee Profile & Intent</span>
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850/80 space-y-3 text-xs leading-relaxed text-slate-800 dark:text-slate-350">
+                  {selectedMentee.intentStatement ? (
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-slate-500 block">Pledge / Intent Statement</span>
+                      <p className="italic font-serif text-[11px] text-slate-900 dark:text-slate-100">
+                        "{selectedMentee.intentStatement}"
+                      </p>
+                    </div>
+                  ) : null}
+                  {selectedMentee.description ? (
+                    <div className="space-y-1">
+                      <span className="text-[9px] uppercase font-bold text-slate-500 block">Chain Description</span>
+                      <p className="text-[11px]">
+                        {selectedMentee.description}
+                      </p>
+                    </div>
+                  ) : null}
+                  <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200/50 dark:border-slate-800/40 text-[10px]">
+                    <div>
+                      <span className="text-slate-500 block font-semibold">Privacy Level</span>
+                      <span className="font-bold uppercase text-slate-850 dark:text-slate-200 font-mono tracking-wide">
+                        {selectedMentee.privacyLevel?.replace('LEVEL_', 'Level ')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-slate-500 block font-semibold">Strategy Profile</span>
+                      <span className="font-bold uppercase text-slate-850 dark:text-slate-200 font-mono tracking-wide">
+                        {selectedMentee.strategy?.replace('_', ' ')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[9px] uppercase font-black tracking-wider text-slate-500">Mentee Recovery Analytics</span>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 text-center space-y-1 shadow-xs">
+                    <span className="text-[9px] text-slate-700 dark:text-slate-500 block uppercase font-bold">Current Streak</span>
+                    <strong className="text-xl font-mono text-amber-500 flex items-center justify-center gap-1 font-black">
+                      <Flame className="w-5 h-5 fill-amber-500" />
+                      {selectedMentee.streakDays}
+                    </strong>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 text-center space-y-1 shadow-xs">
+                    <span className="text-[9px] text-slate-700 dark:text-slate-500 block uppercase font-bold">Longest Streak</span>
+                    <strong className="text-xl font-mono text-slate-800 dark:text-slate-200 font-black">
+                      {selectedMentee.longestStreak}
+                    </strong>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 text-center space-y-1 shadow-xs">
+                    <span className="text-[9px] text-slate-700 dark:text-slate-500 block uppercase font-bold">Total Clean Days</span>
+                    <strong className="text-xl font-mono text-emerald-600 dark:text-emerald-450 font-black">
+                      {selectedMentee.totalCleanDays}
+                    </strong>
+                  </div>
+                  <div className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850 text-center space-y-1 shadow-xs">
+                    <span className="text-[9px] text-slate-700 dark:text-slate-500 block uppercase font-bold">Purity Ratio</span>
+                    <strong className="text-xl font-mono text-emerald-600 dark:text-emerald-450 font-black">
+                      {selectedMentee.cleanRatioPercent}%
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 flex items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <span className="text-[9px] uppercase font-bold text-slate-700 dark:text-slate-400 block tracking-wide">Resilience Score</span>
+                    <p className="text-[10px] text-slate-500 leading-tight">
+                      Calculated recovery resilience based on logs, slips, and urge deconditioning.
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-full border-4 border-emerald-500/20 flex items-center justify-center bg-white dark:bg-slate-950 font-mono font-black text-xs text-emerald-700 dark:text-emerald-400 shadow-xs shrink-0">
+                    {selectedMentee.resilienceScore}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[9px] uppercase font-black tracking-wider text-slate-500">Progress & Stage Monitoring</span>
+                <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-850/80 space-y-3.5 text-xs text-slate-800 dark:text-slate-300">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold text-slate-700 dark:text-slate-450">Nafs Spiritual Stage</span>
+                    <span className="font-black text-emerald-600 dark:text-emerald-455 tracking-wide uppercase text-[10px]">
+                      {selectedMentee.nafsStage}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-205 dark:border-slate-850">
+                    <div 
+                      className="bg-emerald-500 h-full rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min(100, (selectedMentee.streakDays / 30) * 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[8px] text-slate-450 font-bold uppercase tracking-wider">
+                    <span>Ammarah (Infancy)</span>
+                    <span>Lawwamah (Striving)</span>
+                    <span>Mutmainnah (Tranquil)</span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-slate-800/40 text-[10px]">
+                    <span className="flex items-center gap-1 text-slate-700 dark:text-slate-500 font-semibold"><Clock className="w-3.5 h-3.5 text-slate-550" /> Last Active Check-in</span>
+                    <span className="font-mono font-bold text-slate-850 dark:text-slate-200">{selectedMentee.lastCheckIn}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <span className="text-[9px] uppercase font-black tracking-wider text-slate-500">Active Nasiha Terminal</span>
+                <Card variant="gold" className="p-4 border-amber-500/40 space-y-3 shadow-xs">
+                  <div className="flex items-center gap-1.5 text-amber-955 dark:text-amber-250 font-black text-[10px] uppercase tracking-wider">
+                    <Send className="w-3.5 h-3.5 text-amber-600" />
+                    <span>Send Counsel Advice</span>
+                  </div>
+                  
+                  <form onSubmit={handleSendCounselNote} className="space-y-3">
+                    <textarea
+                      rows={3}
+                      value={counselNoteText}
+                      onChange={(e) => setCounselNoteText(e.target.value)}
+                      placeholder="Write an encouraging reflection, Quranic reminder, or suggestion for their PMO recovery..."
+                      className="w-full p-2.5 rounded-xl bg-white dark:bg-slate-950/80 border border-amber-450/40 text-xs text-slate-900 dark:text-slate-100 placeholder:text-slate-400 focus:outline-none focus:border-amber-500 resize-none shadow-xs"
+                      required
+                    />
+                    <div className="flex justify-end pt-1">
+                      <Button
+                        type="submit"
+                        variant="emerald"
+                        size="sm"
+                        isLoading={isSubmittingNote}
+                        className="text-[10px] font-black uppercase tracking-wider px-3.5 py-1.5 rounded-xl"
+                      >
+                        Send Nasiha
+                      </Button>
+                    </div>
+                  </form>
+                </Card>
+              </div>
+
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

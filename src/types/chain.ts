@@ -19,6 +19,7 @@ export interface HabitChain {
   status: 'ACTIVE' | 'ARCHIVED';
   lastCheckInDate?: string | null;
   partnershipId?: string;
+  intentStatement?: string;
   createdAt: string;
   updatedAt: string;
 }
