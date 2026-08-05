@@ -197,25 +197,28 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     return items;
   }, [activeDates]);
 
-  // Map logs to a fast lookup dictionary by YYYY-MM-DD
+  // Map logs to a fast lookup dictionary by YYYY-MM-DD (latest check-in of the day wins)
   const logsLookup = React.useMemo(() => {
     const lookup: Record<string, LogEntry> = {};
-    logs.forEach((log) => {
+    // Iterate from oldest to newest so latest log overwrites older ones
+    for (let i = logs.length - 1; i >= 0; i--) {
+      const log = logs[i];
       const dateStr = log.logTimestamp.split('T')[0];
       lookup[dateStr] = log;
-    });
+    }
     return lookup;
   }, [logs]);
 
-  // Filtered lookup for stats computation
+  // Filtered lookup for stats computation (latest matching check-in of the day wins)
   const filteredLogsLookup = React.useMemo(() => {
     const lookup: Record<string, LogEntry> = {};
-    logs.forEach((log) => {
+    for (let i = logs.length - 1; i >= 0; i--) {
+      const log = logs[i];
       if (isLogMatchingFilters(log)) {
         const dateStr = log.logTimestamp.split('T')[0];
         lookup[dateStr] = log;
       }
-    });
+    }
     return lookup;
   }, [logs, isLogMatchingFilters]);
 
@@ -278,13 +281,19 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     };
   }, [activeDates, filteredLogsLookup]);
 
-  // List of chronological logs for the timeline
+  // List of chronological logs for the timeline (showing all entries, even multiple per day!)
   const timelineLogs = React.useMemo(() => {
-    return activeDates
-      .map((dateStr) => ({ dateStr, log: filteredLogsLookup[dateStr] }))
-      .filter((item) => !!item.log)
-      .reverse(); // Newest first
-  }, [activeDates, filteredLogsLookup]);
+    const activeDatesSet = new Set(activeDates);
+    return logs
+      .filter((log) => {
+        const dateStr = log.logTimestamp.split('T')[0];
+        return activeDatesSet.has(dateStr) && isLogMatchingFilters(log);
+      })
+      .map((log) => ({
+        dateStr: log.logTimestamp.split('T')[0],
+        log,
+      }));
+  }, [logs, activeDates, isLogMatchingFilters]);
 
   const getHeatmapColorClass = (status?: LogStatus, isMatching = true) => {
     if (!status) return 'bg-slate-100 dark:bg-slate-900 border-slate-205 dark:border-slate-800/80';
@@ -560,7 +569,12 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
                           log.status === 'URGE_RESISTED' ? 'bg-teal-500' :
                           log.status === 'PEEKED_EDGED' ? 'bg-amber-500' : 'bg-rose-500'
                         }`} />
-                        <span className="font-mono font-bold text-slate-705 dark:text-slate-205">{dateStr}</span>
+                        <span className="font-mono font-bold text-slate-705 dark:text-slate-205 flex items-center gap-1.5">
+                          {dateStr}
+                          <span className="text-[10px] text-slate-400 font-normal">
+                            at {new Date(log.logTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </span>
                       </div>
                       <span className={`text-[8px] font-black px-2 py-0.5 rounded-full border uppercase tracking-wider ${
                         log.status === 'CLEAN' ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 border-emerald-100 dark:border-emerald-900/30' :
