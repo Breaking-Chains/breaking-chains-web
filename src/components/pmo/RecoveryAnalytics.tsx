@@ -197,28 +197,71 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     return items;
   }, [activeDates]);
 
-  // Map logs to a fast lookup dictionary by YYYY-MM-DD (latest check-in of the day wins)
+  // Map logs to a fast lookup dictionary by YYYY-MM-DD using priority status rules
   const logsLookup = React.useMemo(() => {
     const lookup: Record<string, LogEntry> = {};
-    // Iterate from oldest to newest so latest log overwrites older ones
-    for (let i = logs.length - 1; i >= 0; i--) {
-      const log = logs[i];
+    const getStatusWeight = (status: LogStatus): number => {
+      switch (status) {
+        case 'SLIP_UP': return 4;
+        case 'PEEKED_EDGED': return 3;
+        case 'URGE_RESISTED': return 2;
+        case 'CLEAN': return 1;
+        default: return 0;
+      }
+    };
+
+    logs.forEach((log) => {
       const dateStr = log.logTimestamp.split('T')[0];
-      lookup[dateStr] = log;
-    }
+      const existing = lookup[dateStr];
+      if (!existing) {
+        lookup[dateStr] = log;
+      } else {
+        const existingWeight = getStatusWeight(existing.status);
+        const currentWeight = getStatusWeight(log.status);
+        if (currentWeight > existingWeight) {
+          lookup[dateStr] = log;
+        } else if (currentWeight === existingWeight) {
+          if (new Date(log.logTimestamp) > new Date(existing.logTimestamp)) {
+            lookup[dateStr] = log;
+          }
+        }
+      }
+    });
     return lookup;
   }, [logs]);
 
-  // Filtered lookup for stats computation (latest matching check-in of the day wins)
+  // Filtered lookup for stats computation (using priority status rules)
   const filteredLogsLookup = React.useMemo(() => {
     const lookup: Record<string, LogEntry> = {};
-    for (let i = logs.length - 1; i >= 0; i--) {
-      const log = logs[i];
+    const getStatusWeight = (status: LogStatus): number => {
+      switch (status) {
+        case 'SLIP_UP': return 4;
+        case 'PEEKED_EDGED': return 3;
+        case 'URGE_RESISTED': return 2;
+        case 'CLEAN': return 1;
+        default: return 0;
+      }
+    };
+
+    logs.forEach((log) => {
       if (isLogMatchingFilters(log)) {
         const dateStr = log.logTimestamp.split('T')[0];
-        lookup[dateStr] = log;
+        const existing = lookup[dateStr];
+        if (!existing) {
+          lookup[dateStr] = log;
+        } else {
+          const existingWeight = getStatusWeight(existing.status);
+          const currentWeight = getStatusWeight(log.status);
+          if (currentWeight > existingWeight) {
+            lookup[dateStr] = log;
+          } else if (currentWeight === existingWeight) {
+            if (new Date(log.logTimestamp) > new Date(existing.logTimestamp)) {
+              lookup[dateStr] = log;
+            }
+          }
+        }
       }
-    }
+    });
     return lookup;
   }, [logs, isLogMatchingFilters]);
 
