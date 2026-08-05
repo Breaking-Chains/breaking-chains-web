@@ -447,8 +447,64 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         </div>
       )}
 
+      {role === 'MENTOR' && (
+        <div className="space-y-6">
+          <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-lg shadow-xs">
+                👤
+              </div>
+              <div>
+                <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Verified Advisor Space
+                </h3>
+                <p className="text-xs text-slate-700 dark:text-slate-400 font-medium">
+                  Welcome to your counsel terminal, {user?.fullName || 'Mentor'}.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 space-y-3">
+              <div className="text-xs space-y-1.5">
+                <p className="text-slate-850 dark:text-slate-205">
+                  <strong>Specialization:</strong> {myProfile?.specialization || 'Islamic Spiritual Counsel (Tazkiyah)'}
+                </p>
+                <p className="text-slate-850 dark:text-slate-205">
+                  <strong>Affiliation:</strong> {myProfile?.organization || 'Independent spiritual counselor'}
+                </p>
+                <p className="text-slate-850 dark:text-slate-205">
+                  <strong>Experience:</strong> {myProfile?.yearsOfExperience || 0} Years
+                </p>
+                {myProfile?.bio && (
+                  <p className="text-slate-700 dark:text-slate-300 italic pt-2 border-t border-slate-200/60 dark:border-slate-800/40 leading-relaxed font-serif">
+                    "{myProfile.bio}"
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
+              <div className="space-y-1">
+                <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-bold tracking-wider">Share Invite Code with Mentees:</span>
+                <code className="text-sm font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-500/20 block w-fit">
+                  {myProfile?.inviteCode || 'MENTOR-BC-7890'}
+                </code>
+              </div>
+
+              <Button
+                variant="emerald"
+                onClick={handleOpenMentees}
+                className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md cursor-pointer self-start sm:self-auto"
+              >
+                <Users className="w-4 h-4" /> Go to Mentee Roster
+              </Button>
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* SECTION 2: Community Mentors Directory */}
-      {(activeTab === 'directory' || role !== 'USER') && (
+      {role === 'USER' && activeTab === 'directory' && (
         <Card variant="glass" className="p-4 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-900/60">
             <div className="flex items-center gap-2">
@@ -462,27 +518,14 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             </div>
 
             <div className="flex items-center gap-2 self-end sm:self-auto">
-              {role === 'USER' && (
-                <Button
-                  variant="subtle"
-                  size="sm"
-                  onClick={() => setIsConnectModalOpen(true)}
-                  className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
-                >
-                  <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
-                </Button>
-              )}
-
-              {role === 'MENTOR' && (
-                <Button
-                  variant="emerald"
-                  size="sm"
-                  onClick={handleOpenMentees}
-                  className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md shadow-emerald-500/5 dark:shadow-emerald-950/20"
-                >
-                  <Users className="w-4 h-4" /> View My Mentees
-                </Button>
-              )}
+              <Button
+                variant="subtle"
+                size="sm"
+                onClick={() => setIsConnectModalOpen(true)}
+                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
+              >
+                <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
+              </Button>
             </div>
           </div>
 
@@ -492,19 +535,8 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
               <Users className="w-6 h-6 text-slate-600 mx-auto" />
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                {role === 'MENTOR'
-                  ? 'You are a verified mentor! No other mentors registered yet.'
-                  : 'No verified mentors listed yet.'}
+                No verified mentors listed yet.
               </p>
-              {role === 'MENTOR' && (
-                <Button
-                  variant="emerald"
-                  size="sm"
-                  onClick={handleOpenMentees}
-                >
-                  View My Mentees Roster Page
-                </Button>
-              )}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
