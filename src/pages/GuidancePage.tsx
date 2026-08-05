@@ -35,6 +35,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
+  const [connectingMentorId, setConnectingMentorId] = useState<string | null>(null);
 
   const loadMentors = async () => {
     setIsLoadingMentors(true);
@@ -117,6 +118,33 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
     }
   };
 
+  const handleDirectConnect = async (mentor: MentorProfile) => {
+    const code = mentor.inviteCode || `MENTOR-${mentor.fullName.split(' ')[1]?.toUpperCase() || '123'}`;
+    setConnectingMentorId(mentor.id);
+    setConnectErrorMsg(null);
+    setConnectSuccessMsg(null);
+    try {
+      if (isDemoSession) {
+        setConnectSuccessMsg(`Successfully connected to ${mentor.fullName}!`);
+        setTimeout(() => {
+          setConnectSuccessMsg(null);
+          setConnectingMentorId(null);
+        }, 3000);
+      } else {
+        await connectWithMentorCode(code.trim());
+        setConnectSuccessMsg(`Successfully connected to ${mentor.fullName}!`);
+        loadMentors();
+        setTimeout(() => {
+          setConnectSuccessMsg(null);
+          setConnectingMentorId(null);
+        }, 3000);
+      }
+    } catch (err: unknown) {
+      setConnectErrorMsg(formatApiErrorMessage(err));
+      setConnectingMentorId(null);
+    }
+  };
+
   const handleSendMessage = (text: string) => {
     const newMsg: MentorshipChatMessage = {
       id: `msg-${Date.now()}`,
@@ -136,6 +164,19 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
       {errorMsg && (
         <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
           {errorMsg}
+        </div>
+      )}
+
+      {connectErrorMsg && (
+        <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
+          {connectErrorMsg}
+        </div>
+      )}
+
+      {connectSuccessMsg && (
+        <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/80 border border-emerald-250 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
+          <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          {connectSuccessMsg}
         </div>
       )}
 
@@ -216,6 +257,20 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 <p className="text-[10px] text-emerald-700 dark:text-emerald-450 font-extrabold uppercase tracking-wide">{mentor.specialization}</p>
                 <p className="text-[10px] text-slate-700 dark:text-slate-400 font-medium leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
                 <p className="text-[11px] text-slate-800 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
+                <div className="pt-2 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
+                  <span className="text-[10px] text-slate-500 font-mono">Code: {mentor.inviteCode || 'N/A'}</span>
+                  {role === 'USER' && (
+                    <Button
+                      variant="emerald"
+                      size="sm"
+                      disabled={connectingMentorId === mentor.id}
+                      onClick={() => handleDirectConnect(mentor)}
+                      className="cursor-pointer font-bold text-[10px] rounded-lg px-2.5 py-1"
+                    >
+                      {connectingMentorId === mentor.id ? 'Connecting...' : 'Connect'}
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>

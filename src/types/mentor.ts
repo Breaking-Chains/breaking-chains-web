@@ -13,6 +13,7 @@ export interface MentorProfile {
   bio: string;
   status: MentorStatus;
   isVerified: boolean;
+  inviteCode?: string;
   createdAt: string;
 }
 
