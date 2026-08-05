@@ -180,7 +180,7 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 bg-white dark:bg-slate-950/60 p-3 rounded-xl border border-slate-150 dark:border-slate-850 text-xs text-slate-750 dark:text-slate-350 shadow-xs">
+          <div className="flex items-center gap-4 bg-white dark:bg-slate-950/60 p-3 rounded-xl border border-slate-150 dark:border-slate-850 text-xs text-slate-750 dark:text-slate-300 shadow-xs">
             <div>
               <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-bold">Active Mentees</span>
               <strong className="text-emerald-700 dark:text-emerald-405 font-mono text-sm">{displayList.length} Recoverees</strong>
@@ -299,7 +299,7 @@ export const MenteesPage: React.FC<MenteesPageProps> = ({ onBack }) => {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-950/70 p-3 rounded-xl border border-slate-100 dark:border-slate-850 space-y-1.5 text-xs text-slate-700 dark:text-slate-350 shadow-xs">
+                <div className="bg-white dark:bg-slate-950/70 p-3 rounded-xl border border-slate-100 dark:border-slate-850 space-y-1.5 text-xs text-slate-700 dark:text-slate-300 shadow-xs">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-700 dark:text-slate-405 font-medium">Nafs Recovery Stage:</span>
                     <strong className="text-emerald-700 dark:text-emerald-305 text-[11px] font-black">{mentee.nafsStage}</strong>

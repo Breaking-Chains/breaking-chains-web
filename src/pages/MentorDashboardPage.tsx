@@ -628,7 +628,7 @@ export const MentorDashboardPage: React.FC = () => {
                                     <span>{note.mentorFullName || 'Advisor'}</span>
                                     <span>{new Date(note.createdAt).toLocaleDateString()}</span>
                                   </div>
-                                  <p className="text-[10px] leading-relaxed text-slate-800 dark:text-slate-350 italic bg-slate-50 dark:bg-slate-900/30 p-2 rounded-lg border border-slate-100 dark:border-slate-850">
+                                  <p className="text-[10px] leading-relaxed text-slate-800 dark:text-slate-200 italic bg-slate-50 dark:bg-slate-900/30 p-2 rounded-lg border border-slate-100 dark:border-slate-850">
                                     "{note.counselText || note.noteContent}"
                                   </p>
                                 </div>
