@@ -1,4 +1,4 @@
-export type PartnershipRole = 'MENTOR' | 'PEER_BUDDY';
+export type PartnershipRole = 'SPIRITUAL_MENTOR' | 'PEER_BUDDY' | 'MENTOR';
 export type PartnershipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
 
 export interface AccountabilityPartnership {
@@ -10,6 +10,7 @@ export interface AccountabilityPartnership {
   partnerUsername: string;
   role: PartnershipRole;
   status: PartnershipStatus;
+  inviteCode?: string;
   createdAt: string;
 }
 

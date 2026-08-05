@@ -1,5 +1,5 @@
 import { apiFetch } from './apiClient';
-import type { CounselNote, MentorshipChatMessage } from '../types/partner';
+import type { CounselNote, MentorshipChatMessage, AccountabilityPartnership } from '../types/partner';
 import type { HabitChain } from '../types/chain';
 
 export async function getMentees(): Promise<HabitChain[]> {
@@ -45,4 +45,11 @@ export async function connectWithMentorCode(inviteCode: string): Promise<any> {
     method: 'POST',
     body: JSON.stringify({ inviteCode }),
   });
+}
+
+export async function getUserPartnerships(): Promise<AccountabilityPartnership[]> {
+  const res = await apiFetch<AccountabilityPartnership[]>('/api/v1/partnerships', {
+    method: 'GET',
+  });
+  return Array.isArray(res) ? res : [];
 }
