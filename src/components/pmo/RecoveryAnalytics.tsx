@@ -94,6 +94,29 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
   const [startDate, setStartDate] = useState<string>(defaultStartStr);
   const [endDate, setEndDate] = useState<string>(todayStr);
 
+  // Dynamic filter state
+  const [selectedStatus, setSelectedStatus] = useState<string>('ALL');
+  const [selectedReason, setSelectedReason] = useState<string>('ALL');
+
+  // Dynamically extract unique reasons (triggerTag) across all logs
+  const uniqueReasons = React.useMemo(() => {
+    const reasons = new Set<string>();
+    logs.forEach((log) => {
+      if (log.triggerTag) {
+        reasons.add(log.triggerTag);
+      }
+    });
+    return Array.from(reasons).sort();
+  }, [logs]);
+
+  // Dynamic filter check helper
+  const isLogMatchingFilters = React.useCallback((log?: LogEntry) => {
+    if (!log) return false;
+    if (selectedStatus !== 'ALL' && log.status !== selectedStatus) return false;
+    if (selectedReason !== 'ALL' && log.triggerTag !== selectedReason) return false;
+    return true;
+  }, [selectedStatus, selectedReason]);
+
   // Fetch / load logs
   useEffect(() => {
     if (isDemo) {
@@ -139,6 +162,41 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     activeDates = getDatesInRange(startDate, endDate);
   }
 
+  // Calculate padded items for GitHub style 7-row layout
+  const gridItems = React.useMemo(() => {
+    if (activeDates.length === 0) return [];
+    
+    // Sort chronological order (activeDates is already chronologically sorted)
+    const sorted = [...activeDates].sort();
+    const firstDateStr = sorted[0];
+    const startDayOfWeek = new Date(firstDateStr).getDay(); // 0 = Sunday, 1 = Monday ... 6 = Saturday
+    
+    const items: { dateStr?: string; isPlaceholder: boolean; dayNum?: number }[] = [];
+    
+    // Padding at the start
+    for (let i = 0; i < startDayOfWeek; i++) {
+      items.push({ isPlaceholder: true });
+    }
+    
+    // Actual dates
+    sorted.forEach((dateStr) => {
+      const dayNum = new Date(dateStr).getDate();
+      items.push({ dateStr, isPlaceholder: false, dayNum });
+    });
+    
+    // Padding at the end
+    const totalCells = items.length;
+    const remainder = totalCells % 7;
+    if (remainder > 0) {
+      const padEnd = 7 - remainder;
+      for (let i = 0; i < padEnd; i++) {
+        items.push({ isPlaceholder: true });
+      }
+    }
+    
+    return items;
+  }, [activeDates]);
+
   // Map logs to a fast lookup dictionary by YYYY-MM-DD
   const logsLookup = React.useMemo(() => {
     const lookup: Record<string, LogEntry> = {};
@@ -148,6 +206,18 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     });
     return lookup;
   }, [logs]);
+
+  // Filtered lookup for stats computation
+  const filteredLogsLookup = React.useMemo(() => {
+    const lookup: Record<string, LogEntry> = {};
+    logs.forEach((log) => {
+      if (isLogMatchingFilters(log)) {
+        const dateStr = log.logTimestamp.split('T')[0];
+        lookup[dateStr] = log;
+      }
+    });
+    return lookup;
+  }, [logs, isLogMatchingFilters]);
 
   // Compute metrics in active range
   const {
@@ -164,7 +234,7 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     const triggers: Record<string, number> = {};
 
     activeDates.forEach((dateStr) => {
-      const log = logsLookup[dateStr];
+      const log = filteredLogsLookup[dateStr];
       if (log) {
         totalTracked++;
         if (log.status === 'CLEAN' || log.status === 'URGE_RESISTED') {
@@ -186,7 +256,7 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     let currStreak = 0;
 
     sortedRangeDates.forEach((dateStr) => {
-      const log = logsLookup[dateStr];
+      const log = filteredLogsLookup[dateStr];
       if (log && (log.status === 'CLEAN' || log.status === 'URGE_RESISTED')) {
         currStreak++;
         if (currStreak > maxStreak) maxStreak = currStreak;
@@ -206,25 +276,26 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
       currentStreak: currStreak,
       triggersMap: Object.entries(triggers).sort((a, b) => b[1] - a[1]),
     };
-  }, [activeDates, logsLookup]);
+  }, [activeDates, filteredLogsLookup]);
 
   // List of chronological logs for the timeline
   const timelineLogs = React.useMemo(() => {
     return activeDates
-      .map((dateStr) => ({ dateStr, log: logsLookup[dateStr] }))
+      .map((dateStr) => ({ dateStr, log: filteredLogsLookup[dateStr] }))
       .filter((item) => !!item.log)
       .reverse(); // Newest first
-  }, [activeDates, logsLookup]);
+  }, [activeDates, filteredLogsLookup]);
 
-  const getHeatmapColorClass = (status?: LogStatus) => {
-    if (!status) return 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800/80';
+  const getHeatmapColorClass = (status?: LogStatus, isMatching = true) => {
+    if (!status) return 'bg-slate-100 dark:bg-slate-900 border-slate-205 dark:border-slate-800/80';
+    if (!isMatching) return 'bg-slate-105/30 dark:bg-slate-900/35 border-slate-250/20 dark:border-slate-800/10 opacity-30';
     switch (status) {
       case 'CLEAN':
         return 'bg-emerald-500 hover:bg-emerald-600 border-emerald-600/20';
       case 'URGE_RESISTED':
-        return 'bg-teal-500 hover:bg-teal-650 border-teal-600/20';
+        return 'bg-teal-500 hover:bg-teal-600 border-teal-600/20';
       case 'PEEKED_EDGED':
-        return 'bg-amber-500 hover:bg-amber-605 border-amber-600/20';
+        return 'bg-amber-500 hover:bg-amber-600 border-amber-600/20';
       case 'SLIP_UP':
         return 'bg-rose-500 hover:bg-rose-600 border-rose-600/20';
     }
@@ -316,6 +387,44 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
         </div>
       </div>
 
+      {/* Dynamic Status and Reason Dropdown Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-200/50 dark:border-slate-850/60 shadow-xs">
+        <div className="space-y-1.5">
+          <label className="text-[9px] text-slate-500 uppercase tracking-wider font-extrabold block">
+            Status Type Filter:
+          </label>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-200 shadow-2xs cursor-pointer"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="CLEAN">🟢 Clean Days Only</option>
+            <option value="URGE_RESISTED">🔵 Resisted Cravings Only</option>
+            <option value="PEEKED_EDGED">🟡 Peeked / Edged</option>
+            <option value="SLIP_UP">🔴 Slip-ups / Relapses</option>
+          </select>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[9px] text-slate-500 uppercase tracking-wider font-extrabold block">
+            Trigger Reason Filter:
+          </label>
+          <select
+            value={selectedReason}
+            onChange={(e) => setSelectedReason(e.target.value)}
+            className="w-full p-2.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-200 shadow-2xs cursor-pointer"
+          >
+            <option value="ALL">All Trigger Reasons</option>
+            {uniqueReasons.map((reason) => (
+              <option key={reason} value={reason}>
+                ⚠️ {reason.replace(/_/g, ' ')}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {/* KPI Overview Metrics Card Grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-slate-50/50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/50 dark:border-slate-850/60 shadow-xs flex flex-col justify-between min-h-[70px]">
@@ -355,38 +464,66 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
       {filterType !== 'day' && (
         <div className="bg-slate-50/30 dark:bg-slate-950/20 p-4.5 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 space-y-3.5">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] text-slate-705 dark:text-slate-450 block uppercase font-black tracking-wider">
+            <span className="text-[9px] text-slate-755 dark:text-slate-450 block uppercase font-black tracking-wider">
               {filterType === 'month' ? 'Monthly Recovery Heatmap' : 'Range Contribution Grid'}
             </span>
             <div className="flex items-center gap-2 text-[8px] text-slate-505 font-bold uppercase tracking-wider">
               <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded bg-emerald-500 inline-block" /> Clean</span>
-              <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded bg-teal-500 inline-block" /> Resisted</span>
+              <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded bg-teal-555 inline-block" /> Resisted</span>
               <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded bg-amber-500 inline-block" /> Edged</span>
               <span className="flex items-center gap-0.5"><span className="w-2 h-2 rounded bg-rose-505 inline-block" /> Slipped</span>
             </div>
           </div>
 
-          {/* Heatmap Grid Wrapper */}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {activeDates.map((dateStr) => {
-              const log = logsLookup[dateStr];
-              const dayNum = new Date(dateStr).getDate();
-              return (
-                <button
-                  key={dateStr}
-                  onClick={() => {
-                    setSelectedDay(dateStr);
-                    setFilterType('day');
-                  }}
-                  title={`${dateStr}: ${log ? log.status : 'Untracked'}`}
-                  className={`w-8 h-8 rounded-lg border text-[10px] font-mono font-bold flex items-center justify-center transition-all cursor-pointer ${getHeatmapColorClass(
-                    log?.status
-                  )} ${log ? 'text-white border-transparent' : 'text-slate-400 dark:text-slate-600'}`}
-                >
-                  {dayNum}
-                </button>
-              );
-            })}
+          {/* GitHub-Style Heatmap Grid Wrapper */}
+          <div className="flex gap-2 items-start pt-1">
+            {/* Weekday Labels Column */}
+            <div className="grid gap-1 text-[9px] font-extrabold text-slate-400 select-none pr-1 shrink-0" style={{ gridTemplateRows: 'repeat(7, 30px)' }}>
+              <div className="flex items-center justify-end pr-0.5"></div>
+              <div className="flex items-center justify-end pr-0.5">Mon</div>
+              <div className="flex items-center justify-end pr-0.5"></div>
+              <div className="flex items-center justify-end pr-0.5">Wed</div>
+              <div className="flex items-center justify-end pr-0.5"></div>
+              <div className="flex items-center justify-end pr-0.5">Fri</div>
+              <div className="flex items-center justify-end pr-0.5"></div>
+            </div>
+
+            {/* Scrollable Heatmap Grid */}
+            <div className="flex-1 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
+              <div className="grid grid-flow-col gap-1" style={{ gridTemplateRows: 'repeat(7, 30px)' }}>
+                {gridItems.map((item, index) => {
+                  if (item.isPlaceholder) {
+                    return (
+                      <div
+                        key={`placeholder-${index}`}
+                        className="w-[30px] h-[30px] rounded-md bg-transparent border border-transparent shrink-0"
+                      />
+                    );
+                  }
+
+                  const dateStr = item.dateStr!;
+                  const log = logsLookup[dateStr];
+                  const matchesFilter = log ? isLogMatchingFilters(log) : true;
+
+                  return (
+                    <button
+                      key={dateStr}
+                      onClick={() => {
+                        setSelectedDay(dateStr);
+                        setFilterType('day');
+                      }}
+                      title={`${dateStr}: ${log ? log.status : 'Untracked'}`}
+                      className={`w-[30px] h-[30px] rounded-md border text-[9px] font-mono font-bold flex items-center justify-center transition-all cursor-pointer ${getHeatmapColorClass(
+                        log?.status,
+                        matchesFilter
+                      )} ${log && matchesFilter ? 'text-white border-transparent' : 'text-slate-405 dark:text-slate-655 border-slate-200 dark:border-slate-850'}`}
+                    >
+                      {item.dayNum}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
           <p className="text-[9px] text-slate-505 italic">
             * Click on any day box above to zoom in on its specific daily log check-in details.
