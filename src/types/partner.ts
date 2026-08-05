@@ -1,5 +1,5 @@
 export type PartnershipRole = 'SPIRITUAL_MENTOR' | 'PEER_BUDDY' | 'MENTOR';
-export type PartnershipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED';
+export type PartnershipStatus = 'PENDING' | 'ACCEPTED' | 'DECLINED' | 'PENDING_TERMINATION' | 'TERMINATED';
 
 export interface AccountabilityPartnership {
   id: string;
@@ -12,6 +12,7 @@ export interface AccountabilityPartnership {
   status: PartnershipStatus;
   inviteCode?: string;
   createdAt: string;
+  terminationRequestedAt?: string;
 }
 
 export interface CounselNote {

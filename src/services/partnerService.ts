@@ -53,3 +53,27 @@ export async function getUserPartnerships(): Promise<AccountabilityPartnership[]
   });
   return Array.isArray(res) ? res : [];
 }
+
+export async function terminatePartnership(
+  partnershipId: string,
+  reasonCategory: string,
+  rating?: number,
+  exitMessage?: string
+): Promise<any> {
+  return apiFetch<any>(`/api/v1/partnerships/${partnershipId}/terminate`, {
+    method: 'POST',
+    body: JSON.stringify({ reasonCategory, rating, exitMessage }),
+  });
+}
+
+export async function cancelPartnershipTermination(
+  partnershipId: string,
+  reasonCategory: string,
+  rating: number,
+  userMessage?: string
+): Promise<any> {
+  return apiFetch<any>(`/api/v1/partnerships/${partnershipId}/cancel-termination`, {
+    method: 'POST',
+    body: JSON.stringify({ reasonCategory, rating, userMessage }),
+  });
+}

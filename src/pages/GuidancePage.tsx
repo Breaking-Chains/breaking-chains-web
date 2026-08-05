@@ -9,7 +9,7 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { Users, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
-import { connectWithMentorCode, getUserPartnerships, getPartnershipMessages, sendPartnershipMessage } from '../services/partnerService';
+import { connectWithMentorCode, getUserPartnerships, getPartnershipMessages, sendPartnershipMessage, terminatePartnership, cancelPartnershipTermination } from '../services/partnerService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
 import type { MentorshipChatMessage, AccountabilityPartnership } from '../types/partner';
@@ -39,6 +39,20 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [userPartnerships, setUserPartnerships] = useState<AccountabilityPartnership[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isNasihaOpen, setIsNasihaOpen] = useState(false);
+
+  // Exit survey & termination states
+  const [isExitSurveyOpen, setIsExitSurveyOpen] = useState(false);
+  const [exitReason, setExitReason] = useState('STYLE_MISMATCH');
+  const [exitRating, setExitRating] = useState(5);
+  const [exitNotes, setExitNotes] = useState('');
+  const [isSubmittingExit, setIsSubmittingExit] = useState(false);
+
+  // Cancellation feedback states
+  const [isCancelSurveyOpen, setIsCancelSurveyOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('NEED_ACCOUNTABILITY');
+  const [cancelRating, setCancelRating] = useState(5);
+  const [cancelNotes, setCancelNotes] = useState('');
+  const [isSubmittingCancel, setIsSubmittingCancel] = useState(false);
 
   const loadMentors = async () => {
     setIsLoadingMentors(true);
@@ -187,6 +201,66 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
     }
   };
 
+  const handleConfirmDisconnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeMentorship) return;
+    setIsSubmittingExit(true);
+    setConnectErrorMsg(null);
+    setConnectSuccessMsg(null);
+    try {
+      if (isDemoSession) {
+        setUserPartnerships((prev) =>
+          prev.map((p) =>
+            p.id === activeMentorship.id
+              ? { ...p, status: 'PENDING_TERMINATION', terminationRequestedAt: new Date().toISOString() }
+              : p
+          )
+        );
+        setConnectSuccessMsg('Termination grace period initiated (Demo Mode)');
+        setIsExitSurveyOpen(false);
+      } else {
+        await terminatePartnership(activeMentorship.id, exitReason, exitRating, exitNotes);
+        setConnectSuccessMsg('Disconnection grace period initiated.');
+        setIsExitSurveyOpen(false);
+        await loadMentors();
+      }
+    } catch (err) {
+      setConnectErrorMsg(formatApiErrorMessage(err));
+    } finally {
+      setIsSubmittingExit(false);
+    }
+  };
+
+  const handleConfirmCancelDisconnect = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!activeMentorship) return;
+    setIsSubmittingCancel(true);
+    setConnectErrorMsg(null);
+    setConnectSuccessMsg(null);
+    try {
+      if (isDemoSession) {
+        setUserPartnerships((prev) =>
+          prev.map((p) =>
+            p.id === activeMentorship.id
+              ? { ...p, status: 'ACCEPTED', terminationRequestedAt: undefined }
+              : p
+          )
+        );
+        setConnectSuccessMsg('Termination cancelled (Demo Mode)');
+        setIsCancelSurveyOpen(false);
+      } else {
+        await cancelPartnershipTermination(activeMentorship.id, cancelReason, cancelRating, cancelNotes);
+        setConnectSuccessMsg('Guidance connection successfully restored.');
+        setIsCancelSurveyOpen(false);
+        await loadMentors();
+      }
+    } catch (err) {
+      setConnectErrorMsg(formatApiErrorMessage(err));
+    } finally {
+      setIsSubmittingCancel(false);
+    }
+  };
+
   const handleSendMessage = async (text: string) => {
     if (!text.trim()) return;
     if (isDemoSession) {
@@ -240,55 +314,94 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
               My Mentor
             </h3>
-          </div>
-
-          {activeMentorship ? (
-            <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-base font-black uppercase shrink-0">
-                    {(activeMentorship.partnerFullName || 'M')[0]}
-                  </div>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                        {activeMentorship.partnerFullName || 'Verified Mentor'}
-                      </h4>
-                      <span className="text-[8px] font-bold py-0.5 px-2 rounded-full bg-emerald-55 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-transparent uppercase tracking-wider">
-                        Active Guide
-                      </span>
-                    </div>
-                    {(() => {
-                      const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
-                      return (
-                        <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-extrabold uppercase tracking-wide">
-                          {details?.specialization || 'Spiritual Counselor & Tazkiyah Guide'}
+          </div>          {activeMentorship ? (
+            <div className="space-y-4">
+              {/* Grace Period Pending Termination Alert Banner */}
+              {activeMentorship.status === 'PENDING_TERMINATION' && (
+                <div className="p-4 rounded-2xl bg-amber-50/40 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-850 dark:text-amber-300 font-medium space-y-3 shadow-xs animate-pulse">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">⏳</span>
+                      <div>
+                        <p className="font-bold uppercase tracking-wider text-[10px] text-amber-700 dark:text-amber-400">Termination Pending</p>
+                        <p className="text-[10px] text-slate-605 dark:text-slate-400 leading-tight">
+                          Your connection with {activeMentorship.partnerFullName} is scheduled to end in {(() => {
+                            const requestDate = new Date(activeMentorship.terminationRequestedAt || Date.now());
+                            const diffTime = (requestDate.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
+                            const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+                            return `${diffDays} day${diffDays === 1 ? '' : 's'}`;
+                          })()}. You remain connected and under mentor care until then.
                         </p>
-                      );
-                    })()}
-                    <p className="text-[10px] text-slate-500 dark:text-slate-450 max-w-md italic">
-                      "Your recovery and spiritual journey is kept strictly confidential."
-                    </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="emerald"
+                      size="sm"
+                      onClick={() => setIsCancelSurveyOpen(true)}
+                      className="text-[10px] font-black uppercase tracking-wider rounded-xl cursor-pointer"
+                    >
+                      Cancel Disconnect
+                    </Button>
                   </div>
                 </div>
+              )}
 
-                {/* Minimal Label Actions */}
-                <div className="flex items-center gap-3 self-stretch md:self-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-slate-800/40">
-                  <button
-                    onClick={() => setIsNasihaOpen(true)}
-                    className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 hover:text-emerald-650 dark:hover:text-emerald-400 bg-slate-100/50 dark:bg-slate-900 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 rounded-xl transition-all duration-200 border border-slate-200/50 dark:border-slate-850 cursor-pointer"
-                  >
-                    ✵ Nasiha
-                  </button>
-                  <button
-                    onClick={() => setIsChatOpen(true)}
-                    className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-750 rounded-xl shadow-md shadow-emerald-500/10 transition-all duration-200 cursor-pointer"
-                  >
-                    💬 Chat
-                  </button>
+              {/* Connected Mentor Info Card */}
+              <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-base font-black uppercase shrink-0">
+                      {(activeMentorship.partnerFullName || 'M')[0]}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                          {activeMentorship.partnerFullName || 'Verified Mentor'}
+                        </h4>
+                        <span className="text-[8px] font-bold py-0.5 px-2 rounded-full bg-emerald-55 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-transparent uppercase tracking-wider">
+                          {activeMentorship.status === 'PENDING_TERMINATION' ? 'Transition' : 'Active Guide'}
+                        </span>
+                      </div>
+                      {(() => {
+                        const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
+                        return (
+                          <p className="text-[10px] text-emerald-600 dark:text-emerald-450 font-extrabold uppercase tracking-wide">
+                            {details?.specialization || 'Spiritual Counselor & Tazkiyah Guide'}
+                          </p>
+                        );
+                      })()}
+                      <p className="text-[10px] text-slate-500 dark:text-slate-455 max-w-md italic">
+                        "Your recovery and spiritual journey is kept strictly confidential."
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Minimal Label Actions */}
+                  <div className="flex items-center gap-3 self-stretch md:self-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-slate-800/40">
+                    <button
+                      onClick={() => setIsNasihaOpen(true)}
+                      className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-350 hover:text-emerald-650 dark:hover:text-emerald-400 bg-slate-100/50 dark:bg-slate-900 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 rounded-xl transition-all duration-200 border border-slate-200/50 dark:border-slate-850 cursor-pointer"
+                    >
+                      ✵ Nasiha
+                    </button>
+                    <button
+                      onClick={() => setIsChatOpen(true)}
+                      className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-750 rounded-xl shadow-md shadow-emerald-500/10 transition-all duration-200 cursor-pointer"
+                    >
+                      💬 Chat
+                    </button>
+                    {activeMentorship.status === 'ACCEPTED' && (
+                      <button
+                        onClick={() => setIsExitSurveyOpen(true)}
+                        className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 hover:text-rose-650 bg-rose-50/20 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition-all duration-200 border border-rose-200/50 dark:border-rose-850/50 cursor-pointer"
+                      >
+                        ✕ Disconnect
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           ) : (
             /* Unconnected Mentor Card */
             <Card variant="glass" className="p-6 text-center space-y-3 border-slate-200 dark:border-slate-900 bg-slate-100/20 dark:bg-slate-950/20">
@@ -545,6 +658,171 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
         </>
       )}
+
+      {/* Exit Survey (Disconnection Request) Modal */}
+      <Modal 
+        isOpen={isExitSurveyOpen} 
+        onClose={() => setIsExitSurveyOpen(false)} 
+        title="Request Disconnection from Guide"
+      >
+        <form onSubmit={handleConfirmDisconnect} className="space-y-4">
+          <p className="text-xs text-slate-600 dark:text-slate-350 leading-relaxed">
+            Please share why you are ending this guidance connection. Your partnership will enter a <strong>7-day transition period</strong> before final termination.
+          </p>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Reason for ending connection</label>
+            <select
+              value={exitReason}
+              onChange={(e) => setExitReason(e.target.value)}
+              className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            >
+              <option value="INACTIVITY">Inactivity (Mentor hasn't responded)</option>
+              <option value="STYLE_MISMATCH">Style Mismatch (Different counseling approaches)</option>
+              <option value="RELAPSE_SHAME">Relapse Shame (Distressed by a slip-up)</option>
+              <option value="RECOVERED">Successfully Recovered (Ready to go solo)</option>
+              <option value="OTHER">Other Reason</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">How would you rate their guidance? (1-5)</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setExitRating(star)}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors cursor-pointer ${
+                    exitRating >= star
+                      ? 'bg-amber-500 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-400 border border-slate-200 dark:border-slate-800'
+                  }`}
+                >
+                  {star}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Exit Note for your Guide (Optional)</label>
+            <textarea
+              placeholder="Leave a message or closing reflection..."
+              value={exitNotes}
+              onChange={(e) => setExitNotes(e.target.value)}
+              className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-20 resize-none"
+            />
+          </div>
+
+          {connectErrorMsg && (
+            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
+              {connectErrorMsg}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsExitSurveyOpen(false)}
+              className="flex-1 text-xs py-2.5 rounded-xl cursor-pointer"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="danger"
+              disabled={isSubmittingExit}
+              className="flex-1 text-xs py-2.5 bg-rose-600 hover:bg-rose-750 text-white rounded-xl cursor-pointer"
+            >
+              {isSubmittingExit ? 'Submitting...' : 'Confirm Disconnect'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Cancellation Feedback Survey Modal */}
+      <Modal 
+        isOpen={isCancelSurveyOpen} 
+        onClose={() => setIsCancelSurveyOpen(false)} 
+        title="We're glad you're staying!"
+      >
+        <form onSubmit={handleConfirmCancelDisconnect} className="space-y-4">
+          <p className="text-xs text-slate-655 dark:text-slate-350 leading-relaxed">
+            Please let us know what helped change your mind about ending this connection.
+          </p>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">What made you decide to stay?</label>
+            <select
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+            >
+              <option value="MENTOR_OUTREACH">My mentor reached out to support me</option>
+              <option value="URGE_PASSED">The intense urge/distress passed and I feel calmer</option>
+              <option value="NEED_ACCOUNTABILITY">I realized I need accountability to remain clean</option>
+              <option value="OTHER">Other Reason</option>
+            </select>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">How helpful was the 7-day grace period? (1-5)</label>
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setCancelRating(star)}
+                  className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs transition-colors cursor-pointer ${
+                    cancelRating >= star
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-900 text-slate-400 border border-slate-200 dark:border-slate-800'
+                  }`}
+                >
+                  {star}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-[10px] font-black uppercase text-slate-500 tracking-wider">Optional Reflection / Notes</label>
+            <textarea
+              placeholder="Reflect on why you chose to commit further..."
+              value={cancelNotes}
+              onChange={(e) => setCancelNotes(e.target.value)}
+              className="w-full text-xs p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-20 resize-none"
+            />
+          </div>
+
+          {connectErrorMsg && (
+            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
+              {connectErrorMsg}
+            </div>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsCancelSurveyOpen(false)}
+              className="flex-1 text-xs py-2.5 rounded-xl cursor-pointer"
+            >
+              Back
+            </Button>
+            <Button
+              type="submit"
+              variant="emerald"
+              disabled={isSubmittingCancel}
+              className="flex-1 text-xs py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl cursor-pointer"
+            >
+              {isSubmittingCancel ? 'Saving...' : 'Keep Connection'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
