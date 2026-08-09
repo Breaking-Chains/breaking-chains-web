@@ -3,7 +3,11 @@ import { Mail, Lock, User as UserIcon, Link2Off } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatApiErrorMessage } from '../services/apiClient';
 
-export const AuthPage: React.FC = () => {
+interface AuthPageProps {
+  onBack?: () => void;
+}
+
+export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -38,7 +42,15 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex items-center justify-center p-container-padding font-body-md text-body-md antialiased w-full selection:bg-emerald-500/30">
+    <div className="bg-background text-on-background min-h-screen flex items-center justify-center p-container-padding font-body-md text-body-md antialiased w-full selection:bg-emerald-500/30 relative">
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-surface border border-outline-variant px-3 py-1.5 rounded-lg shadow-sm"
+        >
+          ← Back to Product
+        </button>
+      )}
       {/* Main Container */}
       <main className="w-full max-w-[440px] animate-fade-in">
         {/* Logo & Header */}

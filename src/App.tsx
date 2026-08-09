@@ -11,6 +11,7 @@ import { GuidancePage } from './pages/GuidancePage';
 import { MenteesPage } from './pages/MenteesPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AuthPage } from './pages/AuthPage';
+import { LandingPage } from './pages/LandingPage';
 import { MentorDashboardPage } from './pages/MentorDashboardPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
@@ -153,6 +154,7 @@ function ProtectedAppContent() {
 
 function ControlledAccessGuard() {
   const { isAuthenticated, isLoading } = useAuth();
+  const [showAuth, setShowAuth] = useState(false);
 
   if (isLoading) {
     return (
@@ -164,7 +166,10 @@ function ControlledAccessGuard() {
   }
 
   if (!isAuthenticated) {
-    return <AuthPage />;
+    if (showAuth) {
+      return <AuthPage onBack={() => setShowAuth(false)} />;
+    }
+    return <LandingPage onGetStarted={() => setShowAuth(true)} />;
   }
 
   return (
