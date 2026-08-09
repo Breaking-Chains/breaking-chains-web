@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Lock, User as UserIcon, Link2Off } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatApiErrorMessage } from '../services/apiClient';
 
@@ -46,7 +46,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
       {onBack && (
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-surface border border-outline-variant px-3 py-1.5 rounded-lg shadow-sm"
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-surface border border-outline-variant px-3 py-1.5 rounded-lg shadow-sm font-manrope"
         >
           ← Back to Product
         </button>
@@ -56,23 +56,23 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
         {/* Logo & Header */}
         <div className="text-center mb-stack-lg">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-container mb-stack-sm text-primary">
-            <Link2Off className="w-8 h-8" />
+            <span className="text-[32px] font-bold font-manrope">BC</span>
           </div>
-          <h1 className="font-manrope text-[32px] md:text-[48px] font-bold text-primary tracking-tight leading-tight">
+          <h1 className="font-manrope font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-primary tracking-tight">
             Breaking Chains
           </h1>
-          <p className="text-on-surface-variant mt-stack-sm font-inter text-body-md">
+          <p className="text-on-surface-variant mt-stack-sm font-body-md text-body-md font-manrope">
             {mode === 'login' ? 'Welcome back. Your journey continues here.' : 'Create an account to begin your journey.'}
           </p>
         </div>
 
-        {/* Auth Card */}
+        {/* Login/Auth Card */}
         <div className="bg-surface rounded-xl border border-outline-variant p-container-padding">
           {/* Social Login */}
           <button
             type="button"
             onClick={() => loginAsGuest('USER')}
-            className="w-full flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-primary font-inter text-body-md font-semibold py-3 px-4 rounded-lg transition-colors border border-outline-variant mb-stack-md cursor-pointer"
+            className="w-full flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-primary font-body-md text-body-md font-medium py-3 px-4 rounded-lg transition-colors border border-outline-variant mb-stack-md cursor-pointer font-manrope"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"></path>
@@ -86,7 +86,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
           {/* Divider */}
           <div className="relative flex py-5 items-center mb-stack-md">
             <div className="flex-grow border-t border-outline-variant"></div>
-            <span className="flex-shrink-0 mx-4 text-on-surface-variant font-geist text-label-sm uppercase tracking-wider">
+            <span className="flex-shrink-0 mx-4 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-manrope">
               {mode === 'login' ? 'or sign in with email' : 'or sign up with email'}
             </span>
             <div className="flex-grow border-t border-outline-variant"></div>
@@ -94,79 +94,70 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
 
           {/* Error Banner */}
           {error && (
-            <div className="p-3 mb-stack-md rounded-lg bg-error-container border border-outline-variant text-on-error-container text-xs font-semibold text-center animate-fade-in font-inter">
+            <div className="p-3 mb-stack-md rounded-lg bg-error-container border border-outline-variant text-on-error-container text-xs font-semibold text-center animate-fade-in font-manrope">
               ⚠️ {error}
             </div>
           )}
 
           {/* Email Form */}
-          <form onSubmit={handleSubmit} className="space-y-stack-md">
+          <form onSubmit={handleSubmit} className="space-y-stack-md font-manrope">
             {mode === 'register' && (
               <>
                 <div>
-                  <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="fullName">
+                  <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="fullName">
                     Full Name
                   </label>
-                  <div className="relative flex items-center">
-                    <UserIcon className="absolute left-3 w-4 h-4 text-outline" />
-                    <input
-                      className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
-                      id="fullName"
-                      placeholder="e.g. Alex Smith"
-                      type="text"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <input
+                    className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                    id="fullName"
+                    placeholder="e.g. Alex Smith"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
                 </div>
 
                 <div>
-                  <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="username">
+                  <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="username">
                     Username
                   </label>
-                  <div className="relative flex items-center">
-                    <UserIcon className="absolute left-3 w-4 h-4 text-outline" />
-                    <input
-                      className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
-                      id="username"
-                      placeholder="e.g. alexsmith"
-                      type="text"
-                      value={username}
-                      onChange={(e) => setUsername(e.target.value)}
-                      required
-                    />
-                  </div>
+                  <input
+                    className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                    id="username"
+                    placeholder="e.g. alexsmith"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                  />
                 </div>
               </>
             )}
 
             <div>
-              <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="email">
+              <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="email">
                 Email Address
               </label>
-              <div className="relative flex items-center">
-                <Mail className="absolute left-3 w-4 h-4 text-outline" />
-                <input
-                  className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
-                  id="email"
-                  placeholder="you@example.com"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                id="email"
+                placeholder="you@example.com"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
 
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block font-geist text-label-sm text-on-surface-variant" htmlFor="password">
+                <label className="block font-label-sm text-label-sm text-on-surface-variant" htmlFor="password">
                   Password
                 </label>
                 {mode === 'login' && (
                   <a
-                    className="font-geist text-label-sm text-primary hover:text-primary-container transition-colors hover:underline"
+                    className="font-label-sm text-label-sm text-primary hover:text-primary-container transition-colors hover:underline"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
@@ -177,22 +168,19 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                   </a>
                 )}
               </div>
-              <div className="relative flex items-center">
-                <Lock className="absolute left-3 w-4 h-4 text-outline" />
-                <input
-                  className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
-                  id="password"
-                  placeholder="••••••••"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
+              <input
+                className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                id="password"
+                placeholder="••••••••"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
 
             <button
-              className="w-full text-on-primary bg-primary hover:opacity-90 focus:ring-4 focus:outline-none focus:ring-primary/20 font-inter text-body-md font-semibold rounded-lg px-5 py-3 text-center transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              className="w-full text-on-primary bg-primary hover:bg-primary-container focus:ring-4 focus:outline-none focus:ring-primary-fixed font-body-md text-body-md font-medium rounded-lg px-5 py-3 text-center transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
               type="submit"
               disabled={isLoading}
             >
@@ -209,7 +197,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
         </div>
 
         {/* Registration Link */}
-        <p className="text-center mt-stack-lg font-inter text-body-md text-on-surface-variant">
+        <p className="text-center mt-stack-lg font-body-md text-body-md text-on-surface-variant font-manrope">
           {mode === 'login' ? (
             <>
               Don't have an account?{' '}
@@ -243,44 +231,14 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
           )}
         </p>
 
-        {/* Demo Access Role Switcher */}
-        <div className="mt-stack-md bg-surface rounded-xl border border-outline-variant p-4 space-y-2">
-          <span className="block text-[10px] uppercase tracking-wider font-black text-on-surface-variant text-center mb-1.5 font-geist">
-            Select Demo Access Role
-          </span>
-          <div className="grid grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => loginAsGuest('USER')}
-              className="text-[11px] py-2 px-1 text-primary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
-            >
-              Recoverer
-            </button>
-            <button
-              type="button"
-              onClick={() => loginAsGuest('MENTOR')}
-              className="text-[11px] py-2 px-1 text-secondary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
-            >
-              Mentor
-            </button>
-            <button
-              type="button"
-              onClick={() => loginAsGuest('ADMIN')}
-              className="text-[11px] py-2 px-1 text-tertiary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
-            >
-              Admin
-            </button>
-          </div>
-        </div>
-
         {/* Privacy Shield Banner */}
         <div className="mt-stack-lg bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-start gap-3">
           <Lock className="text-tertiary-container mt-0.5 w-5 h-5 flex-shrink-0" />
           <div>
-            <p className="font-geist text-label-sm text-tertiary-container font-semibold uppercase tracking-wider mb-1">
+            <p className="font-label-sm text-label-sm text-tertiary-container font-semibold uppercase tracking-wider mb-1 font-manrope">
               Privacy Focused
             </p>
-            <p className="font-inter text-label-sm text-on-surface-variant leading-relaxed">
+            <p className="font-label-sm text-label-sm text-on-surface-variant leading-relaxed font-manrope">
               Your data is encrypted and secure. We prioritize your anonymity and maintain strict confidentiality standards throughout your recovery journey.
             </p>
           </div>

@@ -98,6 +98,10 @@
   --text-body-lg--line-height: 28px;
   --text-headline-xl: 48px;
   --text-headline-xl--line-height: 56px;
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-headline-lg-mobile: 24px;
+  --text-headline-lg-mobile--line-height: 32px;
 }
 
 @variant dark (&:where(.dark, .dark *));
