@@ -15,7 +15,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
 
-  const { login, register, loginAsGuest, isLoading } = useAuth();
+  const { login, register, isLoading } = useAuth();
+
+  const handleGoogleLogin = () => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
+    window.location.href = `${baseUrl}/api/v1/auth/google`;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,7 +76,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
           {/* Social Login */}
           <button
             type="button"
-            onClick={() => loginAsGuest('USER')}
+            onClick={handleGoogleLogin}
             className="w-full flex items-center justify-center gap-2 bg-[#e6eeff] hover:bg-[#d9e6ff] text-[#00236f] font-body-md text-body-md font-medium py-3 px-4 rounded-lg transition-colors border border-[#c5c5d3] mb-stack-md cursor-pointer font-manrope outline-none"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
