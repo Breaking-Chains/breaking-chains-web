@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, Mail, Lock, User as UserIcon, LogIn, UserPlus } from 'lucide-react';
-import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
-import { Input } from '../components/ui/Input';
+import { Mail, Lock, User as UserIcon, Link2Off } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatApiErrorMessage } from '../services/apiClient';
 
@@ -41,165 +38,244 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col justify-center items-center p-4 selection:bg-emerald-500/30 transition-colors duration-300">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
-        {/* Sleek App Branding */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-center mx-auto shadow-md">
-            <ShieldCheck className="w-7 h-7 text-emerald-600 dark:text-emerald-400 stroke-[2.2]" />
+    <div className="bg-background text-on-background min-h-screen flex items-center justify-center p-container-padding font-body-md text-body-md antialiased w-full selection:bg-emerald-500/30">
+      {/* Main Container */}
+      <main className="w-full max-w-[440px] animate-fade-in">
+        {/* Logo & Header */}
+        <div className="text-center mb-stack-lg">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-container mb-stack-sm text-primary">
+            <Link2Off className="w-8 h-8" />
           </div>
-          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+          <h1 className="font-manrope text-[32px] md:text-[48px] font-bold text-primary tracking-tight leading-tight">
             Breaking Chains
           </h1>
-          <p className="text-xs text-slate-600 dark:text-slate-400 max-w-xs mx-auto">
-            PMO Recovery & Spiritual Growth
+          <p className="text-on-surface-variant mt-stack-sm font-inter text-body-md">
+            {mode === 'login' ? 'Welcome back. Your journey continues here.' : 'Create an account to begin your journey.'}
           </p>
         </div>
 
-        {/* Card Gateway Container */}
-        <Card variant="glass" className="p-6 shadow-2xl space-y-5">
-          {/* Mode Switcher Tabs */}
-          <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-950/80 rounded-xl border border-slate-200 dark:border-slate-900 text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => {
-                setMode('login');
-                setError('');
-              }}
-              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${mode === 'login'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-800 shadow-sm font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-            >
-              <LogIn className="w-3.5 h-3.5" /> Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setMode('register');
-                setError('');
-              }}
-              className={`py-2 rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer ${mode === 'register'
-                  ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-800 shadow-sm font-bold'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
-            >
-              <UserPlus className="w-3.5 h-3.5" /> Create Account
-            </button>
+        {/* Auth Card */}
+        <div className="bg-surface rounded-xl border border-outline-variant p-container-padding">
+          {/* Social Login */}
+          <button
+            type="button"
+            onClick={() => loginAsGuest('USER')}
+            className="w-full flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-primary font-inter text-body-md font-semibold py-3 px-4 rounded-lg transition-colors border border-outline-variant mb-stack-md cursor-pointer"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"></path>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+            </svg>
+            Continue with Google
+          </button>
+
+          {/* Divider */}
+          <div className="relative flex py-5 items-center mb-stack-md">
+            <div className="flex-grow border-t border-outline-variant"></div>
+            <span className="flex-shrink-0 mx-4 text-on-surface-variant font-geist text-label-sm uppercase tracking-wider">
+              {mode === 'login' ? 'or sign in with email' : 'or sign up with email'}
+            </span>
+            <div className="flex-grow border-t border-outline-variant"></div>
           </div>
 
           {/* Error Banner */}
           {error && (
-            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/50 text-rose-800 dark:text-rose-300 text-xs text-center font-medium animate-fade-in">
-              {error}
+            <div className="p-3 mb-stack-md rounded-lg bg-error-container border border-outline-variant text-on-error-container text-xs font-semibold text-center animate-fade-in font-inter">
+              ⚠️ {error}
             </div>
           )}
 
-          {/* Auth Form */}
-          <form onSubmit={handleSubmit} className="space-y-3">
+          {/* Email Form */}
+          <form onSubmit={handleSubmit} className="space-y-stack-md">
             {mode === 'register' && (
               <>
-                <Input
-                  label="Full Name"
-                  placeholder="e.g. Alex Smith"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  icon={<UserIcon className="w-4 h-4 text-slate-500" />}
-                  required
-                />
-                <Input
-                  label="Username"
-                  placeholder="e.g. alexsmith"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  icon={<UserIcon className="w-4 h-4 text-slate-500" />}
-                  required
-                />
+                <div>
+                  <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="fullName">
+                    Full Name
+                  </label>
+                  <div className="relative flex items-center">
+                    <UserIcon className="absolute left-3 w-4 h-4 text-outline" />
+                    <input
+                      className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
+                      id="fullName"
+                      placeholder="e.g. Alex Smith"
+                      type="text"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="username">
+                    Username
+                  </label>
+                  <div className="relative flex items-center">
+                    <UserIcon className="absolute left-3 w-4 h-4 text-outline" />
+                    <input
+                      className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
+                      id="username"
+                      placeholder="e.g. alexsmith"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
               </>
             )}
 
-            <Input
-              label="Email Address"
-              type="email"
-              placeholder="user@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              icon={<Mail className="w-4 h-4 text-slate-500" />}
-              required
-            />
-
-            <Input
-              label="Password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              icon={<Lock className="w-4 h-4 text-slate-500" />}
-              required
-            />
-
-            <Button
-              type="submit"
-              variant="emerald"
-              size="lg"
-              isLoading={isLoading}
-              className="w-full mt-2 text-sm"
-            >
-              {mode === 'login' ? 'Sign In' : 'Create Account'}
-            </Button>
-          </form>
-
-          {/* Divider */}
-          <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-slate-200 dark:border-slate-900"></div>
-            <span className="flex-shrink mx-3 text-[10px] uppercase font-semibold text-slate-500 dark:text-slate-600">
-              or
-            </span>
-            <div className="flex-grow border-t border-slate-200 dark:border-slate-900"></div>
-          </div>
-
-          {/* Guest / Demo Access Buttons */}
-          <div className="space-y-2 pt-1">
-            <span className="block text-[9px] uppercase tracking-wider font-bold text-slate-750 dark:text-slate-500 text-center mb-1.5">
-              Select Demo Access Role
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              <Button
-                type="button"
-                variant="subtle"
-                size="sm"
-                onClick={() => loginAsGuest('USER')}
-                className="text-[10px] py-2.5 px-1 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl font-bold cursor-pointer"
-              >
-                Recoverer
-              </Button>
-              <Button
-                type="button"
-                variant="subtle"
-                size="sm"
-                onClick={() => loginAsGuest('MENTOR')}
-                className="text-[10px] py-2.5 px-1 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 border border-emerald-250 dark:border-emerald-900/50 rounded-xl font-bold cursor-pointer"
-              >
-                Mentor
-              </Button>
-              <Button
-                type="button"
-                variant="subtle"
-                size="sm"
-                onClick={() => loginAsGuest('ADMIN')}
-                className="text-[10px] py-2.5 px-1 text-amber-700 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/20 border border-amber-250 dark:border-amber-900/50 rounded-xl font-bold cursor-pointer"
-              >
-                Admin
-              </Button>
+            <div>
+              <label className="block font-geist text-label-sm text-on-surface-variant mb-1" htmlFor="email">
+                Email Address
+              </label>
+              <div className="relative flex items-center">
+                <Mail className="absolute left-3 w-4 h-4 text-outline" />
+                <input
+                  className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
+                  id="email"
+                  placeholder="you@example.com"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-          </div>
-        </Card>
 
-        {/* Confidentiality Footer */}
-        <p className="text-center text-[11px] text-slate-500 max-w-xs mx-auto">
-          🔒 100% Confidential & Encrypted
+            <div>
+              <div className="flex justify-between items-center mb-1">
+                <label className="block font-geist text-label-sm text-on-surface-variant" htmlFor="password">
+                  Password
+                </label>
+                {mode === 'login' && (
+                  <a
+                    className="font-geist text-label-sm text-primary hover:text-primary-container transition-colors hover:underline"
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('Demo forgot password triggered. In production, this sends a password recovery email.');
+                    }}
+                  >
+                    Forgot?
+                  </a>
+                )}
+              </div>
+              <div className="relative flex items-center">
+                <Lock className="absolute left-3 w-4 h-4 text-outline" />
+                <input
+                  className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 pl-10 transition-all outline-none font-inter"
+                  id="password"
+                  placeholder="••••••••"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <button
+              className="w-full text-on-primary bg-primary hover:opacity-90 focus:ring-4 focus:outline-none focus:ring-primary/20 font-inter text-body-md font-semibold rounded-lg px-5 py-3 text-center transition-colors shadow-sm cursor-pointer disabled:opacity-50"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                mode === 'login' ? 'Sign In' : 'Sign Up'
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Registration Link */}
+        <p className="text-center mt-stack-lg font-inter text-body-md text-on-surface-variant">
+          {mode === 'login' ? (
+            <>
+              Don't have an account?{' '}
+              <a
+                className="text-primary font-semibold hover:underline"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMode('register');
+                  setError('');
+                }}
+              >
+                Create one
+              </a>
+            </>
+          ) : (
+            <>
+              Already have an account?{' '}
+              <a
+                className="text-primary font-semibold hover:underline"
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setMode('login');
+                  setError('');
+                }}
+              >
+                Sign in
+              </a>
+            </>
+          )}
         </p>
-      </div>
+
+        {/* Demo Access Role Switcher */}
+        <div className="mt-stack-md bg-surface rounded-xl border border-outline-variant p-4 space-y-2">
+          <span className="block text-[10px] uppercase tracking-wider font-black text-on-surface-variant text-center mb-1.5 font-geist">
+            Select Demo Access Role
+          </span>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              type="button"
+              onClick={() => loginAsGuest('USER')}
+              className="text-[11px] py-2 px-1 text-primary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
+            >
+              Recoverer
+            </button>
+            <button
+              type="button"
+              onClick={() => loginAsGuest('MENTOR')}
+              className="text-[11px] py-2 px-1 text-secondary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
+            >
+              Mentor
+            </button>
+            <button
+              type="button"
+              onClick={() => loginAsGuest('ADMIN')}
+              className="text-[11px] py-2 px-1 text-tertiary hover:bg-surface-container font-semibold border border-outline-variant rounded-lg transition-colors cursor-pointer bg-surface-container-low"
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
+        {/* Privacy Shield Banner */}
+        <div className="mt-stack-lg bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-start gap-3">
+          <Lock className="text-tertiary-container mt-0.5 w-5 h-5 flex-shrink-0" />
+          <div>
+            <p className="font-geist text-label-sm text-tertiary-container font-semibold uppercase tracking-wider mb-1">
+              Privacy Focused
+            </p>
+            <p className="font-inter text-label-sm text-on-surface-variant leading-relaxed">
+              Your data is encrypted and secure. We prioritize your anonymity and maintain strict confidentiality standards throughout your recovery journey.
+            </p>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
+
+export default AuthPage;
