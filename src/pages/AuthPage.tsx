@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Lock } from 'lucide-react';
+import { Lock, Link2Off } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { formatApiErrorMessage } from '../services/apiClient';
 
@@ -42,11 +42,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="bg-background text-on-background min-h-screen flex items-center justify-center p-container-padding font-body-md text-body-md antialiased w-full selection:bg-emerald-500/30 relative">
+    <div className="bg-[#f8f9ff] text-[#0d1c2e] min-h-screen flex items-center justify-center p-container-padding font-body-md text-body-md antialiased w-full selection:bg-[#00236f]/30 relative">
       {onBack && (
         <button
           onClick={onBack}
-          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-semibold text-on-surface-variant hover:text-primary transition-colors cursor-pointer bg-surface border border-outline-variant px-3 py-1.5 rounded-lg shadow-sm font-manrope"
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-xs font-semibold text-[#444651] hover:text-[#00236f] transition-colors cursor-pointer bg-white border border-[#c5c5d3] px-3 py-1.5 rounded-lg shadow-sm font-manrope outline-none"
         >
           ← Back to Product
         </button>
@@ -55,24 +55,24 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
       <main className="w-full max-w-[440px] animate-fade-in">
         {/* Logo & Header */}
         <div className="text-center mb-stack-lg">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-surface-container mb-stack-sm text-primary">
-            <span className="text-[32px] font-bold font-manrope">BC</span>
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-[#e6eeff] mb-stack-sm text-[#00236f]">
+            <Link2Off className="w-8 h-8" />
           </div>
-          <h1 className="font-manrope font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-primary tracking-tight">
+          <h1 className="font-manrope font-headline-lg text-headline-lg md:font-display-lg md:text-display-lg text-[#00236f] tracking-tight">
             Breaking Chains
           </h1>
-          <p className="text-on-surface-variant mt-stack-sm font-body-md text-body-md font-manrope">
+          <p className="text-[#444651] mt-stack-sm font-body-md text-body-md font-manrope">
             {mode === 'login' ? 'Welcome back. Your journey continues here.' : 'Create an account to begin your journey.'}
           </p>
         </div>
 
         {/* Login/Auth Card */}
-        <div className="bg-surface rounded-xl border border-outline-variant p-container-padding">
+        <div className="bg-white rounded-xl border border-[#c5c5d3] p-container-padding">
           {/* Social Login */}
           <button
             type="button"
             onClick={() => loginAsGuest('USER')}
-            className="w-full flex items-center justify-center gap-2 bg-surface-container hover:bg-surface-container-high text-primary font-body-md text-body-md font-medium py-3 px-4 rounded-lg transition-colors border border-outline-variant mb-stack-md cursor-pointer font-manrope"
+            className="w-full flex items-center justify-center gap-2 bg-[#e6eeff] hover:bg-[#d9e6ff] text-[#00236f] font-body-md text-body-md font-medium py-3 px-4 rounded-lg transition-colors border border-[#c5c5d3] mb-stack-md cursor-pointer font-manrope outline-none"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="currentColor"></path>
@@ -85,16 +85,16 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
 
           {/* Divider */}
           <div className="relative flex py-5 items-center mb-stack-md">
-            <div className="flex-grow border-t border-outline-variant"></div>
-            <span className="flex-shrink-0 mx-4 text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-manrope">
+            <div className="flex-grow border-t border-[#c5c5d3]"></div>
+            <span className="flex-shrink-0 mx-4 text-[#444651] font-label-sm text-label-sm uppercase tracking-wider font-manrope">
               {mode === 'login' ? 'or sign in with email' : 'or sign up with email'}
             </span>
-            <div className="flex-grow border-t border-outline-variant"></div>
+            <div className="flex-grow border-t border-[#c5c5d3]"></div>
           </div>
 
           {/* Error Banner */}
           {error && (
-            <div className="p-3 mb-stack-md rounded-lg bg-error-container border border-outline-variant text-on-error-container text-xs font-semibold text-center animate-fade-in font-manrope">
+            <div className="p-3 mb-stack-md rounded-lg bg-[#ffdad6] border border-[#c5c5d3] text-[#93000a] text-xs font-semibold text-center animate-fade-in font-manrope">
               ⚠️ {error}
             </div>
           )}
@@ -104,11 +104,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
             {mode === 'register' && (
               <>
                 <div>
-                  <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="fullName">
+                  <label className="block font-label-sm text-label-sm text-[#444651] mb-1" htmlFor="fullName">
                     Full Name
                   </label>
                   <input
-                    className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                    className="w-full bg-white border border-[#c5c5d3] text-[#0d1c2e] text-body-md rounded-lg focus:ring-2 focus:ring-[#00236f] focus:border-[#00236f] block p-2.5 transition-all outline-none"
                     id="fullName"
                     placeholder="e.g. Alex Smith"
                     type="text"
@@ -119,11 +119,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                 </div>
 
                 <div>
-                  <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="username">
+                  <label className="block font-label-sm text-label-sm text-[#444651] mb-1" htmlFor="username">
                     Username
                   </label>
                   <input
-                    className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                    className="w-full bg-white border border-[#c5c5d3] text-[#0d1c2e] text-body-md rounded-lg focus:ring-2 focus:ring-[#00236f] focus:border-[#00236f] block p-2.5 transition-all outline-none"
                     id="username"
                     placeholder="e.g. alexsmith"
                     type="text"
@@ -136,11 +136,11 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
             )}
 
             <div>
-              <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1" htmlFor="email">
+              <label className="block font-label-sm text-label-sm text-[#444651] mb-1" htmlFor="email">
                 Email Address
               </label>
               <input
-                className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                className="w-full bg-white border border-[#c5c5d3] text-[#0d1c2e] text-body-md rounded-lg focus:ring-2 focus:ring-[#00236f] focus:border-[#00236f] block p-2.5 transition-all outline-none"
                 id="email"
                 placeholder="you@example.com"
                 type="email"
@@ -152,12 +152,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
 
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block font-label-sm text-label-sm text-on-surface-variant" htmlFor="password">
+                <label className="block font-label-sm text-label-sm text-[#444651]" htmlFor="password">
                   Password
                 </label>
                 {mode === 'login' && (
                   <a
-                    className="font-label-sm text-label-sm text-primary hover:text-primary-container transition-colors hover:underline"
+                    className="font-label-sm text-label-sm text-[#00236f] hover:text-[#001b54] transition-colors hover:underline"
                     href="#"
                     onClick={(e) => {
                       e.preventDefault();
@@ -169,7 +169,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
                 )}
               </div>
               <input
-                className="w-full bg-surface border border-outline-variant text-on-surface text-body-md rounded-lg focus:ring-2 focus:ring-primary focus:border-primary block p-2.5 transition-all outline-none"
+                className="w-full bg-white border border-[#c5c5d3] text-[#0d1c2e] text-body-md rounded-lg focus:ring-2 focus:ring-[#00236f] focus:border-[#00236f] block p-2.5 transition-all outline-none"
                 id="password"
                 placeholder="••••••••"
                 type="password"
@@ -180,7 +180,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
             </div>
 
             <button
-              className="w-full text-on-primary bg-primary hover:bg-primary-container focus:ring-4 focus:outline-none focus:ring-primary-fixed font-body-md text-body-md font-medium rounded-lg px-5 py-3 text-center transition-colors shadow-sm disabled:opacity-50 cursor-pointer"
+              className="w-full text-white bg-[#00236f] hover:bg-[#001b54] focus:ring-4 focus:outline-none focus:ring-[#00236f]/20 font-body-md text-body-md font-medium rounded-lg px-5 py-3 text-center transition-colors shadow-sm disabled:opacity-50 cursor-pointer outline-none"
               type="submit"
               disabled={isLoading}
             >
@@ -197,12 +197,12 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
         </div>
 
         {/* Registration Link */}
-        <p className="text-center mt-stack-lg font-body-md text-body-md text-on-surface-variant font-manrope">
+        <p className="text-center mt-stack-lg font-body-md text-body-md text-[#444651] font-manrope">
           {mode === 'login' ? (
             <>
               Don't have an account?{' '}
               <a
-                className="text-primary font-semibold hover:underline"
+                className="text-[#00236f] font-semibold hover:underline"
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
@@ -217,7 +217,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
             <>
               Already have an account?{' '}
               <a
-                className="text-primary font-semibold hover:underline"
+                className="text-[#00236f] font-semibold hover:underline"
                 href="#"
                 onClick={(e) => {
                   e.preventDefault();
@@ -232,13 +232,13 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
         </p>
 
         {/* Privacy Shield Banner */}
-        <div className="mt-stack-lg bg-surface-container-low border border-outline-variant rounded-lg p-3 flex items-start gap-3">
-          <Lock className="text-tertiary-container mt-0.5 w-5 h-5 flex-shrink-0" />
+        <div className="mt-stack-lg bg-[#eff4ff] border border-[#c5c5d3] rounded-lg p-3 flex items-start gap-3">
+          <Lock className="text-[#3d4143] mt-0.5 w-5 h-5 flex-shrink-0" />
           <div>
-            <p className="font-label-sm text-label-sm text-tertiary-container font-semibold uppercase tracking-wider mb-1 font-manrope">
+            <p className="font-label-sm text-label-sm text-[#3d4143] font-semibold uppercase tracking-wider mb-1 font-manrope">
               Privacy Focused
             </p>
-            <p className="font-label-sm text-label-sm text-on-surface-variant leading-relaxed font-manrope">
+            <p className="font-label-sm text-label-sm text-[#444651] leading-relaxed font-manrope">
               Your data is encrypted and secure. We prioritize your anonymity and maintain strict confidentiality standards throughout your recovery journey.
             </p>
           </div>

@@ -43,17 +43,7 @@
   --color-tertiary-fixed-dim: #c9c6c2;
   --color-on-tertiary-fixed: #1c1c19;
   --color-on-tertiary-fixed-variant: #474743;
-  
-  --spacing-xl: 80px;
-  --spacing-margin-desktop: 64px;
-  --spacing-md: 24px;
-  --spacing-xs: 4px;
-  --spacing-gutter: 24px;
-  --spacing-base: 8px;
-  --spacing-lg: 48px;
-  --spacing-sm: 12px;
-  --spacing-margin-mobile: 16px;
-  
+
   --width-xs: 20rem;
   --width-sm: 24rem;
   --width-md: 28rem;
@@ -176,4 +166,84 @@
 
 .soft-shadow-level-1 {
   box-shadow: 0px 4px 20px rgba(0, 108, 73, 0.1);
+}
+
+@utility p-container-padding {
+  padding: 24px;
+}
+@utility px-container-padding {
+  padding-left: 24px;
+  padding-right: 24px;
+}
+@utility py-container-padding {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+@utility mb-stack-lg {
+  margin-bottom: 32px;
+}
+@utility mb-stack-md {
+  margin-bottom: 16px;
+}
+@utility mb-stack-sm {
+  margin-bottom: 8px;
+}
+@utility mt-stack-lg {
+  margin-top: 32px;
+}
+@utility mt-stack-md {
+  margin-top: 16px;
+}
+@utility mt-stack-sm {
+  margin-top: 8px;
+}
+@utility gap-md {
+  gap: 24px;
+}
+@utility py-xl {
+  padding-top: 80px;
+  padding-bottom: 80px;
+}
+@utility px-margin-mobile {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+@utility px-margin-desktop {
+  padding-left: 64px;
+  padding-right: 64px;
+}
+@utility py-base {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+@utility mt-lg {
+  margin-top: 48px;
+}
+@utility mb-xs {
+  margin-bottom: 4px;
+}
+@utility mb-xl {
+  margin-bottom: 80px;
+}
+@utility gap-gutter {
+  gap: 24px;
+}
+@utility pt-xl {
+  padding-top: 80px;
+}
+@utility pb-xl {
+  padding-bottom: 80px;
+}
+@utility mt-xl {
+  margin-top: 80px;
+}
+@utility mb-sm {
+  margin-bottom: 12px;
+}
+@utility mt-sm {
+  margin-top: 12px;
+}
+@utility py-lg {
+  padding-top: 48px;
+  padding-bottom: 48px;
 }
