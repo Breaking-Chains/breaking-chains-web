@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { User, TokenResponse } from '../types/user';
 import { loginUser, registerUser, getCurrentUser } from '../services/authService';
 import { apiFetch } from '../services/apiClient';
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const loginAsGuest = (role: 'USER' | 'MENTOR' | 'ADMIN' = 'USER') => {
+  const loginAsGuest = useCallback((role: 'USER' | 'MENTOR' | 'ADMIN' = 'USER') => {
     if (role === 'MENTOR') {
       setUser(DEMO_MENTOR);
     } else if (role === 'ADMIN') {
@@ -112,7 +112,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(DEMO_USER);
     }
     setIsDemoSession(true);
-  };
+  }, []);
+
+  useEffect(() => {
+    (window as any).loginAsGuest = loginAsGuest;
+  }, [loginAsGuest]);
 
   const logout = async () => {
     setIsLoading(true);

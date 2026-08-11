@@ -23,15 +23,17 @@ interface MenteeCareTerminalProps {
   };
   onBack: () => void;
   isDemo?: boolean;
+  initialTab?: 'analytics' | 'chat' | 'nasiha';
 }
 
 export const MenteeCareTerminal: React.FC<MenteeCareTerminalProps> = ({
   mentee,
   onBack,
   isDemo = false,
+  initialTab,
 }) => {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<'analytics' | 'chat' | 'nasiha'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'chat' | 'nasiha'>(initialTab || 'analytics');
   const [counselNotes, setCounselNotes] = useState<any[]>([]);
   const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
   const [isLoadingNotes, setIsLoadingNotes] = useState(true);
@@ -39,6 +41,12 @@ export const MenteeCareTerminal: React.FC<MenteeCareTerminalProps> = ({
   const [isSubmittingNote, setIsSubmittingNote] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   // Load counsel notes
   useEffect(() => {
