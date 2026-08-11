@@ -2,7 +2,7 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'emerald' | 'subtle' | 'danger' | 'ghost' | 'sos' | 'outline' | 'gold';
+  variant?: 'emerald' | 'subtle' | 'danger' | 'ghost' | 'sos' | 'outline' | 'gold' | 'primary';
   size?: 'sm' | 'md' | 'lg' | 'icon';
   isLoading?: boolean;
 }
@@ -24,6 +24,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] touch-manipulation';
 
     const variantStyles = {
+      primary:
+        'bg-primary hover:bg-primary/90 text-on-primary font-semibold shadow-sm',
       emerald:
         'bg-emerald-600 hover:bg-emerald-500 text-white shadow-sm font-semibold',
       gold:

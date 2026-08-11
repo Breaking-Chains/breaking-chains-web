@@ -1,12 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PmoProvider, usePmo } from './context/PmoContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { MobileLayout } from './components/layout/MobileLayout';
 import type { NavTab } from './components/layout/BottomNav';
 import { DashboardPage } from './pages/DashboardPage';
-import { EmergencyPage } from './pages/EmergencyPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
 import { GuidancePage } from './pages/GuidancePage';
 import { MenteesPage } from './pages/MenteesPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -14,24 +12,40 @@ import { AuthPage } from './pages/AuthPage';
 import { LandingPage } from './pages/LandingPage';
 import { MentorDashboardPage } from './pages/MentorDashboardPage';
 import { AdminDashboardPage } from './pages/AdminDashboardPage';
+import { MeetingsPage } from './pages/MeetingsPage';
+import { PrivacyPage } from './pages/PrivacyPage';
 import { EmergencySosModal } from './components/pmo/EmergencySosModal';
 import { CheckInModal } from './components/pmo/CheckInModal';
-import { OnboardingWizardModal } from './components/pmo/OnboardingWizardModal';
 import type { LogStatus, PMOTriggerTag } from './types/log';
-import type { PrivacyLevel } from './types/chain';
 
 function ProtectedAppContent() {
   const [activeTab, setActiveTab] = useState<NavTab>('dashboard');
   const [isSosOpen, setIsSosOpen] = useState<boolean>(false);
   const [isCheckInOpen, setIsCheckInOpen] = useState<boolean>(false);
   const [isOnboardingDismissed, setIsOnboardingDismissed] = useState<boolean>(false);
+  const [isAutoOnboardingStarted, setIsAutoOnboardingStarted] = useState<boolean>(false);
 
   const { user } = useAuth();
   const role = user?.role || 'USER';
 
   const { chain, isApiLoading, currentStreak, cleanRatioPercent, submitCheckIn, startSos, completeSos, createCustomChain } = usePmo();
 
-  const showOnboarding = role === 'USER' && chain === null && !isApiLoading && !isOnboardingDismissed;
+  useEffect(() => {
+    if (role === 'USER' && chain === null && !isApiLoading && !isOnboardingDismissed && !isAutoOnboardingStarted) {
+      setIsAutoOnboardingStarted(true);
+      createCustomChain({
+        title: 'My Recovery Journey',
+        strategy: 'PMO_RECOVERY',
+        privacyLevel: 'LEVEL_2_FULL_COUNSEL',
+        triggerTags: ['🌙 Late Night Solitude', '⚡ Stress & Anxiety'],
+        intentStatement: 'I commit to seeking purity, self-mastery, and spiritual growth.',
+      }).then(() => {
+        setIsOnboardingDismissed(true);
+      }).catch((err) => {
+        console.error("Auto onboarding failed:", err);
+      });
+    }
+  }, [role, chain, isApiLoading, isOnboardingDismissed, isAutoOnboardingStarted, createCustomChain]);
 
   const handleTriggerSos = async () => {
     await startSos();
@@ -55,16 +69,6 @@ function ProtectedAppContent() {
     await submitCheckIn(status, triggerTag, notes);
   };
 
-  const handleCompleteOnboarding = async (data: {
-    title: string;
-    strategy: string;
-    privacyLevel: PrivacyLevel;
-    triggerTags: string[];
-    intentStatement: string;
-  }) => {
-    await createCustomChain(data);
-    setIsOnboardingDismissed(true);
-  };
 
   return (
     <MobileLayout
@@ -101,26 +105,21 @@ function ProtectedAppContent() {
             />
           )}
 
-          {activeTab === 'emergency' && (
-            <EmergencyPage onTriggerSosModal={handleTriggerSos} />
-          )}
-
-          {activeTab === 'analytics' && (
-            <AnalyticsPage
-              currentStreak={currentStreak}
-              cleanRatioPercent={cleanRatioPercent}
-            />
-          )}
-
           {activeTab === 'guidance' && (
             <GuidancePage onOpenMenteesPage={() => setActiveTab('mentees')} />
           )}
 
-          {activeTab === 'mentees' && (
-            <MenteesPage onBack={() => setActiveTab('guidance')} />
+          {activeTab === 'meetings' && (
+            <MeetingsPage onOpenGuidance={() => setActiveTab('guidance')} />
           )}
 
           {activeTab === 'settings' && <SettingsPage />}
+
+          {activeTab === 'privacy' && <PrivacyPage />}
+
+          {activeTab === 'mentees' && (
+            <MenteesPage onBack={() => setActiveTab('guidance')} />
+          )}
 
           {activeTab === 'checkin' && (
             <DashboardPage
@@ -140,13 +139,6 @@ function ProtectedAppContent() {
         isOpen={isCheckInOpen}
         onClose={() => setIsCheckInOpen(false)}
         onSubmitLog={handleSubmitLog}
-      />
-
-      {/* New User Onboarding Setup Wizard */}
-      <OnboardingWizardModal
-        isOpen={showOnboarding}
-        onClose={() => setIsOnboardingDismissed(true)}
-        onCompleteOnboarding={handleCompleteOnboarding}
       />
     </MobileLayout>
   );
