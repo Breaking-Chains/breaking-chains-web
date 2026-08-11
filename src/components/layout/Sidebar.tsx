@@ -97,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {user && (
           <div className="flex items-center gap-2.5 py-1.5 px-2 bg-surface-container-low rounded-xl border border-outline-variant/40 mb-2">
             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[10px] shrink-0">
-              {user.fullName[0]?.toUpperCase() || 'U'}
+              {user.fullName?.[0]?.toUpperCase() || 'U'}
             </div>
             <div className="overflow-hidden text-left flex-1 min-w-0">
               <span className="text-[11px] font-bold text-on-surface block truncate leading-tight">{user.fullName}</span>
