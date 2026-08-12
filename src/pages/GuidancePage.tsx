@@ -16,9 +16,10 @@ import type { MentorshipChatMessage, AccountabilityPartnership } from '../types/
 
 interface GuidancePageProps {
   onOpenMenteesPage?: () => void;
+  onOpenChat?: () => void;
 }
 
-export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage }) => {
+export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, onOpenChat }) => {
   const { user, isDemoSession } = useAuth();
   const { counselNotes } = usePmo();
   const role = user?.role || 'USER';
@@ -402,7 +403,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                   {/* Actions Grid */}
                   <div className="grid grid-cols-2 gap-3 pt-2">
                     <button
-                      onClick={() => setIsChatOpen(true)}
+                      onClick={onOpenChat}
                       className="flex items-center justify-center gap-1.5 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
                     >
                       💬 Chat
@@ -768,8 +769,8 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             onClick={() => setIsChatOpen(false)}
           />
           <div 
-            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-transform duration-300 ease-in-out ${
-              isChatOpen ? 'translate-x-0' : 'translate-x-full'
+            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-all duration-300 ease-in-out ${
+              isChatOpen ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'
             }`}
           >
             <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
