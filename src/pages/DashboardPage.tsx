@@ -267,10 +267,31 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Day Details Log Section */}
       <section className="db-day-details-card animate-fade-in">
         <div className="db-day-details-header">
-          <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <h2 className="db-day-details-title">
-            Struggles & Reflections: {new Date(selectedDayStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-          </h2>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+            <div className="flex items-center gap-2.5">
+              <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <h2 className="db-day-details-title">
+                Struggles & Reflections
+              </h2>
+            </div>
+            <span className="text-xs text-slate-400 dark:text-slate-500 font-semibold sm:pl-2 sm:border-l sm:border-slate-200 dark:sm:border-slate-800 select-none">
+              {new Date(selectedDayStr).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
+            </span>
+          </div>
+
+          <div className="db-day-details-picker-container">
+            <input
+              type="date"
+              value={selectedDayStr}
+              max={getLocalDateString(new Date())}
+              onChange={(e) => {
+                if (e.target.value) {
+                  setSelectedDayStr(e.target.value);
+                }
+              }}
+              className="db-day-details-date-input"
+            />
+          </div>
         </div>
 
         {(() => {

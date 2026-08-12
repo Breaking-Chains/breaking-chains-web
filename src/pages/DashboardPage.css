@@ -164,11 +164,19 @@
 }
 
 .db-day-details-header {
-  @apply flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800;
+  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b border-slate-100 dark:border-slate-800;
 }
 
 .db-day-details-title {
   @apply font-manrope text-base font-extrabold text-primary tracking-tight;
+}
+
+.db-day-details-picker-container {
+  @apply w-full sm:w-auto flex items-center;
+}
+
+.db-day-details-date-input {
+  @apply w-full sm:w-auto bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold font-mono focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-200 cursor-pointer shadow-2xs;
 }
 
 .db-day-details-empty {
