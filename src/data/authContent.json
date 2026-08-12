@@ -1,0 +1,31 @@
+{
+  "login": {
+    "title": "Conceal & Purify",
+    "subtitle": "Your journey of Mujahadah continues here.",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Password",
+    "submitBtn": "Sign In",
+    "toggleLink": "Create one",
+    "toggleText": "Don't have an account?"
+  },
+  "register": {
+    "title": "Begin Your Journey",
+    "subtitle": "Create an anonymous profile to break your chains.",
+    "fullNameLabel": "Display Name / Handle",
+    "usernameLabel": "Unique Username",
+    "emailLabel": "Email Address",
+    "passwordLabel": "Secure Password",
+    "submitBtn": "Sign Up",
+    "toggleLink": "Sign in",
+    "toggleText": "Already have an account?"
+  },
+  "googleBtn": "Continue with Google",
+  "dividerText": {
+    "login": "or sign in with email",
+    "register": "or sign up with email"
+  },
+  "privacy": {
+    "title": "Concealing Sins & Sanctuary Privacy",
+    "text": "In accordance with Islamic principles of concealing one's struggles, we do not require your real identity, nor do we track or share your data."
+  }
+}

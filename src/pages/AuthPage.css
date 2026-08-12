@@ -1,0 +1,117 @@
+@reference "../index.css";
+
+.auth-container {
+  @apply min-h-screen flex items-center justify-center p-6 bg-slate-50 text-slate-800 antialiased w-full selection:bg-emerald-500/20 selection:text-emerald-950 font-sans relative overflow-hidden;
+}
+
+.auth-glow-1 {
+  @apply absolute -top-20 -left-20 w-80 h-80 rounded-full bg-emerald-400/10 blur-3xl -z-10 pointer-events-none;
+}
+
+.auth-glow-2 {
+  @apply absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-blue-400/10 blur-3xl -z-10 pointer-events-none;
+}
+
+.auth-btn-back {
+  @apply absolute top-6 left-6 flex items-center gap-1.5 text-xs font-manrope font-extrabold text-slate-600 hover:text-primary hover:border-slate-300 transition-all cursor-pointer bg-white/80 backdrop-blur-sm border border-slate-200 px-3.5 py-2 rounded-xl shadow-sm outline-none active:scale-95;
+}
+
+.auth-card-wrapper {
+  @apply w-full max-w-[440px] z-10;
+}
+
+.auth-header {
+  @apply text-center mb-8;
+}
+
+.auth-logo-box {
+  @apply inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-secondary mb-4 border border-emerald-100 shadow-sm;
+}
+
+.auth-title {
+  @apply font-manrope font-extrabold text-3xl md:text-4xl text-primary tracking-tight;
+}
+
+.auth-subtitle {
+  @apply text-slate-500 mt-2 text-sm font-semibold font-manrope;
+}
+
+.auth-card {
+  @apply bg-white/85 backdrop-blur-md rounded-3xl border border-slate-200/60 p-8 shadow-lg flex flex-col gap-6;
+}
+
+.auth-google-btn {
+  @apply w-full flex items-center justify-center gap-2.5 bg-slate-50 hover:bg-slate-100/80 text-slate-700 font-manrope font-bold py-3.5 px-4 rounded-xl border border-slate-200 transition-all cursor-pointer outline-none active:scale-[0.98] text-sm shadow-sm;
+}
+
+.auth-divider-container {
+  @apply relative flex py-3 items-center;
+}
+
+.auth-divider-line {
+  @apply flex-grow border-t border-slate-200;
+}
+
+.auth-divider-text {
+  @apply flex-shrink-0 mx-4 text-slate-400 font-manrope text-[10px] font-bold uppercase tracking-wider;
+}
+
+.auth-error-banner {
+  @apply p-3.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold text-center font-manrope flex items-center justify-center gap-1.5;
+}
+
+.auth-form {
+  @apply flex flex-col gap-4 font-manrope;
+}
+
+.auth-form-group {
+  @apply flex flex-col gap-1.5;
+}
+
+.auth-label-row {
+  @apply flex justify-between items-center;
+}
+
+.auth-label {
+  @apply font-manrope text-xs font-bold text-slate-500 uppercase tracking-wide;
+}
+
+.auth-forgot-link {
+  @apply font-manrope text-xs font-bold text-secondary hover:text-emerald-700 transition-colors hover:underline;
+}
+
+.auth-input {
+  @apply w-full bg-white border border-slate-200 text-slate-800 text-sm rounded-xl focus:ring-2 focus:ring-secondary/20 focus:border-secondary block p-3.5 transition-all outline-none;
+}
+
+.auth-submit-btn {
+  @apply w-full text-white bg-secondary hover:bg-emerald-700 focus:ring-4 focus:outline-none focus:ring-emerald-500/10 font-manrope font-bold rounded-xl px-5 py-3.5 text-center transition-all shadow-md shadow-emerald-100 disabled:opacity-50 cursor-pointer outline-none active:scale-[0.98] mt-2;
+}
+
+.auth-toggle-panel {
+  @apply text-center mt-6 font-manrope text-sm text-slate-500 font-semibold;
+}
+
+.auth-toggle-link {
+  @apply text-secondary font-extrabold hover:underline ml-1;
+}
+
+.auth-privacy-banner {
+  @apply mt-6 bg-slate-900 border border-slate-800 text-white rounded-2xl p-4.5 flex items-start gap-3.5 shadow-md relative overflow-hidden;
+}
+
+.auth-privacy-glow {
+  @apply absolute -top-12 -left-12 w-32 h-32 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none;
+}
+
+.auth-privacy-icon-box {
+  @apply w-9 h-9 rounded-xl bg-white/10 text-emerald-400 flex items-center justify-center flex-shrink-0 border border-white/5 shadow-sm;
+}
+
+.auth-privacy-title {
+  @apply font-manrope text-xs font-bold uppercase tracking-wider mb-0.5 text-emerald-300;
+}
+
+.auth-privacy-desc {
+  @apply font-manrope text-xs text-slate-300 leading-relaxed font-medium;
+}
