@@ -1,231 +1,375 @@
-import React from 'react';
-import { BookOpen, Brain, LineChart, HeartHandshake, Lock, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+  BookOpen, 
+  Brain, 
+  LineChart, 
+  HeartHandshake, 
+  Lock, 
+  Sparkles, 
+  ChevronDown, 
+  Check, 
+  Flame, 
+  ArrowRight,
+  Shield
+} from 'lucide-react';
+import contentData from '../data/landingContent.json';
+import './LandingPage.css';
 
 interface LandingPageProps {
   onGetStarted: () => void;
 }
 
+const IconMap: Record<string, React.ComponentType<any>> = {
+  BookOpen,
+  Brain,
+  LineChart,
+  HeartHandshake,
+  Lock,
+  Sparkles,
+  Shield,
+};
+
 export const LandingPage: React.FC<LandingPageProps> = ({ onGetStarted }) => {
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenFaqIndex(openFaqIndex === index ? null : index);
+  };
+
+  const { hero, science, process, features, privacy, faqs, footer } = contentData;
+
   return (
-    <div className="bg-background text-on-background font-body-md min-h-screen flex flex-col arabesque-pattern antialiased w-full selection:bg-emerald-500/30">
-      {/* TopNavBar */}
-      <header className="w-full sticky top-0 bg-surface/80 backdrop-blur-md shadow-sm z-50">
-        <div className="flex justify-between items-center max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop py-base">
-          <div className="flex items-center gap-4">
-            <a 
-              className="text-headline-md font-headline-md text-primary dark:text-primary-fixed-dim" 
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              Breaking Chains
+    <div className="landing-container arabesque-pattern">
+      {/* Top Header Navbar */}
+      <header className="landing-header">
+        <div className="landing-nav-container">
+          <div className="landing-brand">
+            <a href="#" onClick={(e) => e.preventDefault()}>
+              Breaking <span className="landing-brand-highlight">Chains</span>
             </a>
           </div>
-          <nav className="hidden md:flex gap-8 items-center">
-            <a 
-              className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" 
-              href="#pillars"
-            >
-              Features
-            </a>
-            <a 
-              className="text-on-surface-variant font-medium hover:text-primary transition-colors duration-200" 
-              href="#privacy"
-            >
-              Privacy
-            </a>
+          <nav className="landing-nav-menu">
+            <a className="landing-nav-link" href="#science">Why Us</a>
+            <a className="landing-nav-link" href="#process">Our Process</a>
+            <a className="landing-nav-link" href="#features">Features</a>
+            <a className="landing-nav-link" href="#privacy">Privacy</a>
+            <a className="landing-nav-link" href="#faq">FAQ</a>
           </nav>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={onGetStarted}
-              className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors duration-200 cursor-pointer transition-transform active:scale-95 hidden md:block outline-none"
-            >
+          <div className="landing-nav-actions">
+            <button onClick={onGetStarted} className="landing-btn-login">
               Login
             </button>
-            <button 
-              onClick={onGetStarted}
-              className="bg-primary text-on-primary font-label-md text-label-md px-6 py-2 rounded-full hover:bg-on-primary-fixed-variant transition-colors duration-200 cursor-pointer transition-transform active:scale-95 outline-none"
-            >
-              Join
+            <button onClick={onGetStarted} className="landing-btn-join">
+              Join Now
             </button>
           </div>
         </div>
       </header>
 
-      {/* Main Content Canvas */}
-      <main className="flex-grow flex flex-col w-full max-w-[1280px] mx-auto">
+      {/* Main Content */}
+      <main className="landing-main">
         {/* Hero Section */}
-        <section className="relative w-full min-h-[80vh] flex items-center justify-center py-xl px-margin-mobile md:px-margin-desktop mt-lg">
-          <div className="absolute inset-0 z-0 rounded-3xl overflow-hidden mx-margin-mobile md:mx-margin-desktop soft-shadow-level-1">
-            <img 
-              alt="A serene landscape at sunrise, symbolizing hope, clarity, and a new beginning. Soft pastel colors, peaceful atmosphere, high resolution." 
-              className="w-full h-full object-cover" 
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOSghMzINkFG63DI06CWtphhi4SJ3tYLmFd-_v0o7bFpxPeOEpKu7to7ZYLSoD4_Ix4dqZtGnuVY2vNt2pUC6X83xcbFDmTNZhruFiMTjqsuZtP-bbNxPw__X8diMv4Scdh5r3p1hN2HfMh-8a7Jotht_fFi65QObqcq_s87Ok3b69z6jnqx7L6NAF4Ijz9hnwOEleWijyyNF3mNfOQo0gDPa8JeWnlFxmngtBBti9tltTfPYfYcga"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-surface-container-lowest/90 via-surface-container-lowest/50 to-transparent"></div>
-          </div>
-          <div className="relative z-10 text-center max-w-3xl mx-auto flex flex-col items-center gap-md pt-xl backdrop-blur-md bg-surface/80 p-8 rounded-3xl">
-            <span className="text-primary mb-sm">
-              <Sparkles className="w-16 h-16" />
+        <section className="landing-hero-section">
+          <div className="landing-hero-content">
+            <span className="landing-hero-badge">
+              <Sparkles className="w-3.5 h-3.5" />
+              {hero.badge}
             </span>
-            <h1 className="font-headline-xl-mobile md:font-headline-xl text-headline-xl-mobile md:text-headline-xl text-on-surface">
-              Heal. Rise. Reconnect.
+            <h1 className="landing-hero-title">
+              {hero.title.split('. ')[0]}.<br />
+              <span className="landing-hero-title-highlight">{hero.title.split('. ')[1]}</span>
             </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mt-sm">
-              A modern, professional path to recovery rooted in spiritual guidance and behavioral science. Find clarity, discipline, and hope.
+            <p className="landing-hero-subtitle">
+              {hero.subtitle}
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 mt-lg justify-center w-full sm:w-auto">
-              <button 
-                onClick={onGetStarted}
-                className="bg-primary text-on-primary font-label-md text-label-md px-8 py-3 rounded-full hover:bg-on-primary-fixed-variant transition-colors duration-200 shadow-md cursor-pointer transition-transform active:scale-95 outline-none"
-              >
-                Start Your Journey
+            <div className="landing-hero-ctas">
+              <button onClick={onGetStarted} className="landing-btn-primary">
+                {hero.ctaStart}
               </button>
-              <a 
-                href="#pillars"
-                className="border border-secondary text-secondary hover:bg-secondary/5 font-label-md text-label-md px-8 py-3 rounded-full transition-colors duration-200 flex items-center justify-center"
-              >
-                Our Approach
+              <a href="#process" className="landing-btn-secondary">
+                {hero.ctaExplore}
+                <ArrowRight className="w-4 h-4" />
               </a>
+            </div>
+          </div>
+
+          <div className="landing-hero-visual">
+            <div className="landing-hero-glow-1"></div>
+            <div className="landing-hero-glow-2"></div>
+            
+            {/* Interactive Dashboard Mockups Teaser */}
+            <div className="landing-mockup-container">
+              <div className="landing-mockup-header">
+                <div className="landing-mockup-dots">
+                  <span className="landing-mockup-dot landing-mockup-dot-red"></span>
+                  <span className="landing-mockup-dot landing-mockup-dot-yellow"></span>
+                  <span className="landing-mockup-dot landing-mockup-dot-green"></span>
+                </div>
+                <span className="landing-mockup-title">Your Progress Sanctuary</span>
+              </div>
+
+              {/* Streak Widget */}
+              <div className="landing-widget-streak">
+                <div className="landing-widget-streak-icon">
+                  <Flame className="w-6 h-6 text-orange-500 fill-orange-100" />
+                </div>
+                <div className="landing-widget-streak-info">
+                  <div className="landing-widget-streak-label">Current Streak</div>
+                  <div className="landing-widget-streak-value">45 Days Clean</div>
+                </div>
+                <span className="text-xs font-bold text-orange-500 bg-orange-50 px-2 py-1 rounded-full">🔥 Active</span>
+              </div>
+
+              {/* Clean Ratio Widget */}
+              <div className="landing-widget-ratio">
+                <div className="landing-widget-ratio-header">
+                  <div className="landing-widget-ratio-label">Recovery Consistency</div>
+                  <div className="landing-widget-ratio-value">98.2%</div>
+                </div>
+                <div className="landing-widget-ratio-bar-bg">
+                  <div className="landing-widget-ratio-bar-fill" style={{ width: '98.2%' }}></div>
+                </div>
+              </div>
+
+              {/* Checkin Status Widget */}
+              <div className="landing-widget-checkin">
+                <span className="landing-widget-checkin-status"></span>
+                <div className="landing-widget-checkin-info">
+                  <div className="landing-widget-checkin-label">Daily Muhasabah</div>
+                  <div className="landing-widget-checkin-value">Check-in Complete for Today</div>
+                </div>
+                <span className="text-xs font-medium text-slate-400">9:30 PM</span>
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Core Pillars Section (Bento Grid) */}
-        <section id="pillars" className="py-xl px-margin-mobile md:px-margin-desktop w-full mt-xl">
-          <div className="text-center mb-xl">
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-xs">
-              A Holistic Path to Recovery
-            </h2>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-xl mx-auto">
-              Our approach integrates timeless spiritual wisdom with modern therapeutic practices.
-            </p>
+        {/* Science Section */}
+        <section id="science" className="landing-science-section">
+          <div className="landing-section-header">
+            <h2 className="landing-section-title">{science.title}</h2>
+            <p className="landing-section-subtitle">{science.subtitle}</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+          
+          <div className="landing-science-grid">
+            {science.cards.map((card, index) => {
+              const IconComp = IconMap[card.icon] || Brain;
+              return (
+                <div key={index} className="landing-science-card group">
+                  <div className="landing-science-icon-box">
+                    <IconComp className="w-6 h-6" />
+                  </div>
+                  <h3 className="landing-science-card-title">{card.title}</h3>
+                  <p className="landing-science-card-desc">{card.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* Process Section (The 4-Phase Timeline) */}
+        <section id="process" className="landing-process-section">
+          <div className="landing-section-header">
+            <h2 className="landing-section-title">{process.title}</h2>
+            <p className="landing-section-subtitle">{process.subtitle}</p>
+          </div>
+
+          <div className="landing-process-timeline">
+            {process.phases.map((phase, index) => (
+              <div key={index} className="landing-process-card group">
+                <div className="landing-process-badge-container">
+                  <span className="landing-process-badge">{phase.number}</span>
+                  <span className="landing-process-timeline-badge">{phase.timeline}</span>
+                </div>
+                <h3 className="landing-process-card-title">{phase.title}</h3>
+                <p className="landing-process-card-goal"><strong>Goal:</strong> {phase.goal}</p>
+                <ul className="landing-process-card-actions">
+                  {phase.actions.map((act, aIdx) => (
+                    <li key={aIdx} className="landing-process-card-action-item">
+                      <Check className="landing-process-check-icon" />
+                      <span>{act}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Bento Grid Features Section */}
+        <section id="features" className="landing-features-section">
+          <div className="landing-section-header">
+            <h2 className="landing-section-title">{features.title}</h2>
+            <p className="landing-section-subtitle">{features.subtitle}</p>
+          </div>
+
+          <div className="landing-features-grid">
             
-            {/* Pillar 1 */}
-            <div className="bg-surface-container-lowest rounded-xl p-6 soft-shadow-level-1 border border-secondary/5 flex flex-col gap-4 relative overflow-hidden group">
-              <div className="absolute -right-12 -top-12 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-300 pointer-events-none">
-                <BookOpen className="w-[120px] h-[120px] text-primary" />
+            {/* Card 1: Visual Streak Chain (span-1) */}
+            <div className="landing-feature-card">
+              <div className="flex flex-col gap-3">
+                <div className="landing-feature-icon-wrapper">
+                  <LineChart className="w-5 h-5" />
+                </div>
+                <h3 className="landing-feature-title">{features.items[0].title}</h3>
+                <p className="landing-feature-desc">{features.items[0].description}</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <BookOpen className="w-5 h-5" />
+              <div className="landing-bento-streak-preview">
+                <div className="landing-bento-streak-row">
+                  <div className="landing-bento-streak-dots">
+                    {[1, 2, 3, 4, 5, 6].map((i) => (
+                      <span key={i} className="landing-bento-streak-dot-active">✓</span>
+                    ))}
+                    <span className="landing-bento-streak-dot-inactive">7</span>
+                  </div>
+                  <span className="landing-bento-streak-badge">🔥 6d</span>
+                </div>
               </div>
-              <h3 className="font-manrope text-headline-md text-on-surface">Qur'an &amp; Sunnah</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Spiritual guidance, accountability, repentance, and self-discipline based on Islamic teachings.
-              </p>
             </div>
 
-            {/* Pillar 2 */}
-            <div className="bg-surface-container-lowest rounded-xl p-6 soft-shadow-level-1 border border-secondary/5 flex flex-col gap-4 relative overflow-hidden group">
-              <div className="absolute -right-12 -top-12 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-300 pointer-events-none">
-                <Brain className="w-[120px] h-[120px] text-primary" />
-              </div>
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <Brain className="w-5 h-5" />
-              </div>
-              <h3 className="font-manrope text-headline-md text-on-surface">Psychology</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Deep understanding of addiction, triggers, and the journey to mental wellness.
-              </p>
-            </div>
-
-            {/* Pillar 3 */}
-            <div className="bg-surface-container-lowest rounded-xl p-6 soft-shadow-level-1 border border-secondary/5 flex flex-col gap-4 relative overflow-hidden group lg:col-span-2">
-              <div className="absolute -right-12 -top-12 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity duration-300 pointer-events-none">
-                <LineChart className="w-[120px] h-[120px] text-primary" />
-              </div>
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                <LineChart className="w-5 h-5" />
-              </div>
-              <h3 className="font-manrope text-headline-md text-on-surface">Behavioral Science</h3>
-              <p className="font-body-md text-body-md text-on-surface-variant max-w-md">
-                Practical tools for building healthier habits and breaking harmful patterns through structured, scientifically-backed methodologies.
-              </p>
-            </div>
-
-            {/* Pillar 4 */}
-            <div className="bg-surface-container-lowest rounded-xl p-6 soft-shadow-level-1 border border-secondary/5 flex flex-col gap-4 relative overflow-hidden group lg:col-span-4 mt-sm bg-gradient-to-r from-surface-container-lowest to-surface-container-low">
-              <div className="flex flex-col md:flex-row items-center gap-8 justify-between">
-                <div className="flex-1 max-w-2xl text-left">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+            {/* Card 2: Anonymous Mentorship (span-2) */}
+            <div className="landing-feature-card landing-feature-card-span-2">
+              <div className="landing-feature-layout-flex">
+                <div className="landing-feature-layout-info">
+                  <div className="landing-feature-icon-wrapper">
                     <HeartHandshake className="w-5 h-5" />
                   </div>
-                  <h3 className="font-manrope text-headline-md text-on-surface mb-2">Accountability &amp; Support</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant">
-                    Personal guidance from trusted mentors who understand your path. You are never alone on this journey towards clarity and peace.
-                  </p>
+                  <h3 className="landing-feature-title">{features.items[1].title}</h3>
+                  <p className="landing-feature-desc">{features.items[1].description}</p>
                 </div>
-                <div className="hidden md:flex flex-shrink-0">
-                  {/* abstract illustration representation */}
-                  <div className="w-32 h-32 rounded-full border-4 border-primary/20 flex items-center justify-center relative">
-                    <div className="w-24 h-24 rounded-full border-4 border-primary/40 flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-primary/10"></div>
+                <div className="landing-bento-chat-preview">
+                  <div className="landing-bento-chat-box">
+                    <div className="landing-bento-chat-msg-mentor">
+                      Assalamu Alaikum. How is your Mujahadah going today?
+                    </div>
+                    <div className="landing-bento-chat-msg-user">
+                      Wa Alaikum Assalam. Solitude is a test, but staying strong.
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
+            {/* Card 3: Daily Muhasabah / Check-Ins (span-2) */}
+            <div className="landing-feature-card landing-feature-card-span-2">
+              <div className="landing-feature-layout-flex">
+                <div className="landing-feature-layout-info">
+                  <div className="landing-feature-icon-wrapper">
+                    <Sparkles className="w-5 h-5" />
+                  </div>
+                  <h3 className="landing-feature-title">{features.items[2].title}</h3>
+                  <p className="landing-feature-desc">{features.items[2].description}</p>
+                </div>
+                <div className="landing-bento-tags-preview">
+                  <div className="landing-bento-tags-box">
+                    <span className="landing-bento-tag-item landing-bento-tag-danger">🌙 Solitude</span>
+                    <span className="landing-bento-tag-item landing-bento-tag-warning">⚡ Stress</span>
+                    <span className="landing-bento-tag-item landing-bento-tag-info">📱 Social Media</span>
+                    <span className="landing-bento-tag-item landing-bento-tag-inactive">📖 Quran Routine</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4: Guidance & Wisdom Library (span-1) */}
+            <div className="landing-feature-card">
+              <div className="flex flex-col gap-3">
+                <div className="landing-feature-icon-wrapper">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h3 className="landing-feature-title">{features.items[3].title}</h3>
+                <p className="landing-feature-desc">{features.items[3].description}</p>
+              </div>
+              <div className="landing-bento-library-preview">
+                <div className="landing-bento-library-box">
+                  <div className="landing-bento-library-header">
+                    <span>Purification of Soul</span>
+                    <span className="landing-bento-library-badge">4/5 read</span>
+                  </div>
+                  <div className="landing-bento-library-progress-bg">
+                    <div className="landing-bento-library-progress-fill" style={{ width: '80%' }}></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </section>
 
-        {/* Privacy & Trust Section */}
-        <section id="privacy" className="py-xl px-margin-mobile md:px-margin-desktop w-full mb-xl">
-          <div className="bg-surface-container-highest rounded-2xl p-8 md:p-12 text-center max-w-4xl mx-auto flex flex-col items-center">
-            <span className="text-secondary mb-4">
-              <Lock className="w-10 h-10" />
-            </span>
-            <h2 className="font-headline-lg text-headline-lg text-on-surface mb-4">
-              A Safe &amp; Confidential Space
-            </h2>
-            <p className="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-              Your journey is deeply personal. We prioritize your privacy and confidentiality above all else, ensuring a secure environment where you can focus entirely on healing and growth without fear of judgment.
-            </p>
+        {/* Privacy Section */}
+        <section id="privacy" className="landing-privacy-section">
+          <div className="landing-privacy-card">
+            <div className="landing-privacy-glow"></div>
+            <div className="landing-privacy-icon-box">
+              <Shield className="w-7 h-7" />
+            </div>
+            <h2 className="landing-privacy-title">{privacy.title}</h2>
+            <p className="landing-privacy-subtitle">{privacy.subtitle}</p>
+            
+            <div className="landing-privacy-points-grid">
+              {privacy.points.map((pt, index) => (
+                <div key={index} className="landing-privacy-point">
+                  <Check className="landing-privacy-point-icon" />
+                  <span>{pt}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="landing-faq-section">
+          <div className="landing-section-header">
+            <h2 className="landing-section-title">{faqs.title}</h2>
+            <p className="landing-section-subtitle">{faqs.subtitle}</p>
+          </div>
+
+          <div className="landing-faq-list">
+            {faqs.items.map((item, index) => {
+              const isOpen = openFaqIndex === index;
+              return (
+                <div 
+                  key={index} 
+                  className={`landing-faq-item ${isOpen ? 'landing-faq-item-active' : ''}`}
+                >
+                  <button 
+                    onClick={() => toggleFaq(index)} 
+                    className="landing-faq-question-btn"
+                  >
+                    <span>{item.question}</span>
+                    <ChevronDown className="landing-faq-icon" />
+                  </button>
+                  {isOpen && (
+                    <div className="landing-faq-answer-panel">
+                      <p>{item.answer}</p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="w-full py-lg bg-surface-container-low dark:bg-surface-container-lowest border-t border-surface-variant mt-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center max-w-[1280px] mx-auto px-margin-desktop gap-6 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start">
-            <span className="text-headline-sm font-headline-sm text-primary mb-2 font-bold font-manrope">
-              Breaking Chains
-            </span>
-            <p className="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim">
-              © 2024 Breaking Chains. A Digital Sanctuary for Recovery.
-            </p>
+      {/* Footer Section */}
+      <footer className="landing-footer">
+        <div className="landing-footer-container">
+          <div className="landing-footer-branding">
+            <span className="landing-footer-brand-title">{footer.brandName}</span>
+            <p className="landing-footer-tagline">{footer.tagline}</p>
+            <p className="landing-footer-copyright">{footer.copyright}</p>
           </div>
-          <nav className="flex flex-wrap justify-center md:justify-end gap-x-6 gap-y-2">
-            <a 
-              className="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-100 hover:opacity-80" 
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              Terms of Service
-            </a>
-            <a 
-              className="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-100 hover:opacity-80" 
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              Privacy Policy
-            </a>
-            <a 
-              className="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-100 hover:opacity-80" 
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              Contact Support
-            </a>
-            <a 
-              className="font-body-md text-body-md text-on-surface-variant hover:text-primary hover:underline transition-all opacity-100 hover:opacity-80" 
-              href="#"
-              onClick={(e) => e.preventDefault()}
-            >
-              About Us
-            </a>
+          <nav className="landing-footer-nav">
+            {footer.links.map((link, index) => (
+              <a 
+                key={index} 
+                className="landing-footer-link" 
+                href={link.href}
+                onClick={(e) => link.href === '#' && e.preventDefault()}
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
         </div>
       </footer>

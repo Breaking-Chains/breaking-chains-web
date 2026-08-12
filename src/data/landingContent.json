@@ -1,0 +1,149 @@
+{
+  "hero": {
+    "badge": "Tazkiyah & Self-Mastery",
+    "title": "Purify the Nafs. Break the Chains.",
+    "subtitle": "A digital sanctuary for spiritual and behavioral recovery. Reclaim your purity and discipline through Quranic guidance, sunnah-based habits, and dedicated mentorship in complete anonymity.",
+    "ctaStart": "Start Your Journey",
+    "ctaExplore": "Explore Our Process"
+  },
+  "science": {
+    "title": "The Spiritual and Psychological Path to Purity",
+    "subtitle": "PMO addiction darkens the heart and weakens the willpower (Nafs). Our program integrates timeless Islamic guidance with behavioral science to restore your spiritual focus.",
+    "cards": [
+      {
+        "icon": "Brain",
+        "title": "The Dopamine & Nafs Loop",
+        "description": "Compulsive behavior feeds the lower self (Al-Nafs al-Ammarah). We construct habit boundaries and daily self-reckoning (Muhasabah) to weaken compulsive loops."
+      },
+      {
+        "icon": "HeartHandshake",
+        "title": "Isolation & Shame",
+        "description": "Shame drives isolation, which fuels relapse. By joining an anonymous, secure brotherhood, you break the cycle of secrecy under the shade of trust."
+      },
+      {
+        "icon": "BookOpen",
+        "title": "Spiritual Purifying",
+        "description": "Tazkiyatun Nafs (purification of the soul) is the ultimate cure. We incorporate Quranic contemplation and Sunnah routines to rebuild your spiritual armor."
+      }
+    ]
+  },
+  "process": {
+    "title": "The 4-Phase Path of Mujahadah",
+    "subtitle": "A structured step-by-step path to guide you from initial withdrawal to sustained self-purification.",
+    "phases": [
+      {
+        "number": "01",
+        "title": "Awareness & Tawbah",
+        "timeline": "Days 1–10",
+        "goal": "Repent, establish friction, and identify temptation triggers.",
+        "actions": [
+          "Identify solitude & stress triggers",
+          "Configure initial app boundaries",
+          "Log daily check-ins"
+        ]
+      },
+      {
+        "number": "02",
+        "title": "Mujahadah & Discipline",
+        "timeline": "Days 11–40",
+        "goal": "Actively struggle against the Nafs and rewire the brain's reward loop.",
+        "actions": [
+          "Build habit consistency",
+          "Engage in daily reflection journaling",
+          "Study guidance materials on self-purification"
+        ]
+      },
+      {
+        "number": "03",
+        "title": "Ukhuwwah & Mentorship",
+        "timeline": "Days 41–90",
+        "goal": "Break isolation through trusted brotherhood and accountability.",
+        "actions": [
+          "Connect anonymously with a vetted Mentor",
+          "Engage in group sharing circles",
+          "Gain direct guidance on resolving slip-ups"
+        ]
+      },
+      {
+        "number": "04",
+        "title": "Tazkiyah & Leadership",
+        "timeline": "Days 90+",
+        "goal": "Achieve sustained purity (Tazkiyah) and transition from healing to leading.",
+        "actions": [
+          "Maintain healthy habits effortlessly",
+          "Incorporate deep spiritual mindfulness",
+          "Optionally train to mentor other brothers"
+        ]
+      }
+    ]
+  },
+  "features": {
+    "title": "Sanctuary Features Built for Growth",
+    "subtitle": "Tools designed to keep you focused, accountable, and growing spiritually every single day.",
+    "items": [
+      {
+        "icon": "LineChart",
+        "title": "Visual Streak Chain",
+        "description": "Watch your progress grow line by line. Visualize the chain of pure days and stay motivated to never break the chain."
+      },
+      {
+        "icon": "HeartHandshake",
+        "title": "Anonymous Mentorship",
+        "description": "Connect with an experienced brother who has walked this path before. 100% confidential and secure text guidance."
+      },
+      {
+        "icon": "Sparkles",
+        "title": "Daily Muhasabah (Check-Ins)",
+        "description": "Reflect on your daily status, note temptation triggers like solitude or fatigue, and build deep self-awareness."
+      },
+      {
+        "icon": "BookOpen",
+        "title": "Guidance & Wisdom Library",
+        "description": "Access curated articles, Quranic reminders, and behavioral science tips to equip your mind and spirit for battle."
+      }
+    ]
+  },
+  "privacy": {
+    "title": "Your Journey is 100% Private",
+    "subtitle": "We prioritize your privacy above all else. In accordance with the Islamic principle of concealing one's sins, we ensure a completely secure and judgment-free environment.",
+    "points": [
+      "No email validation or real-name requirements.",
+      "Completely anonymous handles and profiles.",
+      "Vetted mentors and strict privacy levels.",
+      "Zero tracking cookies, marketing pixels, or third-party scripts."
+    ]
+  },
+  "faqs": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Answers to common questions about our platform and methodology.",
+    "items": [
+      {
+        "question": "Is this platform completely anonymous?",
+        "answer": "Yes, absolutely. We do not require your real name, email verification, or any identifying details. You choose an anonymous handle, and all chats with mentors are fully secured and private."
+      },
+      {
+        "question": "Who are the mentors?",
+        "answer": "Mentors are experienced brothers who have successfully walked the path of recovery, maintained long streaks, and have been vetted by our admin team to provide compassionate, non-judgmental guidance."
+      },
+      {
+        "question": "Does it cost anything to join?",
+        "answer": "No. Breaking Chains is a non-profit spiritual sanctuary dedicated to helping brothers break free. There are no fees, ads, or premium subscriptions."
+      },
+      {
+        "question": "What if I relapse?",
+        "answer": "Relapse is part of the recovery process. Our approach does not shame you. We encourage immediate Tawbah (repentance), resetting the chain with new learnings, and discussing the trigger honestly with your mentor."
+      }
+    ]
+  },
+  "footer": {
+    "brandName": "Breaking Chains",
+    "tagline": "A Digital Sanctuary for Purity & Recovery.",
+    "copyright": "© 2026 Breaking Chains. All rights reserved.",
+    "links": [
+      { "label": "Terms of Service", "href": "#" },
+      { "label": "Privacy Policy", "href": "#" },
+      { "label": "Contact Support", "href": "#" },
+      { "label": "About Us", "href": "#" }
+    ]
+  }
+}
