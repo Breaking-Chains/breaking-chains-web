@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { MentorshipChat } from '../components/pmo/MentorshipChat';
 import { BecomeMentorModal } from '../components/pmo/BecomeMentorModal';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -9,10 +8,10 @@ import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { Users, Link as LinkIcon, Sparkles } from 'lucide-react';
 import { getVerifiedMentors, getMyMentorProfile } from '../services/mentorService';
-import { connectWithMentorCode, getUserPartnerships, getPartnershipMessages, sendPartnershipMessage, terminatePartnership, cancelPartnershipTermination } from '../services/partnerService';
+import { connectWithMentorCode, getUserPartnerships, terminatePartnership, cancelPartnershipTermination } from '../services/partnerService';
 import { formatApiErrorMessage } from '../services/apiClient';
 import type { MentorProfile } from '../types/mentor';
-import type { MentorshipChatMessage, AccountabilityPartnership } from '../types/partner';
+import type { AccountabilityPartnership } from '../types/partner';
 
 interface GuidancePageProps {
   onOpenMenteesPage?: () => void;
@@ -35,10 +34,8 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, o
   const [isLoadingMentors, setIsLoadingMentors] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const [chatMessages, setChatMessages] = useState<MentorshipChatMessage[]>([]);
   const [connectingMentorId, setConnectingMentorId] = useState<string | null>(null);
   const [userPartnerships, setUserPartnerships] = useState<AccountabilityPartnership[]>([]);
-  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Exit survey & termination states
   const [isExitSurveyOpen, setIsExitSurveyOpen] = useState(false);
@@ -107,36 +104,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, o
     loadMentors();
   }, [isDemoSession]);
 
-  useEffect(() => {
-    if (isDemoSession) {
-      setChatMessages([
-        {
-          id: 'msg-1',
-          partnershipId: 'p-1',
-          senderId: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a12',
-          senderFullName: 'Sheikh Ahmad Al-Taji',
-          senderUsername: 'sheikh_ahmad',
-          messageContent: 'Assalamu alaikum! Remember to guard your gaze and keep up your daily Muhasabah check-ins.',
-          isRead: true,
-          createdAt: new Date(Date.now() - 3600000).toISOString(),
-        },
-      ]);
-    } else if (activeMentorship) {
-      const fetchMessages = async () => {
-        try {
-          const msgs = await getPartnershipMessages(activeMentorship.id);
-          setChatMessages(msgs);
-        } catch (err) {
-          console.warn('Failed to load chat messages:', err);
-        }
-      };
-      fetchMessages();
-      const interval = setInterval(fetchMessages, 5000);
-      return () => clearInterval(interval);
-    } else {
-      setChatMessages([]);
-    }
-  }, [activeMentorship, isDemoSession]);
+
 
   const mentorList = Array.isArray(verifiedMentors) ? verifiedMentors : [];
 
@@ -268,29 +236,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, o
     }
   };
 
-  const handleSendMessage = async (text: string) => {
-    if (!text.trim()) return;
-    if (isDemoSession) {
-      const newMsg: MentorshipChatMessage = {
-        id: `msg-${Date.now()}`,
-        partnershipId: 'p-1',
-        senderId: 'me',
-        senderFullName: myProfile?.fullName || 'You',
-        senderUsername: myProfile?.username || 'user',
-        messageContent: text,
-        isRead: false,
-        createdAt: new Date().toISOString(),
-      };
-      setChatMessages((prev) => [...prev, newMsg]);
-    } else if (activeMentorship) {
-      try {
-        const sent = await sendPartnershipMessage(activeMentorship.id, text.trim());
-        setChatMessages((prev) => [...prev, sent]);
-      } catch (err) {
-        console.warn('Failed to send message:', err);
-      }
-    }
-  };
+
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -759,46 +705,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, o
 
 
 
-      {/* --- SLIDE-IN SIDEBAR: MENTORSHIP CHAT --- */}
-      {activeMentorship && (
-        <>
-          <div 
-            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity duration-300 ${
-              isChatOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-            }`}
-            onClick={() => setIsChatOpen(false)}
-          />
-          <div 
-            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-all duration-300 ease-in-out ${
-              isChatOpen ? 'translate-x-0 opacity-100 visible' : 'translate-x-full opacity-0 invisible'
-            }`}
-          >
-            <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-600 dark:text-emerald-450 text-sm font-bold select-none">✵</span>
-                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Mentor Chat
-                </h3>
-              </div>
-              <button 
-                onClick={() => setIsChatOpen(false)}
-                className="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
-              >
-                ✕ Close
-              </button>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-4 bg-slate-55/10 dark:bg-slate-950/20">
-              <MentorshipChat
-                partnerName={activeMentorship.partnerFullName || 'Spiritual Mentor'}
-                inviteCode={activeMentorship.inviteCode}
-                messages={chatMessages}
-                onSendMessage={handleSendMessage}
-              />
-            </div>
-          </div>
-        </>
-      )}
 
       {/* Exit Survey (Disconnection Request) Modal */}
       <Modal 
