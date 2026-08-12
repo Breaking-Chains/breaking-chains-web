@@ -5,7 +5,8 @@ import { getCheckInLogs } from '../services/logService';
 import type { LogEntry, LogStatus } from '../types/log';
 import type { NavTab } from '../components/layout/BottomNav';
 import { Flame, Trophy, History, Lock, Calendar, AlertTriangle } from 'lucide-react';
-import { Card } from '../components/ui/Card';
+import dashboardContent from '../data/dashboardContent.json';
+import './DashboardPage.css';
 
 interface DashboardPageProps {
   onOpenCheckIn: () => void;
@@ -145,116 +146,129 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     columns.push(cells.slice(c * 7, (c + 1) * 7));
   }
 
+  const { header, stats, journey, privacy } = dashboardContent;
+
   return (
-    <div className="space-y-8 animate-fade-in max-w-[1140px] mx-auto pb-8">
+    <div className="db-container animate-fade-in">
       {apiError && (
-        <div className="p-3 rounded-lg bg-error-container border border-error border-opacity-20 text-on-error-container text-xs font-semibold text-center shadow-sm">
-          ⚠️ {apiError}
+        <div className="db-api-error">
+          <AlertTriangle className="w-4 h-4" />
+          <span>{apiError}</span>
         </div>
       )}
 
       {/* Header Section */}
-      <section className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+      <section className="db-header-section">
         <div>
-          <h1 className="font-manrope text-headline-lg-mobile md:text-headline-lg text-primary font-bold">
-            Welcome back, {user?.fullName || 'User'}
+          <h1 className="db-welcome-text">
+            {header.welcomePrefix} {user?.fullName || 'User'}
           </h1>
-          <p className="font-label-sm text-xs text-on-surface-variant mt-1 uppercase tracking-wider">
-            Stay strong on your journey
+          <p className="db-tagline-text">
+            {header.tagline}
           </p>
         </div>
-        <div className="flex gap-3 w-full md:w-auto">
+        <div className="db-actions-container">
           <button
             onClick={onOpenCheckIn}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-error-container text-on-error-container font-manrope text-xs font-bold px-6 py-3 rounded-lg border border-error border-opacity-20 hover:bg-opacity-80 transition-all cursor-pointer shadow-xs"
+            className="db-btn-relapse"
           >
-            <AlertTriangle className="w-4 h-4 text-error" />
-            <span>Record a Relapse</span>
+            <AlertTriangle className="w-4 h-4" />
+            <span>{header.btnRelapse}</span>
           </button>
           
           <button
             onClick={() => onTabChange && onTabChange('meetings')}
-            className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-primary text-on-primary font-manrope text-xs font-bold px-6 py-3 rounded-lg hover:opacity-90 transition-all cursor-pointer shadow-xs animate-pulse-glow"
+            className="db-btn-meeting animate-pulse-glow"
           >
-            <Calendar className="w-4 h-4 text-white" />
-            <span>Request Meeting</span>
+            <Calendar className="w-4 h-4" />
+            <span>{header.btnMeeting}</span>
           </button>
         </div>
       </section>
 
       {/* Stats Bento Grid */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="db-stats-grid">
         {/* Card 1: Current Streak */}
-        <Card variant="glass" className="p-6 flex flex-col items-center justify-center relative overflow-hidden group border border-outline-variant/60 shadow-2xs">
-          <Flame className="w-8 h-8 text-primary mb-2 stroke-[2.2]" />
-          <h3 className="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-bold">Current Streak</h3>
-          <div className="flex items-baseline gap-1">
-            <span className="font-manrope text-3xl font-black text-primary font-mono">{currentStreak}</span>
-            <span className="font-inter text-xs text-on-surface-variant">days</span>
+        <div className="db-stat-card">
+          <div className="db-stat-icon-wrapper db-stat-icon-primary">
+            <Flame className="w-6 h-6 stroke-[2.2]" />
           </div>
-        </Card>
+          <h3 className="db-stat-label">{stats.currentStreak.label}</h3>
+          <div className="db-stat-val-container">
+            <span className="db-stat-value">{currentStreak}</span>
+            <span className="db-stat-unit">{stats.currentStreak.unit}</span>
+          </div>
+        </div>
 
         {/* Card 2: Longest Streak */}
-        <Card variant="glass" className="p-6 flex flex-col items-center justify-center border border-outline-variant/60 shadow-2xs">
-          <Trophy className="w-8 h-8 text-secondary mb-2 stroke-[2.2]" />
-          <h3 className="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-bold">Longest Streak</h3>
-          <div className="flex items-baseline gap-1">
-            <span className="font-manrope text-3xl font-black text-on-surface font-mono">{longestStreak}</span>
-            <span className="font-inter text-xs text-on-surface-variant">days</span>
+        <div className="db-stat-card">
+          <div className="db-stat-icon-wrapper db-stat-icon-secondary">
+            <Trophy className="w-6 h-6 stroke-[2.2]" />
           </div>
-        </Card>
+          <h3 className="db-stat-label">{stats.longestStreak.label}</h3>
+          <div className="db-stat-val-container">
+            <span className="db-stat-value">{longestStreak}</span>
+            <span className="db-stat-unit">{stats.longestStreak.unit}</span>
+          </div>
+        </div>
 
         {/* Card 3: Total Relapses */}
-        <Card variant="glass" className="p-6 flex flex-col items-center justify-center border border-outline-variant/60 shadow-2xs">
-          <History className="w-8 h-8 text-on-surface-variant mb-2 stroke-[2.2]" />
-          <h3 className="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-wider mb-1 font-bold">Total Relapses</h3>
-          <div className="flex items-baseline gap-1">
-            <span className="font-manrope text-3xl font-black text-on-surface font-mono">
+        <div className="db-stat-card">
+          <div className="db-stat-icon-wrapper db-stat-icon-tertiary">
+            <History className="w-6 h-6 stroke-[2.2]" />
+          </div>
+          <h3 className="db-stat-label">{stats.totalRelapses.label}</h3>
+          <div className="db-stat-val-container">
+            <span className="db-stat-value">
               {isLoadingLogs ? '...' : totalRelapses}
             </span>
           </div>
-        </Card>
+        </div>
       </section>
 
       {/* Recovery Journey Heatmap Section */}
-      <section className="bg-surface rounded-xl border border-outline-variant p-6 md:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6">
-          <h2 className="font-manrope text-sm md:text-base font-bold text-primary">Recovery Journey</h2>
+      <section className="db-heatmap-card">
+        <div className="db-heatmap-header">
+          <h2 className="db-heatmap-title">{journey.title}</h2>
           
-          <div className="flex items-center gap-4 font-label-sm text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-error"></div>
-              <span>Relapse</span>
+          <div className="db-heatmap-legend">
+            <div className="db-heatmap-legend-item">
+              <div className="db-heatmap-legend-color db-heatmap-color-relapse"></div>
+              <span>{journey.legendRelapse}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-[#F1F5F9] dark:bg-slate-900 border border-outline-variant/30"></div>
-              <span>Empty</span>
+            <div className="db-heatmap-legend-item">
+              <div className="db-heatmap-legend-color db-heatmap-color-edged"></div>
+              <span>{journey.legendEdged}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 rounded-sm bg-secondary"></div>
-              <span>Sober</span>
+            <div className="db-heatmap-legend-item">
+              <div className="db-heatmap-legend-color db-heatmap-color-empty"></div>
+              <span>{journey.legendEmpty}</span>
+            </div>
+            <div className="db-heatmap-legend-item">
+              <div className="db-heatmap-legend-color db-heatmap-color-sober"></div>
+              <span>{journey.legendSober}</span>
             </div>
           </div>
         </div>
 
-        <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800">
-          <div className="min-w-[700px] flex gap-1 justify-between select-none">
+        <div className="db-heatmap-grid-scroll">
+          <div className="db-heatmap-grid">
             {columns.map((col, colIdx) => (
-              <div key={colIdx} className="flex flex-col gap-1 shrink-0">
+              <div key={colIdx} className="db-heatmap-col">
                 {col.map((cell) => {
-                  let colorClass = 'bg-[#F1F5F9] dark:bg-slate-900 border border-slate-100 dark:border-slate-800/60';
+                  let colorClass = 'db-heatmap-color-empty';
                   if (cell.status === 'SLIP_UP') {
-                    colorClass = 'bg-error border-error/20';
+                    colorClass = 'db-heatmap-color-relapse';
                   } else if (cell.status === 'CLEAN' || cell.status === 'URGE_RESISTED') {
-                    colorClass = 'bg-secondary border-secondary/20';
+                    colorClass = 'db-heatmap-color-sober';
                   } else if (cell.status === 'PEEKED_EDGED') {
-                    colorClass = 'bg-amber-500 border-amber-600/20';
+                    colorClass = 'db-heatmap-color-edged';
                   }
                   
                   return (
                     <div
                       key={cell.dateStr}
-                      className={`w-3.5 h-3.5 rounded-[2px] transition-all hover:scale-115 ${colorClass}`}
+                      className={`db-heatmap-cell ${colorClass}`}
                       title={`${cell.dateStr} (${cell.status || 'No Log'})`}
                     />
                   );
@@ -266,10 +280,12 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       </section>
 
       {/* Privacy Shield lock banner */}
-      <div className="flex items-center justify-center gap-2 py-4 border-t border-outline-variant/40 text-on-surface-variant font-geist text-xs font-semibold">
-        <Lock className="w-3.5 h-3.5 text-on-surface-variant/80" />
-        <span>Privacy Shield Active: Your data is encrypted and zero-knowledge protected.</span>
+      <div className="db-privacy-banner">
+        <Lock className="db-privacy-icon" />
+        <span>{privacy.shieldText}</span>
       </div>
     </div>
   );
 };
+
+export default DashboardPage;

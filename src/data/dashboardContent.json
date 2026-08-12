@@ -1,0 +1,31 @@
+{
+  "header": {
+    "welcomePrefix": "Assalamu Alaikum,",
+    "tagline": "“Seek help through patience and prayer.” [Al-Baqarah 2:153]",
+    "btnRelapse": "Log a Slip-Up",
+    "btnMeeting": "Request Brotherhood Meeting"
+  },
+  "stats": {
+    "currentStreak": {
+      "label": "Current Pure Streak",
+      "unit": "days"
+    },
+    "longestStreak": {
+      "label": "Longest Pure Streak",
+      "unit": "days"
+    },
+    "totalRelapses": {
+      "label": "Total Slip-Ups"
+    }
+  },
+  "journey": {
+    "title": "Your Mujahadah History",
+    "legendRelapse": "Slip-Up",
+    "legendEmpty": "No Log",
+    "legendSober": "Sober Day",
+    "legendEdged": "Peeked / Edged"
+  },
+  "privacy": {
+    "shieldText": "Privacy Shield Active: Zero-knowledge encryption protects your struggle. Your secrets remain concealed."
+  }
+}

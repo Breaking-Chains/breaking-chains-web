@@ -1,0 +1,54 @@
+{
+  "title": "Daily PMO Check-In (Muhasabah)",
+  "subtitle": "Select your status for today. Honest reflection (Muhasabah) is key to recovery.",
+  "submitBtn": "Confirm & Save Log",
+  "statusOptions": [
+    {
+      "id": "CLEAN",
+      "label": "Clean & Guarded",
+      "description": "Purity maintained all day",
+      "icon": "ShieldCheck"
+    },
+    {
+      "id": "URGE_RESISTED",
+      "label": "Resisted Urge",
+      "description": "Fought urge & won",
+      "icon": "Flame"
+    },
+    {
+      "id": "PEEKED_EDGED",
+      "label": "Peeked / Edged",
+      "description": "Visual stumble, no full slip",
+      "icon": "AlertCircle"
+    },
+    {
+      "id": "SLIP_UP",
+      "label": "Slip-Up (Relapse)",
+      "description": "Full relapse occurred",
+      "icon": "Heart"
+    }
+  ],
+  "triggerSection": {
+    "label": "Primary Temptation Trigger",
+    "triggers": [
+      { "id": "LATE_NIGHT_SOLITUDE", "label": "🌙 Late Night Solitude" },
+      { "id": "STRESS_ANXIETY", "label": "⚡ Stress & Anxiety" },
+      { "id": "BOREDOM_IDLENESS", "label": "🛋️ Boredom & Idleness" },
+      { "id": "SOCIAL_MEDIA_SCROLLING", "label": "📱 Social Media Peeking" },
+      { "id": "FATIGUE_EXHAUSTION", "label": "😴 Exhaustion" }
+    ]
+  },
+  "postSlip": {
+    "reminderHeader": "Do not despair of Allah's Mercy",
+    "reminderVerse": "\"Say, 'O My servants who have transgressed against themselves, do not despair of the mercy of Allah. Indeed, Allah forgives all sins.'\"",
+    "reminderSource": "— Surah Az-Zumar (39:53)",
+    "actionHeader": "Immediate Post-Slip Tawbah Action Steps:",
+    "actionSteps": [
+      "Make Wudu with cold water to wash away temptation traces.",
+      "Pray 2 Raka'at Salat al-Tawbah (Prayer of Repentance).",
+      "Give Sadaqah (Charity wipes away bad deeds: Al-Hasanat yudhibna al-sayyi'at).",
+      "Beware of the 48-Hour Chaser Effect (Heightened cravings ahead)."
+    ],
+    "recommitBtn": "I Re-Commit to My Clean Chain"
+  }
+}
