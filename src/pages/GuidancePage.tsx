@@ -38,7 +38,6 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   const [connectingMentorId, setConnectingMentorId] = useState<string | null>(null);
   const [userPartnerships, setUserPartnerships] = useState<AccountabilityPartnership[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isNasihaOpen, setIsNasihaOpen] = useState(false);
 
   // Exit survey & termination states
   const [isExitSurveyOpen, setIsExitSurveyOpen] = useState(false);
@@ -757,62 +756,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         </form>
       </Modal>
 
-      {/* --- SLIDE-IN SIDEBAR: NASIHA FEED --- */}
-      {activeMentorship && (
-        <>
-          <div 
-            className={`fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-40 transition-opacity duration-300 ${
-              isNasihaOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-            }`}
-            onClick={() => setIsNasihaOpen(false)}
-          />
-          <div 
-            className={`fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-slate-950 shadow-2xl border-l border-slate-200 dark:border-slate-800/80 flex flex-col transform transition-transform duration-300 ease-in-out ${
-              isNasihaOpen ? 'translate-x-0' : 'translate-x-full'
-            }`}
-          >
-            <div className="p-4 border-b border-slate-100 dark:border-slate-900/60 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-amber-500 dark:text-amber-455 text-sm font-bold select-none">✵</span>
-                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Spiritual Counsel (Nasiha)
-                </h3>
-              </div>
-              <button 
-                onClick={() => setIsNasihaOpen(false)}
-                className="text-[10px] font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-lg cursor-pointer transition-colors"
-              >
-                ✕ Close
-              </button>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {notesList.length === 0 ? (
-                <div className="text-center py-12 text-xs text-slate-450 italic">
-                  No Nasiha counsel notes posted yet by your mentor.
-                </div>
-              ) : (
-                <div className="relative pl-5 border-l border-emerald-500/20 dark:border-emerald-500/10 space-y-6">
-                  {notesList.map((note) => (
-                    <div key={note.id} className="relative space-y-2">
-                      <div className="absolute -left-[26px] top-1 w-2.5 h-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-950" />
-                      
-                      <div className="flex items-center justify-between text-[9px] text-slate-400 font-mono font-bold uppercase tracking-wider">
-                        <span>{activeMentorship.partnerFullName || 'Spiritual Mentor'}</span>
-                        <span>{new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      </div>
-                      
-                      <div className="p-4 rounded-2xl bg-amber-55/10 dark:bg-amber-950/20 border border-amber-500/15 dark:border-amber-500/10 text-xs text-slate-800 dark:text-slate-200 leading-relaxed italic font-serif shadow-xs">
-                        "{note.counselText}"
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        </>
-      )}
 
       {/* --- SLIDE-IN SIDEBAR: MENTORSHIP CHAT --- */}
       {activeMentorship && (

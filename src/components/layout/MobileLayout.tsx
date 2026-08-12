@@ -3,9 +3,7 @@ import { Header } from './Header';
 import { BottomNav } from './BottomNav';
 import { Sidebar } from './Sidebar';
 import type { NavTab } from './BottomNav';
-import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { Sun, Moon } from 'lucide-react';
 
 interface MobileLayoutProps {
   children: React.ReactNode;
@@ -24,7 +22,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
   currentStreak = 18,
   cleanRatioPercent = 94.7,
 }) => {
-  const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   const role = user?.role || 'USER';
 
@@ -87,15 +84,6 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
               <p className="text-[10px] text-slate-650 dark:text-slate-400 font-medium">
                 {getHeaderSubtitle()}
               </p>
-            </div>
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={toggleTheme}
-                className="p-1.5 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-900 rounded-full text-slate-550 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors cursor-pointer min-h-[32px] min-w-[32px] flex items-center justify-center"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'dark' ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4" />}
-              </button>
             </div>
           </header>
         )}
