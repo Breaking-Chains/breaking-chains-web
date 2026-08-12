@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { usePmo } from '../context/PmoContext';
 import { useAuth } from '../context/AuthContext';
@@ -69,6 +69,123 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   });
 
   const logs = isOfflineDemo ? generateDemoLogs() : (logsData || []);
+
+  const [drawerType, setDrawerType] = useState<'current' | 'longest' | 'slips' | null>(null);
+
+  // 1. Compute logs belonging to the current active streak
+  const currentStreakDetails = useMemo(() => {
+    if (isOfflineDemo) {
+      return {
+        days: 8,
+        logs: [
+          { id: 'mock-1', logTimestamp: '2026-08-12T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-2', logTimestamp: '2026-08-11T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-3', logTimestamp: '2026-08-10T20:00:00Z', status: 'URGE_RESISTED' as LogStatus },
+          { id: 'mock-4', logTimestamp: '2026-08-09T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-5', logTimestamp: '2026-08-08T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-6', logTimestamp: '2026-08-07T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-7', logTimestamp: '2026-08-06T20:00:00Z', status: 'CLEAN' as LogStatus },
+          { id: 'mock-8', logTimestamp: '2026-08-05T20:00:00Z', status: 'CLEAN' as LogStatus },
+        ]
+      };
+    }
+    
+    const streakLogs: LogEntry[] = [];
+    const today = new Date();
+    const curr = new Date(today);
+    const chainStart = chain?.startDate ? new Date(chain.startDate) : today;
+    const chainStartStr = getLocalDateString(chainStart);
+    
+    let loops = 0;
+    while (loops < 365) {
+      loops++;
+      const dateStr = getLocalDateString(curr);
+      if (dateStr < chainStartStr) break;
+      
+      const dayLogs = logs.filter(l => getLocalDateString(new Date(l.logTimestamp)) === dateStr);
+      const hasSlip = dayLogs.some(l => l.status === 'SLIP_UP');
+      if (hasSlip) break;
+      
+      dayLogs.forEach(l => streakLogs.push(l));
+      curr.setDate(curr.getDate() - 1);
+    }
+    
+    streakLogs.sort((a, b) => b.logTimestamp.localeCompare(a.logTimestamp));
+    return {
+      days: currentStreak,
+      logs: streakLogs
+    };
+  }, [logs, chain, currentStreak, isOfflineDemo]);
+
+  // 2. Compute date boundaries for the longest pure streak period
+  const longestStreakDetails = useMemo(() => {
+    if (isOfflineDemo) {
+      return {
+        days: 128,
+        startDateStr: '2026-02-07',
+        endDateStr: '2026-06-15'
+      };
+    }
+    
+    if (logs.length === 0) {
+      return { days: 0, startDateStr: '', endDateStr: '' };
+    }
+    
+    const today = new Date();
+    const chainStart = chain?.startDate ? new Date(chain.startDate) : today;
+    const daysDiff = Math.max(0, Math.floor((today.getTime() - chainStart.getTime()) / (1000 * 60 * 60 * 24))) + 1;
+    
+    let longest = 0;
+    let longestStart = '';
+    let longestEnd = '';
+    
+    let running = 0;
+    let runningStart = '';
+    
+    for (let i = 0; i < daysDiff; i++) {
+      const curr = new Date(chainStart);
+      curr.setDate(chainStart.getDate() + i);
+      const dateStr = getLocalDateString(curr);
+      
+      const dayLogs = logs.filter(l => getLocalDateString(new Date(l.logTimestamp)) === dateStr);
+      const hasSlip = dayLogs.some(l => l.status === 'SLIP_UP');
+      
+      if (hasSlip) {
+        if (running > longest) {
+          longest = running;
+          longestStart = runningStart;
+          longestEnd = getLocalDateString(new Date(curr.getTime() - 24 * 60 * 60 * 1000));
+        }
+        running = 0;
+        runningStart = '';
+      } else {
+        if (running === 0) {
+          runningStart = dateStr;
+        }
+        running++;
+        if (i === daysDiff - 1) {
+          if (running > longest) {
+            longest = running;
+            longestStart = runningStart;
+            longestEnd = dateStr;
+          }
+        }
+      }
+    }
+    
+    return {
+      days: analytics?.longestStreak ?? longest,
+      startDateStr: longestStart,
+      endDateStr: longestEnd
+    };
+  }, [logs, chain, analytics, isOfflineDemo]);
+
+  // 3. Compute chronological relapses history list
+  const slipUpsDetails = useMemo(() => {
+    const slipLogs = logs.filter(l => l.status === 'SLIP_UP');
+    slipLogs.sort((a, b) => b.logTimestamp.localeCompare(a.logTimestamp));
+    return slipLogs;
+  }, [logs]);
 
   // Compute total relapses
   const totalRelapses = isOfflineDemo 
@@ -172,7 +289,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       {/* Stats Bento Grid */}
       <section className="db-stats-grid">
         {/* Card 1: Current Streak */}
-        <div className="db-stat-card">
+        <div 
+          className="db-stat-card cursor-pointer hover:border-blue-300 dark:hover:border-blue-800 transition-all select-none active:scale-[0.98]"
+          onClick={() => setDrawerType('current')}
+          title="Click to view current streak details"
+        >
           <div className="db-stat-icon-wrapper db-stat-icon-primary">
             <Flame className="w-6 h-6 stroke-[2.2]" />
           </div>
@@ -184,7 +305,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {/* Card 2: Longest Streak */}
-        <div className="db-stat-card">
+        <div 
+          className="db-stat-card cursor-pointer hover:border-emerald-300 dark:hover:border-emerald-800 transition-all select-none active:scale-[0.98]"
+          onClick={() => setDrawerType('longest')}
+          title="Click to view longest streak details"
+        >
           <div className="db-stat-icon-wrapper db-stat-icon-secondary">
             <Trophy className="w-6 h-6 stroke-[2.2]" />
           </div>
@@ -196,15 +321,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
 
         {/* Card 3: Total Relapses */}
-        <div className="db-stat-card">
+        <div 
+          className="db-stat-card cursor-pointer hover:border-rose-300 dark:hover:border-rose-800 transition-all select-none active:scale-[0.98]"
+          onClick={() => setDrawerType('slips')}
+          title="Click to view relapse analysis"
+        >
           <div className="db-stat-icon-wrapper db-stat-icon-tertiary">
             <History className="w-6 h-6 stroke-[2.2]" />
           </div>
           <h3 className="db-stat-label">{stats.totalRelapses.label}</h3>
           <div className="db-stat-val-container">
-            <span className="db-stat-value">
-              {isLoadingLogs ? '...' : totalRelapses}
-            </span>
+            <span className="db-stat-value">{isLoadingLogs ? '...' : totalRelapses}</span>
           </div>
         </div>
       </section>
@@ -303,9 +430,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           if (dayLogs.length === 0) {
             return (
               <div className="db-day-details-empty">
-                <AlertTriangle className="w-8 h-8 text-slate-350 dark:text-slate-700 mx-auto mb-2" />
+                <AlertTriangle className="w-8 h-8 text-slate-400 dark:text-slate-700 mx-auto mb-2" />
                 <p>No check-in logs submitted on this day.</p>
-                <span className="text-[10px] text-slate-450 dark:text-slate-500 font-medium">Use the "Log Daily Check-in" button to record details.</span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Use the "Log Daily Check-in" button to record details.</span>
               </div>
             );
           }
@@ -366,6 +493,119 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <Lock className="db-privacy-icon" />
         <span>{privacy.shieldText}</span>
       </div>
+
+      {/* Side Drawer Details Overlay */}
+      {drawerType && (
+        <div className="db-drawer-overlay animate-fade-in" onClick={() => setDrawerType(null)}>
+          <div className="db-drawer" onClick={(e) => e.stopPropagation()}>
+            <div className="db-drawer-header">
+              <h3 className="db-drawer-title">
+                {drawerType === 'current' && 'Current Streak Details'}
+                {drawerType === 'longest' && 'Longest Streak Details'}
+                {drawerType === 'slips' && 'Slip-up & Relapse Analysis'}
+              </h3>
+              <button className="db-drawer-close" onClick={() => setDrawerType(null)}>×</button>
+            </div>
+            
+            <div className="db-drawer-body">
+              {drawerType === 'current' && (
+                <div className="space-y-6">
+                  <div className="db-drawer-metric-card border-l-4 border-l-blue-500">
+                    <span className="db-drawer-metric-label">Current Active Streak</span>
+                    <span className="db-drawer-metric-val text-blue-600 dark:text-blue-400 font-mono">{currentStreakDetails.days} Days</span>
+                    <p className="db-drawer-metric-subtitle">Since your last slip-up. Keep defending your clean days!</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <h4 className="db-drawer-section-title">Streak Log Timeline</h4>
+                    <div className="db-drawer-timeline-container">
+                      {currentStreakDetails.logs.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-500 italic text-center py-6">No logs recorded in this active streak yet.</p>
+                      ) : (
+                        currentStreakDetails.logs.map((log, idx) => (
+                          <div key={log.id || idx} className="db-drawer-timeline-item">
+                            <span className="db-drawer-timeline-date font-mono">
+                              {new Date(log.logTimestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                            <span className={`db-drawer-timeline-badge ${log.status === 'CLEAN' ? 'badge-sober' : 'badge-resisted'}`}>
+                              {log.status === 'CLEAN' ? 'Clean' : 'Urge Resisted'}
+                            </span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {drawerType === 'longest' && (
+                <div className="space-y-6">
+                  <div className="db-drawer-metric-card border-l-4 border-l-emerald-500">
+                    <span className="db-drawer-metric-label">Longest Pure Streak</span>
+                    <span className="db-drawer-metric-val text-emerald-600 dark:text-emerald-400 font-mono">{longestStreakDetails.days} Days</span>
+                    <p className="db-drawer-metric-subtitle">Your peak neural recovery period. You have proven you can sustain this!</p>
+                  </div>
+                  {longestStreakDetails.startDateStr && (
+                    <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-2xl border border-slate-200/50 dark:border-slate-800 space-y-1.5">
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider block">Peak Streak Window</span>
+                      <span className="text-xs font-mono font-black text-slate-700 dark:text-slate-200 block">
+                        {new Date(longestStreakDetails.startDateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        <span className="text-slate-400 font-normal px-2">➔</span>
+                        {new Date(longestStreakDetails.endDateStr).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 rounded-2xl border border-emerald-500/20 dark:border-emerald-900/30 text-xs text-emerald-800 dark:text-emerald-350 leading-relaxed font-medium">
+                    📖 <strong>Barakah Note:</strong> "Self-discipline is built one decision at a time. The fact that you have achieved a {longestStreakDetails.days}-day streak shows that your neurochemistry is fully capable of rewiring. Stay patient, renew your intent daily, and focus on one day at a time."
+                  </div>
+                </div>
+              )}
+
+              {drawerType === 'slips' && (
+                <div className="space-y-6">
+                  <div className="db-drawer-metric-card border-l-4 border-l-rose-500">
+                    <span className="db-drawer-metric-label">Total Slip-Ups</span>
+                    <span className="db-drawer-metric-val text-rose-600 dark:text-rose-400 font-mono">{slipUpsDetails.length} Instances</span>
+                    <p className="db-drawer-metric-subtitle">Relapses are data points for trigger swaps, not identity failures.</p>
+                  </div>
+
+                  <div className="space-y-3">
+                    <h4 className="db-drawer-section-title">Trigger & Notes Analysis</h4>
+                    <div className="db-drawer-timeline-container">
+                      {slipUpsDetails.length === 0 ? (
+                        <p className="text-xs text-slate-400 dark:text-slate-550 italic text-center py-6">No slip-ups recorded. Alhamdulillah!</p>
+                      ) : (
+                        slipUpsDetails.map((log, idx) => (
+                          <div key={log.id || idx} className="p-4 rounded-2xl bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800 space-y-2 text-xs">
+                            <div className="flex justify-between items-center">
+                              <span className="font-mono font-bold text-slate-600 dark:text-slate-400">
+                                {new Date(log.logTimestamp).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                              {log.triggerTag && (
+                                <span className="text-[9px] font-mono font-black uppercase text-amber-700 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/30 px-2 py-0.5 rounded border border-amber-500/10">
+                                  {log.triggerTag.replace(/_/g, ' ')}
+                                </span>
+                              )}
+                            </div>
+                            {log.notes ? (
+                              <p className="text-xs text-slate-500 dark:text-slate-400 italic pl-3 border-l-2 border-l-rose-500 font-serif">
+                                "{log.notes}"
+                              </p>
+                            ) : (
+                              <p className="text-[10px] text-slate-400 italic">No reflection notes logged.</p>
+                            )}
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

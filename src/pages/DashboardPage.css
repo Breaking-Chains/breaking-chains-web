@@ -238,3 +238,77 @@
 .db-day-log-no-notes {
   @apply text-[11px] text-slate-400 dark:text-slate-500 italic font-medium;
 }
+
+/* KPI Side Drawer Overlay Backdrop */
+.db-drawer-overlay {
+  @apply fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-xs z-50 flex justify-end;
+}
+
+/* Sliding Side Drawer Panel */
+.db-drawer {
+  @apply w-full max-w-[420px] h-full bg-white dark:bg-slate-900 border-l border-slate-200/60 dark:border-slate-800 shadow-2xl flex flex-col translate-x-0 transition-transform duration-300 ease-out;
+  animation: slideIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.db-drawer-header {
+  @apply flex justify-between items-center px-6 py-5 border-b border-slate-100 dark:border-slate-800;
+}
+
+.db-drawer-title {
+  @apply font-manrope text-xs font-extrabold text-primary uppercase tracking-wider;
+}
+
+.db-drawer-close {
+  @apply text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-white text-2xl font-normal transition-colors cursor-pointer w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-50 dark:hover:bg-slate-950/50 outline-none;
+}
+
+.db-drawer-body {
+  @apply flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-slate-200 dark:scrollbar-thumb-slate-800;
+}
+
+/* Metric summary card inside drawer */
+.db-drawer-metric-card {
+  @apply p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/25 border border-slate-200/50 dark:border-slate-800 shadow-xs flex flex-col gap-1;
+}
+
+.db-drawer-metric-label {
+  @apply text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block;
+}
+
+.db-drawer-metric-val {
+  @apply text-2xl font-black font-mono tracking-tight;
+}
+
+.db-drawer-metric-subtitle {
+  @apply text-[11px] text-slate-500 dark:text-slate-400 leading-normal font-medium mt-1;
+}
+
+.db-drawer-section-title {
+  @apply text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block;
+}
+
+/* Timeline/List container inside drawer */
+.db-drawer-timeline-container {
+  @apply space-y-2.5 max-h-[360px] overflow-y-auto pr-1;
+}
+
+.db-drawer-timeline-item {
+  @apply flex justify-between items-center p-3 rounded-xl bg-white/50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800/80 shadow-xs;
+}
+
+.db-drawer-timeline-date {
+  @apply text-xs font-semibold text-slate-600 dark:text-slate-300;
+}
+
+.db-drawer-timeline-badge {
+  @apply text-[8px] font-black px-2 py-0.5 rounded-full border uppercase tracking-wider;
+}
