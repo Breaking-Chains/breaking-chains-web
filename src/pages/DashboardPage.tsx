@@ -99,14 +99,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const todayStr = getLocalDateString(today);
     const cells: { dateStr: string; status?: LogStatus }[] = [];
     
-    // First day is 363 days ago to fit exactly 52 columns * 7 rows = 364 cells
-    const startDate = new Date();
-    startDate.setDate(today.getDate() - 363);
+    // End date is Saturday of the current week to align columns perfectly
+    const endDate = new Date(today);
+    const daysUntilSaturday = 6 - today.getDay();
+    endDate.setDate(today.getDate() + daysUntilSaturday);
     
-    // Pad to start of week (Sunday is 0)
-    const startDayOfWeek = startDate.getDay();
-    const adjustedStartDate = new Date(startDate);
-    adjustedStartDate.setDate(startDate.getDate() - startDayOfWeek);
+    // Start date is 363 days before the end date (52 weeks * 7 days - 1 = 363)
+    const startDate = new Date(endDate);
+    startDate.setDate(endDate.getDate() - 363);
     
     const lookup: Record<string, LogStatus> = {};
     logs.forEach((log) => {
@@ -120,8 +120,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
     const totalCells = 52 * 7;
     for (let i = 0; i < totalCells; i++) {
-      const currentCellDate = new Date(adjustedStartDate);
-      currentCellDate.setDate(adjustedStartDate.getDate() + i);
+      const currentCellDate = new Date(startDate);
+      currentCellDate.setDate(startDate.getDate() + i);
       const dateStr = getLocalDateString(currentCellDate);
       
       const isFuture = dateStr > todayStr;
