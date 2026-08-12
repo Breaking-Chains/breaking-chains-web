@@ -24,7 +24,7 @@ interface PmoContextType {
   activeSosSessionId: string | null;
   apiError: string | null;
   clearApiError: () => void;
-  submitCheckIn: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => Promise<void>;
+  submitCheckIn: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string, logTimestamp?: string) => Promise<void>;
   startSos: () => Promise<string>;
   completeSos: (durationSeconds: number) => Promise<void>;
   createCustomChain: (options: {
@@ -92,16 +92,17 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // 4. Submit daily check-in mutation
   const checkInMutation = useMutation({
-    mutationFn: async ({ status, triggerTag, notes }: { status: LogStatus; triggerTag?: PMOTriggerTag; notes?: string }) => {
+    mutationFn: async ({ status, triggerTag, notes, logTimestamp }: { status: LogStatus; triggerTag?: PMOTriggerTag; notes?: string; logTimestamp?: string }) => {
       if (!chain) {
         throw new Error('No active habit chain found to check in.');
       }
-      return submitCheckInLog(chain.id, status, triggerTag, notes);
+      return submitCheckInLog(chain.id, status, triggerTag, notes, logTimestamp);
     },
     onSuccess: () => {
       // Invalidate both chains and stats queries to trigger background refetch
       queryClient.invalidateQueries({ queryKey: ['user-chains'] });
       queryClient.invalidateQueries({ queryKey: ['chain-analytics', chain?.id] });
+      queryClient.invalidateQueries({ queryKey: ['counsel-notes', chain?.id] });
       setMutationError(null);
     },
     onError: (err) => {
@@ -109,9 +110,9 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     },
   });
 
-  const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
+  const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string, logTimestamp?: string) => {
     try {
-      await checkInMutation.mutateAsync({ status, triggerTag, notes });
+      await checkInMutation.mutateAsync({ status, triggerTag, notes, logTimestamp });
     } catch (err) {
       throw err;
     }

@@ -5,7 +5,8 @@ export async function submitCheckInLog(
   chainId: string,
   status: LogStatus,
   triggerTag?: PMOTriggerTag,
-  notes?: string
+  notes?: string,
+  logTimestamp?: string
 ): Promise<{ log: LogEntry; tawbahProtocol?: PostSlipTawbahResponse }> {
   return apiFetch<{ log: LogEntry; tawbahProtocol?: PostSlipTawbahResponse }>(
     `/api/v1/chains/${chainId}/logs`,
@@ -15,6 +16,7 @@ export async function submitCheckInLog(
         status,
         triggerTag,
         reflectionNote: notes,
+        logTimestamp,
       }),
     }
   );

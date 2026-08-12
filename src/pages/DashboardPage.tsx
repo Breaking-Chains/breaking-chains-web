@@ -87,8 +87,16 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const longestStreak = chain?.longestStreak ?? (isOfflineDemo ? 128 : currentStreak);
 
   // Generate a chronological 7x52 contribution grid representing the last 364 days
+  const getLocalDateString = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const generateHeatmapGrid = () => {
     const today = new Date();
+    const todayStr = getLocalDateString(today);
     const cells: { dateStr: string; status?: LogStatus }[] = [];
     
     // First day is 363 days ago to fit exactly 52 columns * 7 rows = 364 cells
@@ -102,7 +110,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     
     const lookup: Record<string, LogStatus> = {};
     logs.forEach((log) => {
-      const dateStr = log.logTimestamp.split('T')[0];
+      const localDate = new Date(log.logTimestamp);
+      const dateStr = getLocalDateString(localDate);
       const existing = lookup[dateStr];
       if (!existing || log.status === 'SLIP_UP') {
         lookup[dateStr] = log.status;
@@ -113,14 +122,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     for (let i = 0; i < totalCells; i++) {
       const currentCellDate = new Date(adjustedStartDate);
       currentCellDate.setDate(adjustedStartDate.getDate() + i);
-      const dateStr = currentCellDate.toISOString().split('T')[0];
+      const dateStr = getLocalDateString(currentCellDate);
       
-      const cellDate = new Date(dateStr);
-      const isFuture = cellDate > today;
+      const isFuture = dateStr > todayStr;
 
       let status = lookup[dateStr];
       if (isOfflineDemo && !isFuture && !status) {
         // Mock some recovery days for offline demo
+        const cellDate = new Date(currentCellDate);
         const offset = Math.floor((today.getTime() - cellDate.getTime()) / (1000 * 60 * 60 * 24));
         if ([5, 45, 120].includes(offset)) {
           status = 'SLIP_UP';

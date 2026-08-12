@@ -11,11 +11,18 @@ interface RecoveryAnalyticsProps {
 
 type FilterType = 'day' | 'month' | 'custom';
 
+const getLocalDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
 // Realistic mock logs for the offline demo session spanning the last 45 days
 const MOCK_DEMO_LOGS: LogEntry[] = Array.from({ length: 45 }).map((_, index) => {
   const date = new Date();
   date.setDate(date.getDate() - index);
-  const dateStr = date.toISOString().split('T')[0];
+  const dateStr = getLocalDateString(date);
 
   let status: LogStatus = 'CLEAN';
   let triggerTag: PMOTriggerTag | undefined = undefined;
@@ -60,7 +67,7 @@ const getDatesInRange = (startDateStr: string, endDateStr: string): string[] => 
   end.setHours(12, 0, 0, 0);
 
   while (current <= end) {
-    dates.push(current.toISOString().split('T')[0]);
+    dates.push(getLocalDateString(current));
     current.setDate(current.getDate() + 1);
   }
   return dates;
@@ -86,8 +93,8 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
   const [filterType, setFilterType] = useState<FilterType>('custom');
 
   // Dates state
-  const todayStr = new Date().toISOString().split('T')[0];
-  const defaultStartStr = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const todayStr = getLocalDateString(new Date());
+  const defaultStartStr = getLocalDateString(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
   
   const [selectedDay, setSelectedDay] = useState<string>(todayStr);
   const [selectedMonth, setSelectedMonth] = useState<string>(todayStr.substring(0, 7)); // YYYY-MM
@@ -211,7 +218,7 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     };
 
     logs.forEach((log) => {
-      const dateStr = log.logTimestamp.split('T')[0];
+      const dateStr = getLocalDateString(new Date(log.logTimestamp));
       const existing = lookup[dateStr];
       if (!existing) {
         lookup[dateStr] = log;
@@ -245,7 +252,7 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
 
     logs.forEach((log) => {
       if (isLogMatchingFilters(log)) {
-        const dateStr = log.logTimestamp.split('T')[0];
+        const dateStr = getLocalDateString(new Date(log.logTimestamp));
         const existing = lookup[dateStr];
         if (!existing) {
           lookup[dateStr] = log;
@@ -329,11 +336,11 @@ export const RecoveryAnalytics: React.FC<RecoveryAnalyticsProps> = ({ chainId, i
     const activeDatesSet = new Set(activeDates);
     return logs
       .filter((log) => {
-        const dateStr = log.logTimestamp.split('T')[0];
+        const dateStr = getLocalDateString(new Date(log.logTimestamp));
         return activeDatesSet.has(dateStr) && isLogMatchingFilters(log);
       })
       .map((log) => ({
-        dateStr: log.logTimestamp.split('T')[0],
+        dateStr: getLocalDateString(new Date(log.logTimestamp)),
         log,
       }));
   }, [logs, activeDates, isLogMatchingFilters]);

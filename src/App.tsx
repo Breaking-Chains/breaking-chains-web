@@ -66,8 +66,8 @@ function ProtectedAppContent() {
     }
   };
 
-  const handleSubmitLog = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
-    await submitCheckIn(status, triggerTag, notes);
+  const handleSubmitLog = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string, logTimestamp?: string) => {
+    await submitCheckIn(status, triggerTag, notes, logTimestamp);
   };
 
 

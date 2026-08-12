@@ -9,7 +9,7 @@ import './CheckInModal.css';
 interface CheckInModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmitLog: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => Promise<void> | void;
+  onSubmitLog: (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string, logTimestamp?: string) => Promise<void> | void;
 }
 
 const IconMap: Record<string, React.ComponentType<any>> = {
@@ -19,6 +19,13 @@ const IconMap: Record<string, React.ComponentType<any>> = {
   Heart,
   HeartHandshake,
   CheckCircle2,
+};
+
+const getLocalDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const CheckInModal: React.FC<CheckInModalProps> = ({
@@ -32,10 +39,12 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [postSlipSubmitted, setPostSlipSubmitted] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [selectedDate, setSelectedDate] = useState<string>(getLocalDateString(new Date()));
 
   const handleClose = () => {
     setSelectedStatus(null);
     setSelectedTrigger('LATE_NIGHT_SOLITUDE');
+    setSelectedDate(getLocalDateString(new Date()));
     setPostSlipSubmitted(false);
     setErrorMsg(null);
     onClose();
@@ -53,7 +62,8 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
     setErrorMsg(null);
 
     try {
-      await onSubmitLog(selectedStatus, selectedTrigger, notes);
+      const formattedTimestamp = `${selectedDate}T12:00:00`;
+      await onSubmitLog(selectedStatus, selectedTrigger, notes, formattedTimestamp);
 
       if (selectedStatus === 'CLEAN' || selectedStatus === 'URGE_RESISTED') {
         triggerConfetti();
@@ -99,6 +109,18 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
           <p className="cm-subtitle">
             {subtitle}
           </p>
+
+          {/* Date Selector */}
+          <div className="cm-date-container">
+            <label className="cm-date-label">Check-In Date</label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+              max={getLocalDateString(new Date())}
+              className="cm-date-input"
+            />
+          </div>
 
           <div className="cm-status-grid">
             {statusOptions.map((opt) => {
