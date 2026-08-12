@@ -33,6 +33,14 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   const [postSlipSubmitted, setPostSlipSubmitted] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  const handleClose = () => {
+    setSelectedStatus(null);
+    setSelectedTrigger('LATE_NIGHT_SOLITUDE');
+    setPostSlipSubmitted(false);
+    setErrorMsg(null);
+    onClose();
+  };
+
   const handleSelectStatus = (status: LogStatus) => {
     setSelectedStatus(status);
     setErrorMsg(null);
@@ -54,8 +62,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
       if (selectedStatus === 'SLIP_UP') {
         setPostSlipSubmitted(true);
       } else {
-        onClose();
-        setSelectedStatus(null);
+        handleClose();
       }
     } catch (err: unknown) {
       setErrorMsg(err instanceof Error ? err.message : 'Failed to save check-in log. Please try again.');
@@ -81,7 +88,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
   const { title, subtitle, submitBtn, statusOptions, triggerSection, postSlip } = checkInContent;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={title}>
       {!postSlipSubmitted ? (
         <div className="cm-container">
           {errorMsg && (
@@ -185,11 +192,7 @@ export const CheckInModal: React.FC<CheckInModalProps> = ({
 
           {/* Recommit button */}
           <button
-            onClick={() => {
-              setPostSlipSubmitted(false);
-              setSelectedStatus(null);
-              onClose();
-            }}
+            onClick={handleClose}
             className="cm-post-slip-recommit-btn"
           >
             <CheckCircle2 className="w-5 h-5" />
