@@ -16,8 +16,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
   const [fullName, setFullName] = useState('');
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { login, register, isLoading } = useAuth();
+  const { login, register } = useAuth();
 
   const handleGoogleLogin = () => {
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
@@ -33,18 +34,23 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
       return;
     }
 
+    setIsSubmitting(true);
+
     try {
       if (mode === 'login') {
         await login(email, password);
       } else {
         if (!fullName || !username) {
           setError('Please provide full name and username.');
+          setIsSubmitting(false);
           return;
         }
         await register(email, password, fullName, username);
       }
     } catch (err: unknown) {
       setError(formatApiErrorMessage(err));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -185,9 +191,9 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onBack }) => {
             <button
               className="auth-submit-btn"
               type="submit"
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
                   <span>Processing...</span>

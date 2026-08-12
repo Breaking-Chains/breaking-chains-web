@@ -72,35 +72,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = async (email: string, password: string) => {
-    setIsLoading(true);
-    try {
-      const authData = await loginUser(email, password);
-      if (authData.tokens) {
-        setTokens(authData.tokens);
-      }
-      if (authData.user) {
-        setUser(authData.user);
-      }
-      setIsDemoSession(false);
-    } finally {
-      setIsLoading(false);
+    const authData = await loginUser(email, password);
+    if (authData.tokens) {
+      setTokens(authData.tokens);
     }
+    if (authData.user) {
+      setUser(authData.user);
+    }
+    setIsDemoSession(false);
   };
 
   const register = async (email: string, password: string, fullName: string, username: string) => {
-    setIsLoading(true);
-    try {
-      const authData = await registerUser(email, password, fullName, username);
-      if (authData.tokens) {
-        setTokens(authData.tokens);
-      }
-      if (authData.user) {
-        setUser(authData.user);
-      }
-      setIsDemoSession(false);
-    } finally {
-      setIsLoading(false);
+    const authData = await registerUser(email, password, fullName, username);
+    if (authData.tokens) {
+      setTokens(authData.tokens);
     }
+    if (authData.user) {
+      setUser(authData.user);
+    }
+    setIsDemoSession(false);
   };
 
   const loginAsGuest = useCallback((role: 'USER' | 'MENTOR' | 'ADMIN' = 'USER') => {

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PmoProvider, usePmo } from './context/PmoContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -171,13 +172,25 @@ function ControlledAccessGuard() {
   );
 }
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      retry: 1,
+    },
+  },
+});
+
 export function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ControlledAccessGuard />
-      </AuthProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider>
+        <AuthProvider>
+          <ControlledAccessGuard />
+        </AuthProvider>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 

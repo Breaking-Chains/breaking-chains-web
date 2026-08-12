@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { HabitChain } from '../types/chain';
 import type { AnalyticsSummary } from '../types/analytics';
 import type { LogStatus, PMOTriggerTag } from '../types/log';
@@ -39,63 +40,102 @@ interface PmoContextType {
 const PmoContext = createContext<PmoContextType | undefined>(undefined);
 
 export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [chain, setChain] = useState<HabitChain | null>(null);
-  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
-  const [counselNotes, setCounselNotes] = useState<CounselNote[]>([]);
-  const [chaserEffectActive, setChaserEffectActive] = useState<boolean>(false);
-  const [isApiLoading, setIsApiLoading] = useState<boolean>(false);
-  const [isOfflineDemo, setIsOfflineDemo] = useState<boolean>(false);
+  const queryClient = useQueryClient();
   const [activeSosSessionId, setActiveSosSessionId] = useState<string | null>(null);
-  const [apiError, setApiError] = useState<string | null>(null);
+  const [mutationError, setMutationError] = useState<string | null>(null);
+  const [isOfflineDemo] = useState<boolean>(false);
 
-  const clearApiError = () => setApiError(null);
+  const clearApiError = () => setMutationError(null);
 
-  const fetchLiveData = async () => {
-    setIsApiLoading(true);
-    setApiError(null);
-    try {
-      const chains = await getUserChains();
-      const activeChain = Array.isArray(chains)
-        ? chains.find((c) => c.strategy === 'PMO_RECOVERY') || chains[0]
-        : null;
+  // 1. Fetch user chains
+  const { 
+    data: chains, 
+    isLoading: isChainsLoading, 
+    error: chainsError 
+  } = useQuery({
+    queryKey: ['user-chains'],
+    queryFn: getUserChains,
+    enabled: !!localStorage.getItem('accessToken'),
+  });
 
-      setChain(activeChain || null);
-      setIsOfflineDemo(false);
+  // Calculate the active chain
+  const chain = Array.isArray(chains)
+    ? chains.find((c) => c.strategy === 'PMO_RECOVERY') || chains[0]
+    : null;
 
-      if (activeChain) {
-        try {
-          const [stats, notes] = await Promise.all([
-            getChainAnalytics(activeChain.id).catch(() => null),
-            getCounselNotes(activeChain.id).catch(() => []),
-          ]);
-          setAnalytics(stats);
-          setCounselNotes(Array.isArray(notes) ? notes : []);
-          setChaserEffectActive(stats?.chaserEffectActive || false);
-        } catch (err) {
-          console.warn('Failed to load chain analytics or counsel notes:', err);
-          setAnalytics(null);
-          setCounselNotes([]);
-          setChaserEffectActive(false);
-        }
-      } else {
-        setAnalytics(null);
-        setCounselNotes([]);
-        setChaserEffectActive(false);
+  // 2. Fetch Dependent chain stats/analytics
+  const { 
+    data: analyticsData, 
+    isLoading: isAnalyticsLoading 
+  } = useQuery({
+    queryKey: ['chain-analytics', chain?.id],
+    queryFn: () => getChainAnalytics(chain!.id),
+    enabled: !!chain?.id,
+  });
+  const analytics = analyticsData || null;
+
+  // 3. Fetch Dependent counsel notes
+  const { 
+    data: notesData, 
+    isLoading: isNotesLoading 
+  } = useQuery({
+    queryKey: ['counsel-notes', chain?.id],
+    queryFn: () => getCounselNotes(chain!.id),
+    enabled: !!chain?.id,
+  });
+  const counselNotes = Array.isArray(notesData) ? notesData : [];
+
+  // Derive loading and error states
+  const isApiLoading = isChainsLoading || isAnalyticsLoading || isNotesLoading;
+  const apiError = mutationError || (chainsError ? formatApiErrorMessage(chainsError) : null);
+  const chaserEffectActive = analytics?.chaserEffectActive || false;
+
+  // 4. Submit daily check-in mutation
+  const checkInMutation = useMutation({
+    mutationFn: async ({ status, triggerTag, notes }: { status: LogStatus; triggerTag?: PMOTriggerTag; notes?: string }) => {
+      if (!chain) {
+        throw new Error('No active habit chain found to check in.');
       }
-    } catch (err: unknown) {
-      setChain(null);
-      setAnalytics(null);
-      setCounselNotes([]);
-      setChaserEffectActive(false);
-      setApiError(formatApiErrorMessage(err));
-    } finally {
-      setIsApiLoading(false);
+      return submitCheckInLog(chain.id, status, triggerTag, notes);
+    },
+    onSuccess: () => {
+      // Invalidate both chains and stats queries to trigger background refetch
+      queryClient.invalidateQueries({ queryKey: ['user-chains'] });
+      queryClient.invalidateQueries({ queryKey: ['chain-analytics', chain?.id] });
+      setMutationError(null);
+    },
+    onError: (err) => {
+      setMutationError(formatApiErrorMessage(err));
+    },
+  });
+
+  const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
+    try {
+      await checkInMutation.mutateAsync({ status, triggerTag, notes });
+    } catch (err) {
+      throw err;
     }
   };
 
-  useEffect(() => {
-    fetchLiveData();
-  }, []);
+  // 5. Create custom chain mutation
+  const createChainMutation = useMutation({
+    mutationFn: async (options: {
+      title: string;
+      strategy: string;
+      privacyLevel: string;
+      triggerTags: string[];
+      intentStatement: string;
+    }) => {
+      return createPmoChain(options);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-chains'] });
+      setMutationError(null);
+    },
+    onError: (err) => {
+      setMutationError(formatApiErrorMessage(err));
+    },
+  });
 
   const createCustomChain = async (options: {
     title: string;
@@ -104,36 +144,14 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     triggerTags: string[];
     intentStatement: string;
   }) => {
-    setIsApiLoading(true);
-    setApiError(null);
     try {
-      const newChain = await createPmoChain(options);
-      setChain(newChain);
-      await fetchLiveData();
+      await createChainMutation.mutateAsync(options);
     } catch (err) {
-      const formatted = formatApiErrorMessage(err);
-      setApiError(formatted);
-      throw new Error(formatted);
-    } finally {
-      setIsApiLoading(false);
+      throw err;
     }
   };
 
-  const submitCheckIn = async (status: LogStatus, triggerTag?: PMOTriggerTag, notes?: string) => {
-    if (!chain) {
-      throw new Error('No active habit chain found to check in.');
-    }
-
-    try {
-      await submitCheckInLog(chain.id, status, triggerTag, notes);
-      await fetchLiveData();
-    } catch (err) {
-      const formatted = formatApiErrorMessage(err);
-      setApiError(formatted);
-      throw new Error(formatted);
-    }
-  };
-
+  // 6. SOS Sessions handlers
   const startSos = async (): Promise<string> => {
     if (!chain) {
       const demoId = `sos-${Date.now()}`;
@@ -163,6 +181,15 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveSosSessionId(null);
   };
 
+  // 7. Manual refresh method
+  const refreshData = async () => {
+    await Promise.all([
+      queryClient.refetchQueries({ queryKey: ['user-chains'] }),
+      chain?.id ? queryClient.refetchQueries({ queryKey: ['chain-analytics', chain.id] }) : Promise.resolve(),
+      chain?.id ? queryClient.refetchQueries({ queryKey: ['counsel-notes', chain.id] }) : Promise.resolve(),
+    ]);
+  };
+
   return (
     <PmoContext.Provider
       value={{
@@ -181,7 +208,7 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         startSos,
         completeSos,
         createCustomChain,
-        refreshData: fetchLiveData,
+        refreshData,
       }}
     >
       {children}
