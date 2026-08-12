@@ -23,8 +23,18 @@ export async function submitCheckInLog(
 }
 
 export async function getCheckInLogs(chainId: string): Promise<LogEntry[]> {
-  const res = await apiFetch<LogEntry[]>(`/api/v1/chains/${chainId}/logs`, {
+  const res = await apiFetch<any[]>(`/api/v1/chains/${chainId}/logs`, {
     method: 'GET',
   });
-  return Array.isArray(res) ? res : [];
+  const list = Array.isArray(res) ? res : [];
+  return list.map((log) => ({
+    id: log.id,
+    chainId: log.chainId,
+    userId: log.userId,
+    logTimestamp: log.logTimestamp,
+    status: log.status,
+    triggerTag: log.triggerTag,
+    notes: log.reflectionNote || '',
+    chaserEffectActive: log.chaserAlertActive || false,
+  }));
 }

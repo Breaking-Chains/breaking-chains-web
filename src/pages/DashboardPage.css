@@ -152,3 +152,81 @@
 .db-privacy-icon {
   @apply w-3.5 h-3.5 text-slate-400/80;
 }
+
+/* Selected Heatmap Cell */
+.db-heatmap-cell-selected {
+  @apply ring-2 ring-emerald-500 scale-110 shadow-xs z-10;
+}
+
+/* Day Details Log Section */
+.db-day-details-card {
+  @apply bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-3xl border border-slate-200/60 dark:border-slate-800/80 p-6 md:p-8 shadow-sm space-y-6 mt-6;
+}
+
+.db-day-details-header {
+  @apply flex items-center gap-2.5 pb-4 border-b border-slate-100 dark:border-slate-800;
+}
+
+.db-day-details-title {
+  @apply font-manrope text-base font-extrabold text-primary tracking-tight;
+}
+
+.db-day-details-empty {
+  @apply py-8 text-center text-slate-400 dark:text-slate-500 font-manrope text-xs font-semibold space-y-1;
+}
+
+.db-day-details-timeline {
+  @apply space-y-4 max-h-[400px] overflow-y-auto pr-1;
+}
+
+.db-day-log-card {
+  @apply p-5 rounded-2xl bg-slate-50/50 dark:bg-slate-950/45 border border-slate-200/60 dark:border-slate-800/60 shadow-2xs hover:shadow-xs transition-all duration-300 space-y-3;
+}
+
+.db-day-log-header {
+  @apply flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 pb-2.5 border-b border-slate-200/40 dark:border-slate-800/45;
+}
+
+.db-day-log-meta {
+  @apply flex items-center gap-2.5;
+}
+
+.db-day-log-time {
+  @apply font-mono text-xs font-bold text-slate-400 dark:text-slate-500;
+}
+
+.db-day-log-status {
+  @apply text-[9px] font-black px-2.5 py-0.5 rounded-full border uppercase tracking-wider;
+}
+
+.badge-relapse {
+  @apply bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-950/20 dark:text-rose-400 dark:border-rose-900/30;
+}
+
+.badge-sober {
+  @apply bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-950/20 dark:text-emerald-400 dark:border-emerald-900/30;
+}
+
+.badge-resisted {
+  @apply bg-teal-50 text-teal-600 border-teal-100 dark:bg-teal-950/20 dark:text-teal-400 dark:border-teal-900/30;
+}
+
+.badge-edged {
+  @apply bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-950/20 dark:text-amber-400 dark:border-amber-900/30;
+}
+
+.badge-empty {
+  @apply bg-slate-50 text-slate-400 border-slate-100 dark:bg-slate-950/20 dark:text-slate-500 dark:border-slate-800;
+}
+
+.db-day-log-trigger {
+  @apply text-[10px] font-mono font-black uppercase text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/20;
+}
+
+.db-day-log-notes {
+  @apply text-[12px] leading-relaxed text-slate-700 dark:text-slate-300 italic bg-white/70 dark:bg-slate-950/50 p-4 rounded-xl border border-slate-200/50 dark:border-slate-800/60 font-serif shadow-xs pl-5 border-l-4 border-l-emerald-500;
+}
+
+.db-day-log-no-notes {
+  @apply text-[11px] text-slate-400 dark:text-slate-500 italic font-medium;
+}

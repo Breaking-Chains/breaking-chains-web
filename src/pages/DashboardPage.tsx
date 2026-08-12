@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { usePmo } from '../context/PmoContext';
 import { useAuth } from '../context/AuthContext';
 import { getCheckInLogs } from '../services/logService';
@@ -7,6 +8,13 @@ import type { NavTab } from '../components/layout/BottomNav';
 import { Flame, Trophy, History, Lock, Calendar, AlertTriangle } from 'lucide-react';
 import dashboardContent from '../data/dashboardContent.json';
 import './DashboardPage.css';
+
+const getLocalDateString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 interface DashboardPageProps {
   onOpenCheckIn: () => void;
@@ -20,8 +28,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const { currentStreak, chain, analytics, isOfflineDemo, apiError } = usePmo();
   const { user } = useAuth();
   
-  const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [isLoadingLogs, setIsLoadingLogs] = useState(true);
+  const [selectedDayStr, setSelectedDayStr] = useState<string>(() => getLocalDateString(new Date()));
 
   // Generate demo logs for offline mode to simulate recovery history
   const generateDemoLogs = (): LogEntry[] => {
@@ -55,29 +62,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     return mockLogs;
   };
 
-  useEffect(() => {
-    if (!chain) {
-      setIsLoadingLogs(false);
-      return;
-    }
+  const { data: logsData, isLoading: isLoadingLogs } = useQuery({
+    queryKey: ['chain-logs', chain?.id],
+    queryFn: () => getCheckInLogs(chain!.id),
+    enabled: !!chain?.id && !isOfflineDemo,
+  });
 
-    if (isOfflineDemo) {
-      setLogs(generateDemoLogs());
-      setIsLoadingLogs(false);
-    } else {
-      setIsLoadingLogs(true);
-      getCheckInLogs(chain.id)
-        .then((data) => {
-          setLogs(data);
-        })
-        .catch((err) => {
-          console.error("Failed to load logs for dashboard:", err);
-        })
-        .finally(() => {
-          setIsLoadingLogs(false);
-        });
-    }
-  }, [chain, isOfflineDemo]);
+  const logs = isOfflineDemo ? generateDemoLogs() : (logsData || []);
 
   // Compute total relapses
   const totalRelapses = isOfflineDemo 
@@ -85,14 +76,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     : logs.filter((log) => log.status === 'SLIP_UP').length;
 
   const longestStreak = analytics?.longestStreak ?? chain?.longestStreak ?? (isOfflineDemo ? 128 : currentStreak);
-
-  // Generate a chronological 7x52 contribution grid representing the last 364 days
-  const getLocalDateString = (date: Date): string => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
 
   const generateHeatmapGrid = () => {
     const today = new Date();
@@ -265,11 +248,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                     colorClass = 'db-heatmap-color-edged';
                   }
                   
+                  const isSelected = cell.dateStr === selectedDayStr;
                   return (
                     <div
                       key={cell.dateStr}
-                      className={`db-heatmap-cell ${colorClass}`}
-                      title={`${cell.dateStr} (${cell.status || 'No Log'})`}
+                      className={`db-heatmap-cell ${colorClass} ${isSelected ? 'db-heatmap-cell-selected' : ''}`}
+                      title={`${cell.dateStr} (${cell.status || 'No Log'}) - Click for details`}
+                      onClick={() => setSelectedDayStr(cell.dateStr)}
                     />
                   );
                 })}
@@ -277,6 +262,82 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             ))}
           </div>
         </div>
+      </section>
+
+      {/* Day Details Log Section */}
+      <section className="db-day-details-card animate-fade-in">
+        <div className="db-day-details-header">
+          <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+          <h2 className="db-day-details-title">
+            Struggles & Reflections: {new Date(selectedDayStr).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+          </h2>
+        </div>
+
+        {(() => {
+          const dayLogs = logs.filter(log => {
+            const dateStr = getLocalDateString(new Date(log.logTimestamp));
+            return dateStr === selectedDayStr;
+          }).sort((a, b) => a.logTimestamp.localeCompare(b.logTimestamp));
+
+          if (dayLogs.length === 0) {
+            return (
+              <div className="db-day-details-empty">
+                <AlertTriangle className="w-8 h-8 text-slate-350 dark:text-slate-700 mx-auto mb-2" />
+                <p>No check-in logs submitted on this day.</p>
+                <span className="text-[10px] text-slate-450 dark:text-slate-500 font-medium">Use the "Log Daily Check-in" button to record details.</span>
+              </div>
+            );
+          }
+
+          return (
+            <div className="db-day-details-timeline">
+              {dayLogs.map((log) => {
+                const logTime = new Date(log.logTimestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                let badgeClass = 'badge-empty';
+                let statusText = log.status.replace('_', ' ');
+                if (log.status === 'SLIP_UP') {
+                  badgeClass = 'badge-relapse';
+                } else if (log.status === 'CLEAN') {
+                  badgeClass = 'badge-sober';
+                } else if (log.status === 'URGE_RESISTED') {
+                  badgeClass = 'badge-resisted';
+                  statusText = 'Urge Resisted';
+                } else if (log.status === 'PEEKED_EDGED') {
+                  badgeClass = 'badge-edged';
+                  statusText = 'Peeked / Edged';
+                }
+
+                return (
+                  <div key={log.id} className="db-day-log-card">
+                    <div className="db-day-log-header">
+                      <div className="db-day-log-meta">
+                        <span className="db-day-log-time">{logTime}</span>
+                        <span className={`db-day-log-status ${badgeClass}`}>
+                          {statusText}
+                        </span>
+                      </div>
+                      
+                      {log.triggerTag && (
+                        <span className="db-day-log-trigger">
+                          Trigger: {log.triggerTag.replace(/_/g, ' ')}
+                        </span>
+                      )}
+                    </div>
+
+                    {log.notes ? (
+                      <blockquote className="db-day-log-notes">
+                        "{log.notes}"
+                      </blockquote>
+                    ) : (
+                      <p className="db-day-log-no-notes">No reflection journal logged for this entry.</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })()}
       </section>
 
       {/* Privacy Shield lock banner */}

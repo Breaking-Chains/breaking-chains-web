@@ -187,6 +187,7 @@ export const PmoProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     await Promise.all([
       queryClient.refetchQueries({ queryKey: ['user-chains'] }),
       chain?.id ? queryClient.refetchQueries({ queryKey: ['chain-analytics', chain.id] }) : Promise.resolve(),
+      chain?.id ? queryClient.refetchQueries({ queryKey: ['chain-logs', chain.id] }) : Promise.resolve(),
       chain?.id ? queryClient.refetchQueries({ queryKey: ['counsel-notes', chain.id] }) : Promise.resolve(),
     ]);
   };
