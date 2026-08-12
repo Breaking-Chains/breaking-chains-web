@@ -1,0 +1,163 @@
+@reference "../../index.css";
+
+/* Daily Check-In Modal Layout */
+.cm-container {
+  @apply space-y-5 py-2;
+}
+
+.cm-error-banner {
+  @apply p-3.5 rounded-xl bg-rose-50 border border-rose-100 text-rose-600 text-xs font-bold text-center font-manrope flex items-center justify-center gap-1.5;
+}
+
+.cm-subtitle {
+  @apply text-xs text-slate-500 font-bold font-manrope leading-relaxed;
+}
+
+/* Status Cards Grid */
+.cm-status-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1;
+}
+
+.cm-status-btn {
+  @apply p-5 rounded-3xl border text-left flex items-start gap-4 transition-all duration-300 cursor-pointer hover:-translate-y-0.5 hover:shadow-xs outline-none;
+}
+
+.cm-status-btn-inactive {
+  @apply bg-white/70 backdrop-blur-md border-slate-200/60 text-slate-800 hover:border-slate-300;
+}
+
+.cm-status-btn-clean {
+  @apply bg-emerald-50/65 border-emerald-500 text-emerald-950 ring-4 ring-emerald-500/10 shadow-sm shadow-emerald-100;
+}
+
+.cm-status-btn-urge {
+  @apply bg-amber-50/65 border-amber-500 text-amber-950 ring-4 ring-amber-500/10 shadow-sm shadow-amber-100;
+}
+
+.cm-status-btn-peeked {
+  @apply bg-orange-50/65 border-orange-500 text-orange-950 ring-4 ring-orange-500/10 shadow-sm shadow-orange-100;
+}
+
+.cm-status-btn-slip {
+  @apply bg-rose-50/65 border-rose-500 text-rose-950 ring-4 ring-rose-500/10 shadow-sm shadow-rose-100;
+}
+
+/* Icon Box inside Card */
+.cm-icon-box {
+  @apply p-2.5 rounded-2xl border transition-colors flex items-center justify-center;
+}
+
+.cm-icon-box-inactive {
+  @apply bg-slate-50 border-slate-100 text-slate-400;
+}
+
+.cm-icon-box-clean {
+  @apply bg-emerald-500 text-white border-emerald-500;
+}
+
+.cm-icon-box-urge {
+  @apply bg-amber-500 text-white border-amber-500;
+}
+
+.cm-icon-box-peeked {
+  @apply bg-orange-500 text-white border-orange-500;
+}
+
+.cm-icon-box-slip {
+  @apply bg-rose-500 text-white border-rose-500;
+}
+
+.cm-status-title {
+  @apply text-base font-manrope font-extrabold text-slate-900;
+}
+
+.cm-status-desc {
+  @apply text-xs text-slate-500 font-semibold mt-0.5 leading-snug;
+}
+
+/* Primary Trigger Tags Section */
+.cm-trigger-section {
+  @apply space-y-3 pt-4 border-t border-slate-100;
+}
+
+.cm-trigger-label {
+  @apply block text-[10px] font-manrope font-extrabold text-slate-400 uppercase tracking-widest;
+}
+
+.cm-trigger-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-2.5;
+}
+
+.cm-trigger-btn {
+  @apply px-4 py-3 text-xs font-semibold rounded-2xl border text-left transition-all duration-200 cursor-pointer outline-none active:scale-[0.98] shadow-2xs;
+}
+
+.cm-trigger-btn-inactive {
+  @apply bg-white border-slate-200/80 text-slate-600 hover:border-slate-300 hover:bg-slate-50/30;
+}
+
+.cm-trigger-btn-active {
+  @apply bg-emerald-50 text-secondary border-emerald-500 font-bold shadow-xs;
+}
+
+/* Bottom Action Confirm Button */
+.cm-confirm-btn {
+  @apply w-full mt-4 py-4 font-manrope font-extrabold rounded-2xl shadow-md transition-all active:scale-[0.98] outline-none;
+}
+
+.cm-confirm-btn-primary {
+  @apply bg-secondary text-white hover:bg-emerald-700 shadow-emerald-500/10 hover:shadow-lg;
+}
+
+.cm-confirm-btn-danger {
+  @apply bg-rose-600 text-white hover:bg-rose-700 shadow-rose-500/10 hover:shadow-lg;
+}
+
+/* Salat al-Tawbah Post-Slip Layout */
+.cm-post-slip-wrapper {
+  @apply space-y-5 text-center py-2;
+}
+
+.cm-post-slip-verse-card {
+  @apply p-6 bg-gradient-to-br from-amber-50/50 to-white rounded-3xl border-2 border-amber-300/40 shadow-sm space-y-3.5;
+}
+
+.cm-post-slip-verse-icon-box {
+  @apply w-12 h-12 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600 shadow-xs;
+}
+
+.cm-post-slip-verse-title {
+  @apply text-xs font-manrope font-extrabold text-amber-800 uppercase tracking-wider;
+}
+
+.cm-post-slip-verse-text {
+  @apply text-sm text-amber-950 font-serif leading-relaxed italic;
+}
+
+.cm-post-slip-verse-ref {
+  @apply block font-sans not-italic text-[10px] text-amber-600/90 mt-1.5 font-bold;
+}
+
+.cm-post-slip-steps-card {
+  @apply p-6 bg-slate-900 text-white rounded-3xl border border-slate-800 text-left space-y-4 shadow-md;
+}
+
+.cm-post-slip-steps-title {
+  @apply text-xs font-manrope font-extrabold text-emerald-400 uppercase tracking-wider pb-2 border-b border-white/5;
+}
+
+.cm-post-slip-steps-list {
+  @apply space-y-3;
+}
+
+.cm-post-slip-step-item {
+  @apply flex items-start gap-3 text-xs text-slate-200 font-semibold leading-relaxed;
+}
+
+.cm-post-slip-step-bullet {
+  @apply w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5;
+}
+
+.cm-post-slip-recommit-btn {
+  @apply w-full py-4 bg-secondary text-white hover:bg-emerald-700 font-manrope font-extrabold rounded-2xl shadow-md shadow-emerald-500/10 transition-all active:scale-[0.98] outline-none flex items-center justify-center gap-2;
+}
