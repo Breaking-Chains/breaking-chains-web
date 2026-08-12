@@ -17,7 +17,7 @@ interface DashboardPageProps {
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   onTabChange,
 }) => {
-  const { currentStreak, chain, isOfflineDemo, apiError } = usePmo();
+  const { currentStreak, chain, analytics, isOfflineDemo, apiError } = usePmo();
   const { user } = useAuth();
   
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -84,7 +84,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     ? 3 
     : logs.filter((log) => log.status === 'SLIP_UP').length;
 
-  const longestStreak = chain?.longestStreak ?? (isOfflineDemo ? 128 : currentStreak);
+  const longestStreak = analytics?.longestStreak ?? chain?.longestStreak ?? (isOfflineDemo ? 128 : currentStreak);
 
   // Generate a chronological 7x52 contribution grid representing the last 364 days
   const getLocalDateString = (date: Date): string => {
