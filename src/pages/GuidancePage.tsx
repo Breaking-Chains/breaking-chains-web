@@ -295,31 +295,31 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
   return (
     <div className="space-y-6 animate-fade-in">
       {errorMsg && (
-        <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
+        <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
           {errorMsg}
         </div>
       )}
 
       {connectErrorMsg && (
-        <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
+        <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
           {connectErrorMsg}
         </div>
       )}
 
       {connectSuccessMsg && (
-        <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/80 border border-emerald-250 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
+        <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
           <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           {connectSuccessMsg}
         </div>
       )}
 
       {role === 'USER' && (
-        <div className="flex items-center gap-1.5 p-1 bg-slate-150/30 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 max-w-xs sm:max-w-sm">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100/30 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-800/50 max-w-xs sm:max-w-sm">
           <button
             onClick={() => setActiveTab('my-mentor')}
             className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'my-mentor'
-                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-800/50'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
             }`}
           >
@@ -329,7 +329,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             onClick={() => setActiveTab('directory')}
             className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'directory'
-                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-850/50'
+                ? 'bg-white dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 shadow-xs border border-slate-200/40 dark:border-slate-800/50'
                 : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
             }`}
           >
@@ -340,180 +340,227 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
 
       {/* SECTION 1: My Mentor */}
       {role === 'USER' && activeTab === 'my-mentor' && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 px-1">
-            <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-              My Mentor
-            </h3>
-          </div>          {activeMentorship ? (
-            <div className="space-y-4">
-              {/* Grace Period Pending Termination Alert Banner */}
-              {activeMentorship.status === 'PENDING_TERMINATION' && (
-                <div className="p-4 rounded-2xl bg-amber-50/40 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 text-xs text-amber-850 dark:text-amber-300 font-medium space-y-3 shadow-xs animate-pulse">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm">⏳</span>
-                      <div>
-                        <p className="font-bold uppercase tracking-wider text-[10px] text-amber-700 dark:text-amber-400">Termination Pending</p>
-                        <p className="text-[10px] text-slate-605 dark:text-slate-400 leading-tight">
-                          Your connection with {activeMentorship.partnerFullName} is scheduled to end in {(() => {
-                            const requestDate = new Date(activeMentorship.terminationRequestedAt || Date.now());
-                            const diffTime = (requestDate.getTime() + 7 * 24 * 60 * 60 * 1000) - Date.now();
-                            const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
-                            return `${diffDays} day${diffDays === 1 ? '' : 's'}`;
-                          })()}. You remain connected and under mentor care until then.
-                        </p>
+        <div className="space-y-6 animate-fade-in">
+          {activeMentorship ? (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+              
+              {/* Left Column: Mentor Profile Card */}
+              <div className="lg:col-span-1 space-y-6">
+                <Card variant="glass" className="overflow-hidden border-slate-200/60 dark:border-slate-800/80 relative flex flex-col p-6 space-y-6 shadow-sm">
+                  {/* Profile Card Header with Avatar & Online Dot */}
+                  <div className="flex flex-col items-center text-center space-y-4 pt-4">
+                    <div className="relative">
+                      <div className="w-24 h-24 rounded-full bg-emerald-50/50 dark:bg-emerald-950/40 border border-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-4xl font-extrabold shadow-sm select-none">
+                        {(activeMentorship.partnerFullName || 'M')[0]}
                       </div>
+                      <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 rounded-full border-4 border-white dark:border-slate-900 animate-pulse shadow-sm" />
                     </div>
-                    <Button
-                      variant="emerald"
-                      size="sm"
-                      onClick={() => setIsCancelSurveyOpen(true)}
-                      className="text-[10px] font-black uppercase tracking-wider rounded-xl cursor-pointer"
-                    >
-                      Cancel Disconnect
-                    </Button>
-                  </div>
-                </div>
-              )}
 
-              {/* Connected Mentor Info Card */}
-              <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-250/20 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-base font-black uppercase shrink-0">
-                      {(activeMentorship.partnerFullName || 'M')[0]}
-                    </div>
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                          {activeMentorship.partnerFullName || 'Verified Mentor'}
-                        </h4>
-                        <span className="text-[8px] font-bold py-0.5 px-2 rounded-full bg-emerald-55 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-transparent uppercase tracking-wider">
-                          {activeMentorship.status === 'PENDING_TERMINATION' ? 'Transition' : 'Active Guide'}
-                        </span>
-                      </div>
+                      <h4 className="font-manrope text-base font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                        {activeMentorship.partnerFullName || 'Verified Mentor'}
+                      </h4>
                       {(() => {
                         const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
                         return (
-                          <p className="text-[10px] text-emerald-600 dark:text-emerald-450 font-extrabold uppercase tracking-wide">
-                            {details?.specialization || 'Spiritual Counselor & Tazkiyah Guide'}
-                          </p>
+                          <div className="space-y-2">
+                            <span className="inline-block text-[9px] font-black uppercase tracking-widest text-emerald-700 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/40 px-2.5 py-0.5 rounded-full border border-emerald-500/10">
+                              {activeMentorship.status === 'PENDING_TERMINATION' ? 'Transitioning' : 'Active Guide'}
+                            </span>
+                            <p className="text-[10px] text-emerald-600 dark:text-emerald-450 font-black uppercase tracking-wide px-4">
+                              {details?.specialization || 'Spiritual Counselor & Tazkiyah Guide'}
+                            </p>
+                          </div>
                         );
                       })()}
-                      <p className="text-[10px] text-slate-500 dark:text-slate-455 max-w-md italic">
-                        "Your recovery and spiritual journey is kept strictly confidential."
-                      </p>
                     </div>
                   </div>
 
-                  {/* Minimal Label Actions */}
-                  <div className="flex items-center gap-3 self-stretch md:self-auto justify-end border-t md:border-t-0 pt-4 md:pt-0 border-slate-100 dark:border-slate-800/40">
-                    <button
-                      onClick={() => setIsNasihaOpen(true)}
-                      className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-350 hover:text-emerald-650 dark:hover:text-emerald-400 bg-slate-100/50 dark:bg-slate-900 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 rounded-xl transition-all duration-200 border border-slate-200/50 dark:border-slate-850 cursor-pointer"
-                    >
-                      ✵ Nasiha
-                    </button>
+                  {/* Bio & Information List */}
+                  {(() => {
+                    const details = verifiedMentors.find(m => m.userId === activeMentorship.partnerUserId);
+                    return (
+                      <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800/40 text-xs">
+                        {details?.organization && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Affiliation</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-350">{details.organization}</span>
+                          </div>
+                        )}
+                        {details?.yearsOfExperience !== undefined && (
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-400 font-bold uppercase text-[9px] tracking-wider">Experience</span>
+                            <span className="font-bold text-slate-700 dark:text-slate-350">{details.yearsOfExperience} Years</span>
+                          </div>
+                        )}
+                        <div className="bg-slate-50/50 dark:bg-slate-950/40 p-4 rounded-xl border border-slate-200/50 dark:border-slate-850/50 text-[11px] text-slate-500 dark:text-slate-405 italic leading-relaxed text-center font-serif">
+                          "Your recovery and spiritual journey is kept strictly confidential."
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Actions Grid */}
+                  <div className="grid grid-cols-2 gap-3 pt-2">
                     <button
                       onClick={() => setIsChatOpen(true)}
-                      className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-750 rounded-xl shadow-md shadow-emerald-500/10 transition-all duration-200 cursor-pointer"
+                      className="flex items-center justify-center gap-1.5 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md shadow-emerald-500/10 transition-all cursor-pointer"
                     >
                       💬 Chat
                     </button>
                     {activeMentorship.status === 'ACCEPTED' && (
                       <button
                         onClick={() => setIsExitSurveyOpen(true)}
-                        className="flex-1 md:flex-none text-center px-4 py-2 text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400 hover:text-rose-650 bg-rose-50/20 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition-all duration-200 border border-rose-200/50 dark:border-rose-850/50 cursor-pointer"
+                        className="flex items-center justify-center gap-1.5 px-4 py-3 text-[10px] font-black uppercase tracking-wider text-rose-750 dark:text-rose-400 hover:text-white hover:bg-rose-600 rounded-xl transition-all border border-rose-200/60 dark:border-rose-800/80 cursor-pointer"
                       >
-                        ✕ Disconnect
+                        ✕ Leave
                       </button>
                     )}
+                  </div>
+                </Card>
+              </div>
+
+              {/* Right Columns (Span 2): Nasiha Advisory Feed & Guidance Journey */}
+              <div className="lg:col-span-2 space-y-6">
+                <Card variant="glass" className="p-6 md:p-8 border-slate-200/60 dark:border-slate-800/80 space-y-6">
+                  <div className="flex justify-between items-center pb-4 border-b border-slate-100 dark:border-slate-800/60">
+                    <div className="flex items-center gap-2.5">
+                      <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                      <div>
+                        <h3 className="font-manrope text-base font-extrabold text-primary tracking-tight">
+                          Spiritual Counsel (Nasiha)
+                        </h3>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Advices & reminders from your guide</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    {notesList.length === 0 ? (
+                      <div className="text-center py-12 space-y-3">
+                        <span className="text-3xl block select-none">📖</span>
+                        <p className="text-xs text-slate-400 dark:text-slate-500 font-medium italic">
+                          No Nasiha counsel notes posted yet by your mentor.
+                        </p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-600 max-w-xs mx-auto">
+                          Whenever your mentor shares targeted advisories, reflections, or homework assignments, they will appear here.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="relative pl-6 border-l-2 border-emerald-500/20 dark:border-emerald-500/10 space-y-6 py-2">
+                        {notesList.map((note) => (
+                          <div key={note.id} className="relative space-y-2 group">
+                            {/* Timeline Bullet node */}
+                            <div className="absolute -left-[31px] top-1.5 w-3 h-3 rounded-full bg-emerald-500 border-2 border-white dark:border-slate-900 group-hover:scale-125 transition-transform duration-200 shadow-sm" />
+                            
+                            <div className="flex items-center justify-between text-[10px] text-slate-400 font-mono font-bold uppercase tracking-wider">
+                              <span className="text-slate-650 dark:text-slate-400">{activeMentorship.partnerFullName || 'Spiritual Mentor'}</span>
+                              <span>{new Date(note.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
+                            </div>
+                            
+                            <div className="p-5 rounded-2xl bg-amber-50/20 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-500/5 text-xs text-slate-800 dark:text-slate-200 leading-relaxed italic font-serif shadow-xs">
+                              "{note.counselText}"
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
+            </div>
+          ) : (
+            /* Unconnected Mentor Card */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+              {/* Connect Side */}
+              <Card variant="glass" className="p-6 md:p-8 border-slate-200/60 dark:border-slate-800/80 flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400 text-lg shadow-2xs select-none">
+                    🔑
+                  </div>
+                  <div className="space-y-1">
+                    <h4 className="font-manrope text-base font-extrabold text-primary tracking-tight uppercase">Connect with a Mentor</h4>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 leading-normal font-medium">
+                      Enter the unique Invite Code provided by your assigned spiritual mentor or recovery coach to establish a connection.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleConnectMentor} className="space-y-3">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="e.g. MENTOR-BC-7890"
+                      value={inviteCodeInput}
+                      onChange={(e) => setInviteCodeInput(e.target.value.toUpperCase())}
+                      className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs font-bold font-mono focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-slate-200 shadow-2xs uppercase"
+                      required
+                    />
+                  </div>
+                  <Button
+                    type="submit"
+                    variant="emerald"
+                    className="w-full text-xs font-black uppercase tracking-wider rounded-xl cursor-pointer py-2.5 shadow-md shadow-emerald-500/10"
+                  >
+                    Establish Connection
+                  </Button>
+                </form>
+              </Card>
+
+              {/* Benefits/Why side */}
+              <Card variant="glass" className="p-6 md:p-8 border-slate-200/60 dark:border-slate-800/80 space-y-6 bg-emerald-500/[0.02] dark:bg-emerald-500/[0.01]">
+                <h4 className="font-manrope text-xs font-extrabold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
+                  ✵ Why Spiritual Mentorship?
+                </h4>
+                
+                <div className="space-y-4">
+                  <div className="flex gap-3">
+                    <span className="text-base select-none shrink-0">🛡️</span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">100% Confidentiality</strong>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                        All logs, reflections, and chats are encrypted and only accessible by your direct guide.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <span className="text-base select-none shrink-0">✨</span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">Tazkiyah Counseling</strong>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                        Combine neuroscience recovery with heart purification guidance to overcome underlying spiritual root causes.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <span className="text-base select-none shrink-0">🤝</span>
+                    <div className="space-y-0.5">
+                      <strong className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">Active Accountability</strong>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                        Your mentor monitors check-ins and offers targeted, structured advisories during chaser effect peaks.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </Card>
             </div>
-          ) : (
-            /* Unconnected Mentor Card */
-            <Card variant="glass" className="p-6 text-center space-y-3 border-slate-200 dark:border-slate-900 bg-slate-100/20 dark:bg-slate-950/20">
-              <Users className="w-8 h-8 text-slate-400 mx-auto" />
-              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">No Active Mentor Connected</h4>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto font-medium">
-                Confidential one-on-one mentorship is available. Browse the Community Mentors directory below and connect using their code to begin.
-              </p>
-            </Card>
           )}
-        </div>
-      )}
-
-      {role === 'MENTOR' && (
-        <div className="space-y-6">
-          <Card variant="glass" className="p-6 border-emerald-500/20 dark:border-emerald-500/10 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-black text-lg shadow-xs">
-                👤
-              </div>
-              <div>
-                <h3 className="text-base font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Verified Advisor Space
-                </h3>
-                <p className="text-xs text-slate-700 dark:text-slate-400 font-medium">
-                  Welcome to your counsel terminal, {user?.fullName || 'Mentor'}.
-                </p>
-              </div>
-            </div>
-
-            <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-200/50 dark:border-slate-850/50 space-y-3">
-              <div className="text-xs space-y-1.5">
-                <p className="text-slate-850 dark:text-slate-205">
-                  <strong>Specialization:</strong> {myProfile?.specialization || 'Islamic Spiritual Counsel (Tazkiyah)'}
-                </p>
-                <p className="text-slate-850 dark:text-slate-205">
-                  <strong>Affiliation:</strong> {myProfile?.organization || 'Independent spiritual counselor'}
-                </p>
-                <p className="text-slate-850 dark:text-slate-205">
-                  <strong>Experience:</strong> {myProfile?.yearsOfExperience || 0} Years
-                </p>
-                {myProfile?.bio && (
-                  <p className="text-slate-700 dark:text-slate-300 italic pt-2 border-t border-slate-200/60 dark:border-slate-800/40 leading-relaxed font-serif">
-                    "{myProfile.bio}"
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2">
-              <div className="space-y-1">
-                <span className="text-[10px] text-slate-700 dark:text-slate-500 block uppercase font-bold tracking-wider">Share Invite Code with Mentees:</span>
-                <code className="text-sm font-mono font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-500/20 block w-fit">
-                  {myProfile?.inviteCode || 'MENTOR-BC-7890'}
-                </code>
-              </div>
-
-              <Button
-                variant="emerald"
-                onClick={handleOpenMentees}
-                className="flex items-center gap-1.5 text-xs font-bold rounded-xl shadow-md cursor-pointer self-start sm:self-auto"
-              >
-                <Users className="w-4 h-4" /> Go to Mentee Roster
-              </Button>
-            </div>
-          </Card>
         </div>
       )}
 
       {/* SECTION 2: Community Mentors Directory */}
       {role === 'USER' && activeTab === 'directory' && (
-        <Card variant="glass" className="p-4 space-y-4">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1 border-b border-slate-100 dark:border-slate-900/60">
+        <Card variant="glass" className="p-6 border-slate-200/60 dark:border-slate-800/80 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800/60">
             <div className="flex items-center gap-2">
               <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
               <div>
-                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                  Community Mentors
+                <h3 className="font-manrope text-base font-extrabold text-primary tracking-tight">
+                  Community Mentors Directory
                 </h3>
-                <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium">Spiritual Guides & Recovery Coaches</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Spiritual Guides & Recovery Coaches</p>
               </div>
             </div>
 
@@ -522,7 +569,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 variant="subtle"
                 size="sm"
                 onClick={() => setIsConnectModalOpen(true)}
-                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-semibold"
+                className="flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 cursor-pointer rounded-xl font-bold bg-amber-50/50 dark:bg-amber-950/20 px-3 py-1.5 border border-amber-500/10"
               >
                 <LinkIcon className="w-3.5 h-3.5" /> Connect via Code
               </Button>
@@ -530,16 +577,14 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
 
           {isLoadingMentors ? (
-            <div className="text-center py-4 text-xs text-slate-500">Loading verified mentors...</div>
+            <div className="text-center py-12 text-xs text-slate-500">Loading verified mentors...</div>
           ) : mentorList.length === 0 ? (
-            <div className="p-4 rounded-xl bg-slate-100/60 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-850 text-center space-y-2">
-              <Users className="w-6 h-6 text-slate-600 mx-auto" />
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                No verified mentors listed yet.
-              </p>
+            <div className="p-8 rounded-2xl bg-slate-50/50 dark:bg-slate-950/40 border border-slate-200/50 dark:border-slate-800/60 text-center space-y-3">
+              <Users className="w-8 h-8 text-slate-400 mx-auto" />
+              <p className="text-xs text-slate-400 italic">No verified mentors listed yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {mentorList.map((mentor) => {
                 const isCurrentMentor = activeMentorship && (activeMentorship.partnerUserId === mentor.userId || activeMentorship.inviteCode === mentor.inviteCode);
                 const hasAnyMentor = !!activeMentorship;
@@ -547,29 +592,43 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
                 return (
                   <div
                     key={mentor.id}
-                    className="p-3.5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-850 space-y-2 text-xs shadow-xs hover:shadow-sm transition-shadow duration-200"
+                    className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/80 space-y-4 text-xs shadow-xs hover:shadow-sm transition-all duration-200 flex flex-col justify-between"
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-1.5">
-                        <strong className="text-slate-900 dark:text-slate-100 text-xs font-black">{mentor.fullName}</strong>
-                        <span className="text-[8px] tracking-wider font-semibold py-0.5 px-1.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-400">
-                          VERIFIED
-                        </span>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <strong className="text-slate-900 dark:text-white text-xs font-black uppercase tracking-wider">{mentor.fullName}</strong>
+                          <span className="text-[8px] font-black py-0.5 px-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-500/10 uppercase tracking-widest animate-pulse">
+                            VERIFIED
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-mono font-bold">{mentor.yearsOfExperience} Yrs Exp</span>
                       </div>
-                      <span className="text-[9px] text-slate-700 dark:text-slate-450 font-mono font-bold">{mentor.yearsOfExperience} yrs exp</span>
+                      
+                      <p className="text-[10px] text-emerald-600 dark:text-emerald-450 font-black uppercase tracking-wide">
+                        {mentor.specialization}
+                      </p>
+                      
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold leading-normal">
+                        {mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}
+                      </p>
+                      
+                      {mentor.bio && (
+                        <p className="text-[11px] text-slate-650 dark:text-slate-350 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-3">
+                          "{mentor.bio}"
+                        </p>
+                      )}
                     </div>
-                    <p className="text-[10px] text-emerald-700 dark:text-emerald-450 font-extrabold uppercase tracking-wide">{mentor.specialization}</p>
-                    <p className="text-[10px] text-slate-700 dark:text-slate-440 font-medium leading-tight">{mentor.qualification} {mentor.organization ? `(${mentor.organization})` : ''}</p>
-                    <p className="text-[11px] text-slate-800 dark:text-slate-300 italic font-serif leading-relaxed border-t border-slate-100 dark:border-slate-800/40 pt-1.5 line-clamp-2">"{mentor.bio}"</p>
-                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
-                      <span className="text-[10px] text-slate-500 font-mono">Code: {mentor.inviteCode || 'N/A'}</span>
+
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-400 font-mono font-bold">Code: <span className="font-extrabold text-amber-700 dark:text-amber-400 uppercase">{mentor.inviteCode || 'N/A'}</span></span>
                       {role === 'USER' && (
                         <Button
                           variant={isCurrentMentor ? "outline" : "emerald"}
                           size="sm"
                           disabled={connectingMentorId === mentor.id || (hasAnyMentor && !isCurrentMentor)}
                           onClick={() => handleDirectConnect(mentor)}
-                          className="cursor-pointer font-bold text-[10px] rounded-lg px-2.5 py-1"
+                          className="cursor-pointer font-black text-[9px] uppercase tracking-wider rounded-lg px-3 py-1.5 shadow-2xs"
                         >
                           {connectingMentorId === mentor.id 
                             ? 'Connecting...' 
@@ -585,6 +644,77 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
             </div>
           )}
         </Card>
+      )}
+
+      {role === 'MENTOR' && (
+        <div className="space-y-6 animate-fade-in">
+          <Card variant="glass" className="p-6 md:p-8 border-slate-200/60 dark:border-slate-800/80 space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/60">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-500/40 flex items-center justify-center text-emerald-600 dark:text-emerald-450 text-xl shadow-2xs select-none">
+                  🛡️
+                </div>
+                <div>
+                  <h3 className="font-manrope text-base font-extrabold text-primary tracking-tight uppercase">
+                    Verified Advisor space
+                  </h3>
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                    Welcome to your counsel terminal, {user?.fullName || 'Mentor'}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                variant="emerald"
+                onClick={handleOpenMentees}
+                className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider rounded-xl shadow-md cursor-pointer self-start sm:self-auto px-4 py-2.5"
+              >
+                <Users className="w-4 h-4" /> Go to Mentee Roster
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Counsel Qualifications</h4>
+                <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200/50 dark:border-slate-800 space-y-3.5 text-xs">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-semibold">Specialization</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200 text-right">{myProfile?.specialization || 'Islamic Spiritual Counsel (Tazkiyah)'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-semibold">Affiliation</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200 text-right">{myProfile?.organization || 'Independent counselor'}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 font-semibold">Experience</span>
+                    <span className="font-bold text-slate-700 dark:text-slate-200">{myProfile?.yearsOfExperience || 0} Years</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Connection Sharing</h4>
+                <div className="p-5 rounded-2xl bg-amber-50/20 dark:bg-amber-950/10 border border-amber-500/15 dark:border-amber-500/5 space-y-3 flex flex-col justify-between h-[115px]">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal font-medium">
+                    Share this unique invite code with your students/mentees so they can request active guidance under your care.
+                  </p>
+                  <code className="text-sm font-mono font-black text-amber-700 dark:text-amber-400 bg-white dark:bg-slate-950 px-3.5 py-1.5 rounded-xl border border-amber-500/20 block w-fit shadow-2xs uppercase tracking-wider select-all">
+                    {myProfile?.inviteCode || 'MENTOR-BC-7890'}
+                  </code>
+                </div>
+              </div>
+            </div>
+
+            {myProfile?.bio && (
+              <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800/60 text-xs">
+                <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Advisor Biography</h4>
+                <p className="text-slate-700 dark:text-slate-300 italic leading-relaxed font-serif pl-5 border-l-4 border-l-emerald-500 bg-slate-50/50 dark:bg-slate-950/40 p-4 rounded-xl">
+                  "{myProfile.bio}"
+                </p>
+              </div>
+            )}
+          </Card>
+        </div>
       )}
 
       <BecomeMentorModal
@@ -609,13 +739,13 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           />
 
           {connectErrorMsg && (
-            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
+            <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-medium text-center animate-fade-in">
               {connectErrorMsg}
             </div>
           )}
 
           {connectSuccessMsg && (
-            <div className="p-3 rounded-xl bg-emerald-55/60 dark:bg-emerald-950/80 border border-emerald-250 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
+            <div className="p-3 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/80 border border-emerald-200 dark:border-emerald-700 text-emerald-800 dark:text-emerald-300 text-xs font-medium text-center flex items-center justify-center gap-1.5 animate-fade-in">
               <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               {connectSuccessMsg}
             </div>
@@ -782,7 +912,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
 
           {connectErrorMsg && (
-            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
+            <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
               {connectErrorMsg}
             </div>
           )}
@@ -800,7 +930,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
               type="submit"
               variant="danger"
               disabled={isSubmittingExit}
-              className="flex-1 text-xs py-2.5 bg-rose-600 hover:bg-rose-750 text-white rounded-xl cursor-pointer"
+              className="flex-1 text-xs py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl cursor-pointer"
             >
               {isSubmittingExit ? 'Submitting...' : 'Confirm Disconnect'}
             </Button>
@@ -815,7 +945,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
         title="We're glad you're staying!"
       >
         <form onSubmit={handleConfirmCancelDisconnect} className="space-y-4">
-          <p className="text-xs text-slate-655 dark:text-slate-350 leading-relaxed">
+          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
             Please let us know what helped change your mind about ending this connection.
           </p>
 
@@ -864,7 +994,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
           </div>
 
           {connectErrorMsg && (
-            <div className="p-3 rounded-xl bg-rose-55/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-850 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
+            <div className="p-3 rounded-xl bg-rose-50/60 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center animate-fade-in">
               {connectErrorMsg}
             </div>
           )}
@@ -882,7 +1012,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage })
               type="submit"
               variant="emerald"
               disabled={isSubmittingCancel}
-              className="flex-1 text-xs py-2.5 bg-emerald-650 hover:bg-emerald-750 text-white rounded-xl cursor-pointer"
+              className="flex-1 text-xs py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl cursor-pointer"
             >
               {isSubmittingCancel ? 'Saving...' : 'Keep Connection'}
             </Button>
