@@ -15,7 +15,6 @@ interface DashboardPageProps {
 }
 
 export const DashboardPage: React.FC<DashboardPageProps> = ({
-  onOpenCheckIn,
   onTabChange,
 }) => {
   const { currentStreak, chain, isOfflineDemo, apiError } = usePmo();
@@ -168,14 +167,6 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
           </p>
         </div>
         <div className="db-actions-container">
-          <button
-            onClick={onOpenCheckIn}
-            className="db-btn-relapse"
-          >
-            <AlertTriangle className="w-4 h-4" />
-            <span>{header.btnRelapse}</span>
-          </button>
-          
           <button
             onClick={() => onTabChange && onTabChange('meetings')}
             className="db-btn-meeting animate-pulse-glow"
