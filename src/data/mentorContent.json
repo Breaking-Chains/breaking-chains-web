@@ -1,0 +1,46 @@
+{
+  "header": {
+    "shieldText": "🛡️ Encrypted Advisor Space",
+    "title": "Mentees Roster & Counsel Terminal",
+    "subtitle": "Review your recoverees' daily sobriety wudu logs, post target Nasiha advice guidelines, and review pending counsel meeting slots."
+  },
+  "disclaimer": "Mentor-Mentee communications are encrypted and confidential.",
+  "roster": {
+    "title": "Assigned Mentees",
+    "activeBadge": "Active Mentees",
+    "searchPlaceholder": "Search recoverees by name...",
+    "emptyMessage": "No connected recoverees found.",
+    "checkinPrefix": "Check-in:"
+  },
+  "invites": {
+    "title": "Connection Invites",
+    "pendingBadge": "Pending Invites",
+    "emptyMessage": "No pending invite code connections.",
+    "acceptTooltip": "Accept request",
+    "declineTooltip": "Decline request"
+  },
+  "detail": {
+    "emptyState": "Select a mentee from the roster to view their progress details.",
+    "milestoneLabel": "Goal: 90 Days Milestone",
+    "heatmapTitle": "Check-in History & Logs",
+    "legendMissed": "Missed",
+    "legendSober": "Sober",
+    "legendSlip": "Slip",
+    "actions": {
+      "message": "Message",
+      "nasiha": "Nasiha",
+      "analytics": "Analytics",
+      "email": "Send Email Alert"
+    }
+  },
+  "meetings": {
+    "title": "Meeting Requests",
+    "pendingBadge": "Pending Requests",
+    "emptyMessage": "No pending video meeting requests.",
+    "btnApprove": "Approve Call",
+    "btnReschedule": "Reschedule"
+  },
+  "terminal": {
+    "workspaceTitle": "Care Workspace:"
+  }
+}
