@@ -392,79 +392,7 @@ export const MentorDashboardPage: React.FC = () => {
 
             </div>
 
-            {/* Progress Goal Linear Bar */}
-            <div className="space-y-2 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-xs">
-              <div className="flex justify-between text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <span>{mentorContent.detail.milestoneLabel}</span>
-                <span>{selectedMentee.streak}/90 Days ({Math.min(100, Math.round((selectedMentee.streak / 90) * 100)) || 0}%)</span>
-              </div>
-              <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-200/20">
-                <div 
-                  className="bg-emerald-500 dark:bg-emerald-450 h-full rounded-full transition-all duration-500" 
-                  style={{ width: `${Math.min(100, (selectedMentee.streak / 90) * 100)}%` }}
-                />
-              </div>
-            </div>
 
-            {/* Check-in History Heatmap */}
-            <div className="space-y-3">
-              <h3 className="text-[10px] font-black text-slate-450 dark:text-slate-505 uppercase tracking-widest flex items-center gap-1.5 select-none text-left">
-                <ClipboardList className="w-4 h-4 text-emerald-600" />
-                <span>{mentorContent.detail.heatmapTitle}</span>
-              </h3>
-
-              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200/85 dark:border-slate-800/85 shadow-xs">
-                <div className="flex gap-2 overflow-x-auto pb-1 max-w-full">
-                  {/* Render 4 column stacks representing the last 4 weeks */}
-                  {Array.from({ length: 4 }).map((_, colIdx) => (
-                    <div key={colIdx} className="flex flex-col gap-1.5 shrink-0">
-                      {Array.from({ length: 7 }).map((_, rowIdx) => {
-                        const dayNum = (colIdx * 7) + rowIdx;
-                        let cellClass = "bg-emerald-500"; // Default Solid Green
-                        
-                        // Mocking missed status for visual parity
-                        const isSlipUp = selectedMentee.lastStatus === 'SLIP_UP' && colIdx === 3 && rowIdx === 6;
-                        if (isSlipUp) {
-                          cellClass = "bg-rose-500";
-                        } else if ((colIdx === 0 && rowIdx === 3) || (colIdx === 2 && rowIdx === 5)) {
-                          cellClass = "bg-slate-200 dark:bg-slate-800"; // Missed check-in
-                        } else if (dayNum % 3 === 0) {
-                          cellClass = "bg-emerald-500/40"; // Light clean green
-                        } else if (colIdx === 3 && rowIdx === 4) {
-                          cellClass = "bg-white dark:bg-slate-900 border-2 border-emerald-500"; // Selected / Today
-                        }
-                        
-                        return (
-                          <div
-                            key={rowIdx}
-                            className={cn("w-4.5 h-4.5 rounded-md transition-all border border-slate-200/10 hover:scale-105", cellClass)}
-                            title={`Week ${colIdx + 1}, Day ${rowIdx + 1}`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Heatmap Legend */}
-                <div className="flex justify-end gap-3.5 mt-4 text-[10px] text-slate-450 font-bold uppercase tracking-wider select-none border-t border-slate-100 dark:border-slate-800/60 pt-3">
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 bg-slate-200 dark:bg-slate-800 rounded-md" />
-                    <span>{mentorContent.detail.legendMissed}</span>
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 bg-emerald-500 rounded-md" />
-                    <span>{mentorContent.detail.legendSober}</span>
-                  </span>
-                  {selectedMentee.lastStatus === 'SLIP_UP' && (
-                    <span className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 bg-rose-500 rounded-md" />
-                      <span>{mentorContent.detail.legendSlip}</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
 
             {/* RecoveryAnalytics Charts / Logs */}
             <div className="space-y-3">
