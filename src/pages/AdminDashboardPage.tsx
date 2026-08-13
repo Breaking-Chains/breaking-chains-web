@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
-import { Badge } from '../components/ui/Badge';
 import { 
   ShieldCheck, 
   Check, 
   X, 
   Bell, 
-  ShieldAlert, 
+  ShieldAlert,
   Award, 
   Search, 
   Filter, 
@@ -26,14 +25,7 @@ interface Application {
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
 
-interface FlaggedMessage {
-  id: string;
-  sender: string;
-  receiver: string;
-  message: string;
-  flagReason: string;
-  resolved: boolean;
-}
+
 
 interface ActiveMember {
   id: string;
@@ -62,7 +54,7 @@ export const AdminDashboardPage: React.FC = () => {
   
   // Auditing states
   const [applications, setApplications] = useState<Application[]>([]);
-  const [flaggedMessages, setFlaggedMessages] = useState<FlaggedMessage[]>([]);
+
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [newAnnouncementText, setNewAnnouncementText] = useState('');
   const [successToast, setSuccessToast] = useState<string | null>(null);
@@ -84,10 +76,7 @@ export const AdminDashboardPage: React.FC = () => {
         { id: 'app-1', fullName: 'Shaykh Luqman', username: 'luqman_h', qualification: 'MA Islamic Counseling', experience: 8, status: 'PENDING' },
         { id: 'app-2', fullName: 'Dr. Tariq Mahmood', username: 'tariq_m', qualification: 'PhD Clinical Psychology', experience: 15, status: 'PENDING' },
       ]);
-      setFlaggedMessages([
-        { id: 'flag-1', sender: '@user_3', receiver: '@mentor_1', message: 'I shared my private phone number here to connect directly...', flagReason: 'External Link / Direct Contact Sharing Policy', resolved: false },
-        { id: 'flag-2', sender: '@user_7', receiver: '@mentor_4', message: 'Check out this website link for reboot resources...', flagReason: 'Link sharing policy trigger', resolved: false },
-      ]);
+
       setAnnouncements([
         { id: 'a-1', title: 'Prepare for Ramadan Tazkiyah Program', date: 'August 1' },
         { id: 'a-2', title: 'Daily Check-in Streaks System Update', date: 'July 28' },
@@ -127,12 +116,7 @@ export const AdminDashboardPage: React.FC = () => {
     triggerToast(`Rejected application for ${name}`);
   };
 
-  const handleResolveFlag = (flagId: string) => {
-    setFlaggedMessages((prev) =>
-      prev.map((msg) => (msg.id === flagId ? { ...msg, resolved: true } : msg))
-    );
-    triggerToast('Compliance flag resolved.');
-  };
+
 
   const handleAddAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
@@ -459,52 +443,7 @@ export const AdminDashboardPage: React.FC = () => {
           </div>
 
         </div>
-
-        {/* Flagged Message Auditing Card */}
-        <div className="space-y-4 pt-4">
-          <h3 className="text-xs font-black text-slate-900 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5 select-none pl-1">
-            <ShieldAlert className="w-4 h-4 text-primary" /> 
-            <span>Privacy-Preserved Flagged Conversations</span>
-          </h3>
-
-          <div className="space-y-3">
-            {flaggedMessages.length === 0 ? (
-              <Card variant="glass" className="p-8 text-center bg-slate-50/10 border-slate-150 dark:border-slate-850 rounded-xl">
-                <p className="text-xs text-slate-500 italic">No compliance flags triggered.</p>
-              </Card>
-            ) : (
-              flaggedMessages.map((msg) => (
-                <Card key={msg.id} variant="dark" className="p-4 space-y-3 border-slate-150 dark:border-slate-850 shadow-xs relative">
-                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-850/60 pb-2">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="rose" className="text-[9px] font-bold">FLAGGED</Badge>
-                      <span className="text-xs font-black text-slate-700 dark:text-slate-400">{msg.sender} ➔ {msg.receiver}</span>
-                    </div>
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-[10px] text-rose-700 dark:text-rose-450 font-bold italic">{msg.flagReason}</span>
-                      {msg.resolved ? (
-                        <Badge variant="emerald">RESOLVED</Badge>
-                      ) : (
-                        <button
-                          onClick={() => handleResolveFlag(msg.id)}
-                          className="text-[10px] text-emerald-700 hover:text-emerald-950 dark:text-emerald-400 font-bold underline cursor-pointer"
-                        >
-                          Dismiss / Resolve
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <p className="text-xs font-serif italic text-slate-800 dark:text-slate-300 pl-4 border-l-2 border-rose-500/40 leading-relaxed">
-                    "{msg.message}"
-                  </p>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
-
       </div>
-
     </div>
   );
 };
