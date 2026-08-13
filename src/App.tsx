@@ -191,7 +191,6 @@ function ProtectedAppContent() {
       {role === 'ADMIN' ? (
         <>
           {activeTab === 'dashboard' && <AdminDashboardPage />}
-          {activeTab === 'guidance' && <AdminDashboardPage />}
           {activeTab === 'settings' && <SettingsPage />}
         </>
       ) : role === 'MENTOR' ? (

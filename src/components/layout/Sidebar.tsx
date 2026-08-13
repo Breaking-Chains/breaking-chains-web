@@ -30,7 +30,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const navItems: NavItem[] = role === 'ADMIN' ? [
     { id: 'dashboard', label: 'System Overview', icon: Home },
-    { id: 'guidance', label: 'Audit & Approvals', icon: Users },
     { id: 'settings', label: 'Settings', icon: Settings },
   ] : role === 'MENTOR' ? [
     { id: 'dashboard', label: 'Mentee Roster', icon: Home },

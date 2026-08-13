@@ -27,7 +27,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 
   const tabs: TabItem[] = role === 'ADMIN' ? [
     { id: 'dashboard', label: 'Home', icon: Home },
-    { id: 'guidance', label: 'Audit', icon: Users },
+    { id: 'settings', label: 'Settings', icon: Settings },
   ] : role === 'MENTOR' ? [
     { id: 'dashboard', label: 'Home', icon: Home },
     { id: 'settings', label: 'Settings', icon: Settings },
