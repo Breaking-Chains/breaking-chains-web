@@ -12,7 +12,7 @@ import {
   Sliders
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getAllMentorApplications } from '../services/mentorService';
+import { getAllMentorApplications, getVerifiedMentors, updateMentorStatus } from '../services/mentorService';
 import { cn } from '../utils/cn';
 import adminContent from '../data/adminContent.json';
 
@@ -63,6 +63,13 @@ export const AdminDashboardPage: React.FC = () => {
     enabled: !isDemoSession,
   });
 
+  // TanStack Query for Verified Mentors Directory
+  const { data: verifiedMentorsData, refetch: refetchVerifiedMentors } = useQuery({
+    queryKey: ['verifiedMentors'],
+    queryFn: getVerifiedMentors,
+    enabled: !isDemoSession,
+  });
+
   useEffect(() => {
     if (isDemoSession) {
       setActiveMembers([
@@ -83,36 +90,61 @@ export const AdminDashboardPage: React.FC = () => {
         { id: 'a-1', title: 'Prepare for Ramadan Tazkiyah Program', date: 'August 1' },
         { id: 'a-2', title: 'Daily Check-in Streaks System Update', date: 'July 28' },
       ]);
-    } else if (realAppsData) {
-      const mappedApps = realAppsData.map((app) => ({
-        id: app.id,
-        fullName: app.fullName,
-        username: app.username,
-        qualification: app.qualification,
-        experience: app.yearsOfExperience,
-        status: app.status as 'PENDING' | 'APPROVED' | 'REJECTED',
-      }));
-      setApplications(mappedApps);
+    } else {
+      if (realAppsData) {
+        const mappedApps = realAppsData.map((app) => ({
+          id: app.id,
+          fullName: app.fullName,
+          username: app.username,
+          qualification: app.qualification,
+          experience: app.yearsOfExperience,
+          status: app.status as 'PENDING' | 'APPROVED' | 'REJECTED',
+        }));
+        setApplications(mappedApps);
+      }
+      if (verifiedMentorsData) {
+        const mappedCaps = verifiedMentorsData.map((mentor) => ({
+          id: mentor.id,
+          name: mentor.fullName,
+          current: 0, // Mocked workload load metric
+          capacity: 10, // Default active capacity
+          color: 'emerald' as const,
+        }));
+        setMentorCapacities(mappedCaps);
+      }
     }
-  }, [realAppsData, isDemoSession]);
+  }, [realAppsData, verifiedMentorsData, isDemoSession]);
 
   const handleApprove = async (appId: string, name: string) => {
-    setApplications((prev) =>
-      prev.map((app) => (app.id === appId ? { ...app, status: 'APPROVED' } : app))
-    );
-    triggerToast(`Approved verification for ${name}`);
-    if (!isDemoSession) {
-      refetchRealApps();
+    try {
+      if (!isDemoSession) {
+        await updateMentorStatus(appId, { status: 'APPROVED' });
+        refetchRealApps();
+        refetchVerifiedMentors();
+      } else {
+        setApplications((prev) =>
+          prev.map((app) => (app.id === appId ? { ...app, status: 'APPROVED' } : app))
+        );
+      }
+      triggerToast(`Approved verification for ${name}`);
+    } catch {
+      // Ignore
     }
   };
 
   const handleReject = async (appId: string, name: string) => {
-    setApplications((prev) =>
-      prev.map((app) => (app.id === appId ? { ...app, status: 'REJECTED' } : app))
-    );
-    triggerToast(`Rejected application for ${name}`);
-    if (!isDemoSession) {
-      refetchRealApps();
+    try {
+      if (!isDemoSession) {
+        await updateMentorStatus(appId, { status: 'REJECTED' });
+        refetchRealApps();
+      } else {
+        setApplications((prev) =>
+          prev.map((app) => (app.id === appId ? { ...app, status: 'REJECTED' } : app))
+        );
+      }
+      triggerToast(`Rejected application for ${name}`);
+    } catch {
+      // Ignore
     }
   };
 
@@ -262,7 +294,14 @@ export const AdminDashboardPage: React.FC = () => {
 
             {/* Roster scroll list */}
             <div className="flex-grow overflow-y-auto space-y-2 pr-1 text-left">
-              {filteredMembers.length === 0 ? (
+              {!isDemoSession ? (
+                <div className="text-center py-10 px-6 text-xs text-slate-550 dark:text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10 space-y-2">
+                  <p className="font-extrabold text-slate-705 dark:text-slate-300">🔒 Confidential Data Isolation</p>
+                  <p className="leading-relaxed font-medium">
+                    Struggle logs, streaks, and check-ins reside strictly under client-side isolation for safety. Administrators do not have backdoor access to recoveree accounts. Only active guide assignments are traceably mapped.
+                  </p>
+                </div>
+              ) : filteredMembers.length === 0 ? (
                 <div className="text-center py-12 text-xs text-slate-400 italic border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
                   {adminContent.roster.emptyMessage}
                 </div>
