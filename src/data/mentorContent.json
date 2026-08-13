@@ -1,10 +1,10 @@
 {
   "header": {
-    "shieldText": "🛡️ Encrypted Advisor Space",
+    "shieldText": "🤝 Private Advisor Space",
     "title": "Mentees Roster & Counsel Terminal",
     "subtitle": "Review your recoverees' daily sobriety wudu logs, post target Nasiha advice guidelines, and review pending counsel meeting slots."
   },
-  "disclaimer": "Mentor-Mentee communications are encrypted and confidential.",
+  "disclaimer": "Mentor-Mentee communications are private and confidential.",
   "roster": {
     "title": "Assigned Mentees",
     "activeBadge": "Active Mentees",

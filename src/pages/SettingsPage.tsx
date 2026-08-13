@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User as UserIcon, LogOut, Copy, Check, ShieldAlert, KeyRound, ShieldCheck } from 'lucide-react';
+import { User as UserIcon, LogOut, Copy, Check, ShieldAlert, KeyRound, Sliders } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
@@ -14,13 +14,21 @@ export const SettingsPage: React.FC = () => {
   const [mentorProfile, setMentorProfile] = useState<MentorProfile | null>(null);
   const [inviteCodeCopied, setInviteCodeCopied] = useState(false);
 
-  // SOS Preference States
+  // Recoveree: SOS Preference States
   const [sosDuration, setSosDuration] = useState<number>(30); // minutes
   const [autoNotifyMentor, setAutoNotifyMentor] = useState<boolean>(true);
   const [spiritualReminders, setSpiritualReminders] = useState<boolean>(true);
 
-  // Security Preference States
-  const [isEncrypted, setIsEncrypted] = useState<boolean>(true);
+  // Mentor: Specific Preference States
+  const [menteeCapacity, setMenteeCapacity] = useState<number>(10);
+  const [acceptConnections, setAcceptConnections] = useState<boolean>(true);
+  const [emailAlerts, setEmailAlerts] = useState<boolean>(true);
+  const [weeklySummary, setWeeklySummary] = useState<boolean>(true);
+  const [welcomeMessage, setWelcomeMessage] = useState<string>(
+    'Assalamu alaikum! Welcome to our counseling session. Feel free to log your reflections.'
+  );
+
+  // Cryptographic Security Preference States
   const [biometricLock, setBiometricLock] = useState<boolean>(false);
 
   useEffect(() => {
@@ -58,7 +66,7 @@ export const SettingsPage: React.FC = () => {
 
             {/* Profile Avatar Block */}
             <div className="relative pt-2">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 dark:from-emerald-950/40 dark:to-teal-950/40 border border-emerald-500/20 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-extrabold text-lg shadow-inner select-none">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-emerald-500/20 to-teal-500/20 dark:from-emerald-955/40 dark:to-teal-955/40 border border-emerald-500/20 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-extrabold text-lg shadow-inner select-none animate-fade-in">
                 {user?.fullName?.[0]?.toUpperCase() || 'U'}
               </div>
               <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-white dark:border-slate-950 rounded-full animate-pulse" />
@@ -93,9 +101,9 @@ export const SettingsPage: React.FC = () => {
 
               {role === 'MENTOR' && (
                 <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 space-y-2">
-                  <span className="text-[9px] text-slate-400 dark:text-slate-500 block uppercase font-black tracking-widest">Shareable Invite Code</span>
+                  <span className="text-[9px] text-slate-400 dark:text-slate-505 block uppercase font-black tracking-widest">Shareable Invite Code</span>
                   <div className="flex items-center gap-2">
-                    <code className="text-xs font-mono font-black text-amber-700 dark:text-amber-400 bg-amber-50/40 dark:bg-amber-950/20 px-3 py-2 rounded-xl border border-amber-500/20 block w-full text-center uppercase tracking-wider">
+                    <code className="text-xs font-mono font-black text-amber-705 dark:text-amber-400 bg-amber-50/40 dark:bg-amber-955/20 px-3 py-2 rounded-xl border border-amber-500/20 block w-full text-center uppercase tracking-wider">
                       {isDemoSession ? 'MENTOR123' : (mentorProfile?.inviteCode || 'MENTOR-BC-7890')}
                     </code>
                     <button
@@ -127,120 +135,214 @@ export const SettingsPage: React.FC = () => {
         {/* Right Column: Settings Config Panels (2 Cols) */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* SOS preferences & resets */}
-          <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6">
-            <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
-              <ShieldAlert className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                SOS & Urge Circuit Breakers
-              </h3>
-            </div>
+          {role === 'MENTOR' ? (
+            /* MENTOR Specific Settings Preferences */
+            <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6 text-left">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                <Sliders className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Mentorship & Capacity Settings
+                </h3>
+              </div>
 
-            <div className="space-y-6">
-              {/* Reset Sliders */}
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <label className="text-xs font-black text-slate-800 dark:text-slate-100 block">
-                      Emergency Resets Timer
-                    </label>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
-                      Duration of active circuit breaker lockouts when panic mode is triggered.
+              <div className="space-y-6">
+                {/* Mentee Capacity Limit Slider */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <label className="text-xs font-black text-slate-800 dark:text-slate-100 block">
+                        Maximum Mentee Capacity
+                      </label>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                        Set the maximum number of active recoverees you can support.
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/15">
+                      {menteeCapacity} Mentees
                     </span>
                   </div>
-                  <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/15">
-                    {sosDuration} Min
+                  <input
+                    type="range"
+                    min="1"
+                    max="30"
+                    step="1"
+                    value={menteeCapacity}
+                    onChange={(e) => setMenteeCapacity(Number(e.target.value))}
+                    className="w-full h-1 bg-slate-205 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 dark:accent-emerald-400"
+                  />
+                </div>
+
+                {/* Toggles */}
+                <div className="pt-2 space-y-4">
+                  <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Accept Connection Requests</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                        Enable recoverees to connect with you using your shareable invite code.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setAcceptConnections(!acceptConnections)}
+                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                        acceptConnections ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
+                      }`}
+                    >
+                      <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                        acceptConnections ? 'translate-x-4.5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Urgent Distress Notifications</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                        Receive instant notifications when a mentee triggers their SOS panic mode.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setEmailAlerts(!emailAlerts)}
+                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                        emailAlerts ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
+                      }`}
+                    >
+                      <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                        emailAlerts ? 'translate-x-4.5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-2">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Weekly Progress Summary</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                        Receive weekly email summary reports detailing all active wudu logs and streaks.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setWeeklySummary(!weeklySummary)}
+                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                        weeklySummary ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
+                      }`}
+                    >
+                      <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                        weeklySummary ? 'translate-x-4.5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Default welcome message setup */}
+                <div className="pt-4 border-t border-slate-100 dark:border-slate-800/40 space-y-2">
+                  <label className="text-xs font-black text-slate-800 dark:text-slate-150 block">
+                    Welcome Greeting Message
+                  </label>
+                  <span className="text-[10px] text-slate-455 dark:text-slate-500 block leading-normal font-medium">
+                    This message will automatically be sent to new recoverees upon successful connection.
                   </span>
-                </div>
-                <input
-                  type="range"
-                  min="5"
-                  max="120"
-                  step="5"
-                  value={sosDuration}
-                  onChange={(e) => setSosDuration(Number(e.target.value))}
-                  className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 dark:accent-emerald-400"
-                />
-              </div>
-
-              {/* Toggle Switches */}
-              <div className="pt-2 space-y-4">
-                <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
-                  <div className="space-y-0.5 text-left">
-                    <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Auto-notify Mentor</span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
-                      Automatically alert your active counsel guide if you hit the SOS panic button.
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setAutoNotifyMentor(!autoNotifyMentor)}
-                    className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
-                      autoNotifyMentor ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
-                    }`}
-                  >
-                    <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
-                      autoNotifyMentor ? 'translate-x-4.5' : 'translate-x-0'
-                    }`} />
-                  </button>
-                </div>
-
-                <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
-                  <div className="space-y-0.5 text-left">
-                    <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Spiritual Reminders</span>
-                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
-                      Deliver Quranic reflections and wudu reminders when counseling timers run out.
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => setSpiritualReminders(!spiritualReminders)}
-                    className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
-                      spiritualReminders ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
-                    }`}
-                  >
-                    <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
-                      spiritualReminders ? 'translate-x-4.5' : 'translate-x-0'
-                    }`} />
-                  </button>
+                  <textarea
+                    rows={3}
+                    value={welcomeMessage}
+                    onChange={(e) => setWelcomeMessage(e.target.value)}
+                    className="w-full bg-slate-50/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-808 dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-505 font-medium transition-all resize-none"
+                  />
                 </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          ) : (
+            /* USER Specific Settings Preferences (SOS Circuit Breaker) */
+            <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6 text-left">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                <ShieldAlert className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  SOS & Urge Circuit Breakers
+                </h3>
+              </div>
 
-          {/* Privacy & Cryptography Panel */}
+              <div className="space-y-6">
+                {/* Reset Sliders */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <label className="text-xs font-black text-slate-800 dark:text-slate-105 block">
+                        Emergency Resets Timer
+                      </label>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                        Duration of active circuit breaker lockouts when panic mode is triggered.
+                      </span>
+                    </div>
+                    <span className="text-xs font-mono font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/15">
+                      {sosDuration} Min
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min="5"
+                    max="120"
+                    step="5"
+                    value={sosDuration}
+                    onChange={(e) => setSosDuration(Number(e.target.value))}
+                    className="w-full h-1 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-600 dark:accent-emerald-400"
+                  />
+                </div>
+
+                {/* Toggle Switches */}
+                <div className="pt-2 space-y-4">
+                  <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Auto-notify Mentor</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                        Automatically alert your active counsel guide if you hit the SOS panic button.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setAutoNotifyMentor(!autoNotifyMentor)}
+                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                        autoNotifyMentor ? 'bg-emerald-600 dark:bg-emerald-505' : 'bg-slate-300 dark:bg-slate-800'
+                      }`}
+                    >
+                      <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                        autoNotifyMentor ? 'translate-x-4.5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
+                    <div className="space-y-0.5">
+                      <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Spiritual Reminders</span>
+                      <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                        Deliver Quranic reflections and wudu reminders when counseling timers run out.
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => setSpiritualReminders(!spiritualReminders)}
+                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                        spiritualReminders ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
+                      }`}
+                    >
+                      <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                        spiritualReminders ? 'translate-x-4.5' : 'translate-x-0'
+                      }`} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          )}
+
+          {/* Local Security & Biometrics */}
           <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6">
             <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
               <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Cryptographic Security & Toggles
+                Local Security & Biometrics
               </h3>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-4 py-2 border-b border-slate-100/60 dark:border-slate-800/40">
-                <div className="space-y-0.5 text-left">
-                  <span className="text-xs font-black text-slate-800 dark:text-slate-150 block flex items-center gap-1.5">
-                    End-to-End Encryption (E2EE)
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
-                  </span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
-                    All counselor chat messages, journals, and slip-up notes are sealed with AES-256 keys.
-                  </span>
-                </div>
-                <button
-                  onClick={() => setIsEncrypted(!isEncrypted)}
-                  className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
-                    isEncrypted ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
-                  }`}
-                >
-                  <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
-                    isEncrypted ? 'translate-x-4.5' : 'translate-x-0'
-                  }`} />
-                </button>
-              </div>
-
               <div className="flex items-center justify-between gap-4 py-2">
                 <div className="space-y-0.5 text-left">
-                  <span className="text-xs font-black text-slate-800 dark:text-slate-150 block">Biometric Lockscreen</span>
+                  <span className="text-xs font-black text-slate-800 dark:text-slate-155 block">Biometric Lockscreen</span>
                   <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
                     Prompt local FaceID / Fingerprint lock checks when loading the app page from background suspension.
                   </span>

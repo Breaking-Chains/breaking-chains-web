@@ -465,7 +465,7 @@ export const GuidancePage: React.FC<GuidancePageProps> = ({ onOpenMenteesPage, o
                     <div className="space-y-0.5">
                       <strong className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wide">100% Confidentiality</strong>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-                        All logs, reflections, and chats are encrypted and only accessible by your direct guide.
+                        All logs, reflections, and chats are strictly confidential and only accessible by your direct guide.
                       </p>
                     </div>
                   </div>

@@ -40,7 +40,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
           <span className="text-emerald-600 dark:text-emerald-400 text-sm font-bold select-none">✵</span>
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">Confidential Guidance</h4>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">Encrypted & Private</p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">Private & Confidential</p>
           </div>
         </div>
       </Card>
@@ -65,10 +65,10 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
       <Card variant="dark" className="p-4 space-y-4 rounded-2xl">
         <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/60 pb-3">
           <div className="flex items-center gap-2">
-            <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
             <span className="text-xs font-bold text-slate-900 dark:text-slate-200">{partnerName}</span>
           </div>
-          <span className="text-[9px] text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-transparent uppercase tracking-wider">
+          <span className="text-[9px] text-emerald-700 dark:text-emerald-450 font-bold bg-emerald-50 dark:bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-100 dark:border-transparent uppercase tracking-wider">
             Active Mentor
           </span>
         </div>
@@ -110,7 +110,7 @@ export const MentorshipChat: React.FC<MentorshipChatProps> = ({
           <Input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Send encrypted message to mentor..."
+            placeholder="Send private message to mentor..."
             className="text-xs min-h-[40px] py-2 rounded-xl"
           />
           <Button type="submit" variant="emerald" size="sm" className="shrink-0 min-h-[40px] px-3.5 rounded-xl">

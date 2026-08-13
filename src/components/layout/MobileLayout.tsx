@@ -40,13 +40,13 @@ export const MobileLayout: React.FC<MobileLayoutProps> = ({
       return activeTab === 'dashboard' ? 'Global statistics & active guides engagement' : 'Audit logs, applications & policy triggers';
     }
     if (role === 'MENTOR') {
-      return activeTab === 'dashboard' ? 'Active recoverees & wudu check-in monitors' : 'Encrypted direct Nasiha advisory chat';
+      return activeTab === 'dashboard' ? 'Active recoverees & wudu check-in monitors' : 'Private direct Nasiha advisory chat';
     }
     if (activeTab === 'dashboard') return 'Your healing progress & daily reflection';
     if (activeTab === 'guidance') return 'Confidential spiritual counsel & guidance';
     if (activeTab === 'analytics') return 'Spiritual psychology & reboot metrics';
     if (activeTab === 'meetings') return 'Your upcoming counsel meetings & schedules';
-    if (activeTab === 'privacy') return 'End-to-end encryption & privacy standards';
+    if (activeTab === 'privacy') return 'Confidentiality & privacy standards';
     return 'Urge circuit breakers & emergency resets';
   };
 

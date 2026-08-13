@@ -84,7 +84,7 @@ export const MeetingsPage: React.FC<MeetingsPageProps> = ({ onOpenChat }) => {
               Counsel & Advisory Meetings
             </h2>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl">
-              Schedule and join face-to-face video counsel with verified spiritual advisors. Connect with coaches for private, encrypted advice.
+              Schedule and join face-to-face video counsel with verified spiritual advisors. Connect with coaches for private, confidential advice.
             </p>
           </div>
           <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 shadow-inner">
@@ -199,7 +199,7 @@ export const MeetingsPage: React.FC<MeetingsPageProps> = ({ onOpenChat }) => {
                 Need Instant Help?
               </h5>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-normal">
-                Counsel chat is fully encrypted and active 24/7. Connect instantly with online mentors for guidance.
+                Counsel chat is private, confidential, and active 24/7. Connect instantly with online mentors for guidance.
               </p>
             </div>
             

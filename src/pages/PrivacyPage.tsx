@@ -19,7 +19,7 @@ export const PrivacyPage: React.FC = () => {
           </p>
         </div>
         <div className="max-w-md mx-auto text-xs text-slate-650 dark:text-slate-350 leading-relaxed">
-          The Recovery Path is built on a foundation of absolute privacy and confidentiality. Your personal struggle, check-ins, and data are encrypted and protected under zero-knowledge architectural standards.
+          The Recovery Path is built on a foundation of absolute privacy and confidentiality. Your personal struggle, check-ins, and data are confidential and protected under strict data isolation standards.
         </div>
       </Card>
 
@@ -40,17 +40,17 @@ export const PrivacyPage: React.FC = () => {
           </div>
         </Card>
 
-        {/* Pillar 2: End-to-End Counsel Encryption */}
+        {/* Pillar 2: Private Counsel Chat */}
         <Card variant="glass" className="p-5 flex gap-3 text-left">
           <div className="p-2.5 bg-slate-100 dark:bg-slate-900 rounded-lg text-primary shrink-0 h-10 w-10 flex items-center justify-center border border-outline-variant/40">
             <Lock className="w-5 h-5 text-primary" />
           </div>
           <div className="space-y-1">
             <h3 className="text-xs font-black text-slate-900 dark:text-slate-200 uppercase tracking-wider">
-              Encrypted Counsel Chat
+              Private Counsel Chat
             </h3>
             <p className="text-[11px] text-slate-550 leading-relaxed font-medium">
-              All Direct Counsel chats and Nasiha conversations with your assigned mentor are encrypted end-to-end. No third parties can audit your chat.
+              All Direct Counsel chats and Nasiha conversations with your assigned mentor are strictly confidential. No third parties can access or audit your chat.
             </p>
           </div>
         </Card>
@@ -91,10 +91,10 @@ export const PrivacyPage: React.FC = () => {
         <FileText className="w-5 h-5 text-slate-400 shrink-0 mt-0.5" />
         <div className="space-y-2">
           <h4 className="text-[10px] font-black text-slate-905 dark:text-slate-205 uppercase tracking-widest">
-            Privacy Policy & Cryptographic Auditing
+            Privacy Policy & Access Auditing
           </h4>
           <p className="text-[11px] text-slate-550 leading-relaxed font-medium">
-            Breaking Chains platform conforms to HIPAA and GDPR standards for sensitive behavioral data. All encryption routines are open source and verifiable. If you terminate a mentorship connection, your keys are rotated, and all shared logs are permanently purged from the mentor's view.
+            Breaking Chains platform conforms to strict privacy standards for sensitive behavioral data. All storage architectures are designed for secure access isolation. If you terminate a mentorship connection, all shared logs are permanently purged from the mentor's view.
           </p>
         </div>
       </Card>
