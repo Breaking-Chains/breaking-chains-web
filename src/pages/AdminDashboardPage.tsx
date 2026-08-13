@@ -13,6 +13,7 @@ import {
   Copy
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { getAllUsers } from '../services/authService';
 import { getAllMentorApplications, getVerifiedMentors, updateMentorStatus } from '../services/mentorService';
 import { cn } from '../utils/cn';
 import adminContent from '../data/adminContent.json';
@@ -77,6 +78,13 @@ export const AdminDashboardPage: React.FC = () => {
     enabled: !isDemoSession,
   });
 
+  // TanStack Query for All Users Registry
+  const { data: realUsersData } = useQuery({
+    queryKey: ['allUsers'],
+    queryFn: getAllUsers,
+    enabled: !isDemoSession,
+  });
+
   useEffect(() => {
     if (isDemoSession) {
       setActiveMembers([
@@ -98,13 +106,24 @@ export const AdminDashboardPage: React.FC = () => {
         { id: 'a-2', title: 'Daily Check-in Streaks System Update', date: 'July 28' },
       ]);
     } else {
-      setActiveMembers([
-        { id: 'mem-1', name: 'Zayd Malik', username: 'zayd_m', initials: 'ZM', streakDays: 12, status: 'ACTIVE', assignedMentor: 'Shaykh Ahmad' },
-        { id: 'mem-2', name: 'Bilal Khan', username: 'bilal_k', initials: 'BK', streakDays: 0, status: 'NEEDS_ATTENTION', assignedMentor: 'Shaykh Ahmad' },
-        { id: 'mem-3', name: 'Tariq Ali', username: 'tariq_a', initials: 'TA', streakDays: 42, status: 'ACTIVE', assignedMentor: 'Shaykh Luqman' },
-        { id: 'mem-4', name: 'Yousef Ahmed', username: 'yousef_a', initials: 'YA', streakDays: 18, status: 'ACTIVE', assignedMentor: 'Shaykh Ahmad' },
-        { id: 'mem-5', name: 'Hamza Rizwan', username: 'hamza_r', initials: 'HR', streakDays: 5, status: 'ACTIVE', assignedMentor: 'Dr. Tariq Mahmood' }
-      ]);
+      if (realUsersData) {
+        const mappedUsers = realUsersData
+          .filter((u) => u.role === 'USER')
+          .map((u) => ({
+            id: u.id,
+            name: u.fullName,
+            username: u.username,
+            initials: u.fullName
+              ? u.fullName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()
+              : 'U',
+            streakDays: 0,
+            status: 'ACTIVE' as const,
+            assignedMentor: 'Unassigned',
+          }));
+        setActiveMembers(mappedUsers);
+      } else {
+        setActiveMembers([]);
+      }
       if (realAppsData) {
         const mappedApps = realAppsData.map((app) => ({
           id: app.id,
@@ -127,7 +146,7 @@ export const AdminDashboardPage: React.FC = () => {
         setMentorCapacities(mappedCaps);
       }
     }
-  }, [realAppsData, verifiedMentorsData, isDemoSession]);
+  }, [realAppsData, verifiedMentorsData, realUsersData, isDemoSession]);
 
   const handleApprove = async (appId: string, name: string) => {
     try {

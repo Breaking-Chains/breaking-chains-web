@@ -41,3 +41,10 @@ export async function getCurrentUser(): Promise<User> {
     method: 'GET',
   });
 }
+
+export async function getAllUsers(): Promise<User[]> {
+  const res = await apiFetch<User[]>('/api/v1/users', {
+    method: 'GET',
+  });
+  return Array.isArray(res) ? res : [];
+}
