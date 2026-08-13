@@ -6,7 +6,6 @@ import {
   ShieldCheck, 
   Bell, 
   Award, 
-  Percent,
   Sliders,
   Users,
   Copy,
@@ -53,7 +52,7 @@ export const AdminDashboardPage: React.FC = () => {
   const [mentorCapacities, setMentorCapacities] = useState<MentorCapacity[]>([]);
 
   // Navigation states
-  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'mentors'>('dashboard');
+  const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'mentors' | 'applications'>('dashboard');
   const [usersSearchQuery, setUsersSearchQuery] = useState('');
   const [mentorsSearchQuery, setMentorsSearchQuery] = useState('');
   
@@ -308,7 +307,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* Back Button */}
         <button 
           onClick={() => { setActiveView('dashboard'); setMentorsSearchQuery(''); }}
-          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer select-none"
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-855 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer select-none"
         >
           <span>← Back to Operations Hub</span>
         </button>
@@ -335,7 +334,7 @@ export const AdminDashboardPage: React.FC = () => {
             placeholder="Search mentors by name..."
             value={mentorsSearchQuery}
             onChange={(e) => setMentorsSearchQuery(e.target.value)}
-            className="w-full bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-850 rounded-2xl py-3 pl-10 pr-4 text-xs text-slate-855 dark:text-slate-200 focus:outline-none focus:border-blue-500 font-semibold transition-all"
+            className="w-full bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-855 rounded-2xl py-3 pl-10 pr-4 text-xs text-slate-855 dark:text-slate-200 focus:outline-none focus:border-blue-500 font-semibold transition-all"
           />
         </div>
 
@@ -394,6 +393,108 @@ export const AdminDashboardPage: React.FC = () => {
     );
   }
 
+  if (activeView === 'applications') {
+    return (
+      <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-16 text-left">
+        {/* Toast Alert */}
+        {successToast && (
+          <div className="fixed top-6 right-6 z-50 p-4 bg-emerald-600 text-white rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold animate-fade-in">
+            <ShieldCheck className="w-4 h-4" />
+            <span>{successToast}</span>
+          </div>
+        )}
+
+        {/* Back Button */}
+        <button 
+          onClick={() => setActiveView('dashboard')}
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-850 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer select-none"
+        >
+          <span>← Back to Operations Hub</span>
+        </button>
+
+        {/* Header Card */}
+        <div className="relative overflow-hidden px-6 py-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs flex justify-between items-center gap-4">
+          <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/3 pointer-events-none select-none" />
+          <div className="relative z-10 space-y-1">
+            <h2 className="text-lg font-black font-manrope tracking-tight text-slate-900 dark:text-white uppercase">
+              Mentor Onboarding Applications
+            </h2>
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+              Review and verify prospective counselors and spiritual advisors applying to the platform.
+            </p>
+          </div>
+          {pendingAppsCount > 0 && (
+            <Badge variant="rose" className="animate-pulse">
+              {pendingAppsCount} Awaiting Review
+            </Badge>
+          )}
+        </div>
+
+        {/* Applications List */}
+        <div className="space-y-3.5">
+          {applications.length === 0 ? (
+            <div className="text-center py-12 text-xs text-slate-405 italic border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+              No applications awaiting review at the moment.
+            </div>
+          ) : (
+            applications.map((app) => (
+              <Card 
+                variant="glass" 
+                key={app.id} 
+                className="p-5 flex flex-col sm:flex-row sm:items-center justify-between border-slate-200/60 dark:border-slate-800/60 bg-white/40 dark:bg-slate-900/20 gap-4 transition-all duration-200 hover:border-amber-505/25"
+              >
+                <div className="flex items-center gap-3 text-left">
+                  <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-955 text-slate-700 dark:text-slate-350 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-slate-200/60 dark:border-slate-850/60">
+                    {app.fullName.substring(0, 2).toUpperCase()}
+                  </div>
+                  <div className="text-left">
+                    <h4 className="text-xs font-black text-slate-900 dark:text-white leading-none">{app.fullName}</h4>
+                    <p className="text-[9px] text-slate-400 font-bold uppercase mt-2 tracking-wider">@{app.username}</p>
+                    
+                    <div className="flex gap-4 mt-3 border-t border-slate-100 dark:border-slate-800/40 pt-1.5 text-[9px] font-bold text-slate-500 uppercase">
+                      <span>
+                        Qualification: <span className="text-slate-700 dark:text-slate-300 font-medium normal-case">{app.qualification}</span>
+                      </span>
+                      <span>
+                        Experience: <span className="text-slate-750 dark:text-slate-300 font-mono font-medium">{app.experience} Years</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end items-center">
+                  {app.status === 'PENDING' ? (
+                    <>
+                      <button
+                        onClick={() => handleReject(app.id, app.fullName)}
+                        className="flex-1 sm:flex-none px-4 py-2 border border-slate-200 dark:border-slate-850 text-slate-750 dark:text-slate-350 hover:border-rose-500/40 hover:text-rose-650 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        Reject
+                      </button>
+                      <button
+                        onClick={() => handleApprove(app.id, app.fullName)}
+                        className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer shadow-sm shadow-emerald-500/10"
+                      >
+                        Approve & Verify
+                      </button>
+                    </>
+                  ) : (
+                    <span className={cn(
+                      "text-[9px] font-black px-3.5 py-1.5 rounded-full uppercase tracking-wider border",
+                      app.status === 'APPROVED' ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-rose-500/10 text-rose-750 border-rose-500/20"
+                    )}>
+                      {app.status}
+                    </span>
+                  )}
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-16">
       
@@ -425,7 +526,7 @@ export const AdminDashboardPage: React.FC = () => {
       </div>
 
       {/* High-Level Statistics Bento Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {/* Total Recoverees */}
         <div onClick={() => setActiveView('users')} className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-md hover:border-emerald-500/35 cursor-pointer text-left bg-emerald-500/5 dark:bg-emerald-955/5 border-emerald-500/15 dark:border-emerald-505/10">
           <div className="flex justify-between items-center">
@@ -455,33 +556,22 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
 
         {/* Pending Onboarding Applications */}
-        <div className={cn(
-          "p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-amber-500/5 dark:bg-amber-955/5 border-amber-500/15 dark:border-amber-500/10",
-          pendingAppsCount > 0 && "animate-pulse border-amber-500/30"
-        )}>
+        <div 
+          onClick={() => setActiveView('applications')}
+          className={cn(
+            "p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-md hover:border-amber-500/35 cursor-pointer text-left bg-amber-500/5 dark:bg-amber-955/5 border-amber-500/15 dark:border-amber-505/10",
+            pendingAppsCount > 0 && "animate-pulse border-amber-500/30"
+          )}
+        >
           <div className="flex justify-between items-center">
-            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.applications}</span>
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-455">{adminContent.stats.applications}</span>
             <ShieldCheck className="w-4 h-4 text-amber-600" />
           </div>
           <div className="mt-2">
             <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
               {pendingAppsCount}
             </span>
-            <span className="text-[8px] font-bold uppercase tracking-wider text-amber-600 mt-1 block">Applications</span>
-          </div>
-        </div>
-
-        {/* Workload health score */}
-        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-purple-500/5 dark:bg-purple-955/5 border-purple-500/15 dark:border-purple-505/10">
-          <div className="flex justify-between items-center">
-            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.capacity}</span>
-            <Percent className="w-4 h-4 text-purple-600" />
-          </div>
-          <div className="mt-2">
-            <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
-              94%
-            </span>
-            <span className="text-[8px] font-bold uppercase tracking-wider text-purple-600 mt-1 block">Workload</span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-amber-605 mt-1 block">Applications</span>
           </div>
         </div>
       </div>
