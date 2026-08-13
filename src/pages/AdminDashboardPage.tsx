@@ -6,10 +6,9 @@ import {
   ShieldCheck, 
   Bell, 
   Award, 
-  Search, 
-  Users,
   Percent,
-  Sliders
+  Sliders,
+  Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAllMentorApplications, getVerifiedMentors, updateMentorStatus } from '../services/mentorService';
@@ -48,7 +47,6 @@ export const AdminDashboardPage: React.FC = () => {
   // Roster states
   const [activeMembers, setActiveMembers] = useState<ActiveMember[]>([]);
   const [mentorCapacities, setMentorCapacities] = useState<MentorCapacity[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   
   // Auditing states
   const [applications, setApplications] = useState<Application[]>([]);
@@ -164,11 +162,7 @@ export const AdminDashboardPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
-  // Filter members list
-  const filteredMembers = activeMembers.filter((m) =>
-    m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    m.assignedMentor.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
 
   const pendingAppsCount = applications.filter((app) => app.status === 'PENDING').length;
 
@@ -270,88 +264,7 @@ export const AdminDashboardPage: React.FC = () => {
         {/* LEFT COLUMN: Platform Roster & Onboarding Applications (col-span-8) */}
         <div className="lg:col-span-8 space-y-6">
           
-          {/* Active Members Roster */}
-          <Card variant="glass" className="p-5 flex flex-col h-[520px] border-slate-200/80 dark:border-slate-800/80 shadow-xs">
-            <div className="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800/50 pb-2 shrink-0">
-              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 select-none">
-                <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
-                <span>{adminContent.roster.title}</span>
-              </h2>
-              <Badge variant="emerald">{filteredMembers.length} Accounts</Badge>
-            </div>
 
-            {/* Roster search filter */}
-            <div className="relative mb-3 shrink-0">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={adminContent.roster.searchPlaceholder}
-                className="w-full bg-slate-55 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-850 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-205 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold transition-all"
-              />
-            </div>
-
-            {/* Roster scroll list */}
-            <div className="flex-grow overflow-y-auto space-y-2 pr-1 text-left">
-              {!isDemoSession ? (
-                <div className="text-center py-10 px-6 text-xs text-slate-550 dark:text-slate-400 border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10 space-y-2">
-                  <p className="font-extrabold text-slate-705 dark:text-slate-300">🔒 Confidential Data Isolation</p>
-                  <p className="leading-relaxed font-medium">
-                    Struggle logs, streaks, and check-ins reside strictly under client-side isolation for safety. Administrators do not have backdoor access to recoveree accounts. Only active guide assignments are traceably mapped.
-                  </p>
-                </div>
-              ) : filteredMembers.length === 0 ? (
-                <div className="text-center py-12 text-xs text-slate-400 italic border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
-                  {adminContent.roster.emptyMessage}
-                </div>
-              ) : (
-                filteredMembers.map((member) => (
-                  <div
-                    key={member.id}
-                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950 text-left transition-all relative overflow-hidden hover:scale-[1.005] hover:border-emerald-505/20 hover:bg-slate-50 dark:hover:bg-slate-900/30"
-                  >
-                    <div className="flex items-center gap-3 pl-1">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-350 flex items-center justify-center font-bold text-xs shrink-0 select-none">
-                        {member.initials}
-                      </div>
-                      <div className="text-left">
-                        <h3 className="text-xs font-black text-slate-900 dark:text-white truncate">
-                          {member.name}
-                        </h3>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
-                          {adminContent.roster.assignedMentorPrefix} {member.assignedMentor}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <span className="text-[10px] font-black text-slate-900 dark:text-white block leading-none">
-                          {member.streakDays} Days
-                        </span>
-                        <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-450 mt-1 block">
-                          Streak
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-end">
-                        <span className={cn(
-                          "w-2 h-2 rounded-full",
-                          member.status === 'NEEDS_ATTENTION' ? "bg-rose-500" : "bg-emerald-500"
-                        )} />
-                        <span className={cn(
-                          "text-[9px] font-black mt-1.5 uppercase tracking-wider",
-                          member.status === 'NEEDS_ATTENTION' ? "text-rose-600" : "text-emerald-600"
-                        )}>
-                          {member.status === 'NEEDS_ATTENTION' ? 'Needs Care' : 'Clean'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </Card>
 
           {/* Onboarding Applications board */}
           <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
