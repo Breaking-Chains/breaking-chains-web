@@ -249,6 +249,34 @@ export const SettingsPage: React.FC = () => {
                 </div>
               </div>
             </Card>
+          ) : role === 'ADMIN' ? (
+            /* ADMIN Specific Security & Policy Panel */
+            <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6 text-left">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  System Security & Policy Logs
+                </h3>
+              </div>
+
+              <div className="space-y-4 text-xs font-medium text-slate-650 dark:text-slate-400">
+                <p className="leading-relaxed">
+                  As a platform administrator, you operate under strict privacy compliance rules. Security logs, audit controls, and policy overrides are logged automatically.
+                </p>
+                
+                <div className="bg-slate-50 dark:bg-slate-950 p-4.5 rounded-2xl border border-slate-100 dark:border-slate-900/60 space-y-2.5 text-[10px]">
+                  <div className="flex justify-between items-center text-slate-400 font-bold uppercase tracking-wider pb-1.5 border-b border-slate-100 dark:border-slate-900/40">
+                    <span>Compliance Checks</span>
+                    <Badge variant="emerald">Active</Badge>
+                  </div>
+                  <ul className="list-disc pl-4 space-y-1.5 text-slate-500 leading-relaxed font-bold">
+                    <li>Zero-Knowledge Recoveree isolation checks: <span className="font-black text-slate-800 dark:text-slate-200">ENFORCED</span></li>
+                    <li>Advisor Onboarding Audit Trail logs: <span className="font-black text-slate-800 dark:text-slate-200">ENABLED</span></li>
+                    <li>Announcements override signature checks: <span className="font-black text-slate-800 dark:text-slate-200">ACTIVE</span></li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
           ) : (
             /* USER Specific Settings Preferences (SOS Circuit Breaker) */
             <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6 text-left">
@@ -298,7 +326,7 @@ export const SettingsPage: React.FC = () => {
                     <button
                       onClick={() => setAutoNotifyMentor(!autoNotifyMentor)}
                       className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
-                        autoNotifyMentor ? 'bg-emerald-600 dark:bg-emerald-505' : 'bg-slate-300 dark:bg-slate-800'
+                        autoNotifyMentor ? 'bg-emerald-600 dark:bg-emerald-550' : 'bg-slate-300 dark:bg-slate-800'
                       }`}
                     >
                       <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
@@ -331,35 +359,37 @@ export const SettingsPage: React.FC = () => {
           )}
 
           {/* Local Security & Biometrics */}
-          <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6">
-            <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
-              <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Local Security & Biometrics
-              </h3>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-4 py-2">
-                <div className="space-y-0.5 text-left">
-                  <span className="text-xs font-black text-slate-800 dark:text-slate-155 block">Biometric Lockscreen</span>
-                  <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
-                    Prompt local FaceID / Fingerprint lock checks when loading the app page from background suspension.
-                  </span>
-                </div>
-                <button
-                  onClick={() => setBiometricLock(!biometricLock)}
-                  className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
-                    biometricLock ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
-                  }`}
-                >
-                  <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
-                    biometricLock ? 'translate-x-4.5' : 'translate-x-0'
-                  }`} />
-                </button>
+          {role !== 'ADMIN' && (
+            <Card variant="glass" className="p-6 md:p-8 rounded-3xl border-slate-200/80 dark:border-slate-800/80 space-y-6">
+              <div className="flex items-center gap-2 pb-4 border-b border-slate-100 dark:border-slate-800/50">
+                <KeyRound className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                  Local Security & Biometrics
+                </h3>
               </div>
-            </div>
-          </Card>
+
+              <div className="space-y-4">
+                <div className="flex items-center justify-between gap-4 py-2">
+                  <div className="space-y-0.5 text-left">
+                    <span className="text-xs font-black text-slate-800 dark:text-slate-155 block">Biometric Lockscreen</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block leading-normal font-medium">
+                      Prompt local FaceID / Fingerprint lock checks when loading the app page from background suspension.
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setBiometricLock(!biometricLock)}
+                    className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer shrink-0 ${
+                      biometricLock ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-slate-300 dark:bg-slate-800'
+                    }`}
+                  >
+                    <div className={`bg-white w-4.5 h-4.5 rounded-full shadow-md transform transition-transform duration-200 ${
+                      biometricLock ? 'translate-x-4.5' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </div>
+              </div>
+            </Card>
+          )}
         </div>
 
       </div>

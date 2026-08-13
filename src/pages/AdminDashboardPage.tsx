@@ -4,7 +4,6 @@ import { Badge } from '../components/ui/Badge';
 import { useQuery } from '@tanstack/react-query';
 import { 
   ShieldCheck, 
-  Bell, 
   Award, 
   Sliders,
   Users,
@@ -14,6 +13,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { getAllUsers } from '../services/authService';
 import { getAllMentorApplications, getVerifiedMentors, updateMentorStatus } from '../services/mentorService';
+import { getAllPartnerships } from '../services/partnerService';
 import { cn } from '../utils/cn';
 import adminContent from '../data/adminContent.json';
 
@@ -53,13 +53,12 @@ export const AdminDashboardPage: React.FC = () => {
 
   // Navigation states
   const [activeView, setActiveView] = useState<'dashboard' | 'users' | 'mentors' | 'applications'>('dashboard');
+  const [selectedMentor, setSelectedMentor] = useState<any | null>(null);
   const [usersSearchQuery, setUsersSearchQuery] = useState('');
   const [mentorsSearchQuery, setMentorsSearchQuery] = useState('');
   
   // Auditing states
   const [applications, setApplications] = useState<Application[]>([]);
-  const [announcements, setAnnouncements] = useState<any[]>([]);
-  const [newAnnouncementText, setNewAnnouncementText] = useState('');
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   // TanStack Query for Mentor Onboarding Applications
@@ -83,6 +82,13 @@ export const AdminDashboardPage: React.FC = () => {
     enabled: !isDemoSession,
   });
 
+  // TanStack Query for All Partnerships
+  const { data: realPartnershipsData } = useQuery({
+    queryKey: ['allPartnerships'],
+    queryFn: getAllPartnerships,
+    enabled: !isDemoSession,
+  });
+
   useEffect(() => {
     if (isDemoSession) {
       setActiveMembers([
@@ -99,25 +105,25 @@ export const AdminDashboardPage: React.FC = () => {
         { id: 'app-1', fullName: 'Shaykh Luqman', username: 'luqman_h', qualification: 'MA Islamic Counseling', experience: 8, status: 'PENDING' },
         { id: 'app-2', fullName: 'Dr. Tariq Mahmood', username: 'tariq_m', qualification: 'PhD Clinical Psychology', experience: 15, status: 'PENDING' },
       ]);
-      setAnnouncements([
-        { id: 'a-1', title: 'Prepare for Ramadan Tazkiyah Program', date: 'August 1' },
-        { id: 'a-2', title: 'Daily Check-in Streaks System Update', date: 'July 28' },
-      ]);
     } else {
       if (realUsersData) {
         const mappedUsers = realUsersData
           .filter((u) => u.role === 'USER')
-          .map((u) => ({
-            id: u.id,
-            name: u.fullName,
-            username: u.username,
-            initials: u.fullName
-              ? u.fullName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()
-              : 'U',
-            streakDays: 0,
-            status: 'ACTIVE' as const,
-            assignedMentor: 'Unassigned',
-          }));
+          .map((u) => {
+            const userPartnership = realPartnershipsData?.find((p) => p.userId === u.id && p.status === 'ACCEPTED');
+            const mentorName = userPartnership?.partnerFullName || 'Unassigned';
+            return {
+              id: u.id,
+              name: u.fullName,
+              username: u.username,
+              initials: u.fullName
+                ? u.fullName.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()
+                : 'U',
+              streakDays: 0,
+              status: 'ACTIVE' as const,
+              assignedMentor: mentorName,
+            };
+          });
         setActiveMembers(mappedUsers);
       } else {
         setActiveMembers([]);
@@ -134,17 +140,24 @@ export const AdminDashboardPage: React.FC = () => {
         setApplications(mappedApps);
       }
       if (verifiedMentorsData) {
-        const mappedCaps = verifiedMentorsData.map((mentor) => ({
-          id: mentor.id,
-          name: mentor.fullName,
-          current: 0, // Mocked workload load metric
-          capacity: 10, // Default active capacity
-          color: 'emerald' as const,
-        }));
+        const mappedCaps = verifiedMentorsData.map((mentor) => {
+          const currentMentees = realPartnershipsData?.filter((p) => p.partnerUserId === mentor.userId && p.status === 'ACCEPTED') || [];
+          return {
+            id: mentor.id,
+            name: mentor.fullName,
+            current: currentMentees.length,
+            capacity: 10,
+            color: currentMentees.length >= 8 ? 'rose' as const : currentMentees.length >= 5 ? 'amber' as const : 'emerald' as const,
+          };
+        });
         setMentorCapacities(mappedCaps);
       }
     }
-  }, [realAppsData, verifiedMentorsData, realUsersData, isDemoSession]);
+  }, [realAppsData, verifiedMentorsData, realUsersData, realPartnershipsData, isDemoSession]);
+
+  useEffect(() => {
+    setSelectedMentor(null);
+  }, [activeView]);
 
   const handleApprove = async (appId: string, name: string) => {
     try {
@@ -177,17 +190,6 @@ export const AdminDashboardPage: React.FC = () => {
     } catch {
       // Ignore
     }
-  };
-
-  const handleAddAnnouncement = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newAnnouncementText.trim()) return;
-    setAnnouncements((prev) => [
-      { id: `a-${Date.now()}`, title: newAnnouncementText.trim(), date: 'Just now' },
-      ...prev,
-    ]);
-    setNewAnnouncementText('');
-    triggerToast('Announcement broadcasted successfully!');
   };
 
   const triggerToast = (msg: string) => {
@@ -294,6 +296,176 @@ export const AdminDashboardPage: React.FC = () => {
   }
 
   if (activeView === 'mentors') {
+    if (selectedMentor) {
+      // Find connected recoverees
+      const connectedMentees = activeMembers.filter((m) => m.assignedMentor === selectedMentor.name);
+
+      return (
+        <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-16 text-left">
+          {/* Toast Alert */}
+          {successToast && (
+            <div className="fixed top-6 right-6 z-50 p-4 bg-emerald-600 text-white rounded-xl shadow-lg flex items-center gap-2 text-xs font-bold animate-fade-in">
+              <ShieldCheck className="w-4 h-4" />
+              <span>{successToast}</span>
+            </div>
+          )}
+
+          {/* Back to list button */}
+          <button 
+            onClick={() => setSelectedMentor(null)}
+            className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-slate-500 hover:text-slate-855 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer select-none"
+          >
+            <span>← Back to Verified Mentors</span>
+          </button>
+
+          {/* Mentor Profile Details Header Card */}
+          <div className="relative overflow-hidden p-6 md:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/85 dark:border-slate-800/85 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/3 pointer-events-none select-none" />
+            
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-16 h-16 rounded-full bg-blue-500/10 text-blue-700 dark:text-blue-455 flex items-center justify-center font-bold text-xl shrink-0 select-none border border-blue-500/20">
+                {selectedMentor.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2).toUpperCase()}
+              </div>
+              <div className="space-y-1">
+                <h2 className="text-lg font-black font-manrope tracking-tight text-slate-900 dark:text-white uppercase leading-none">
+                  {selectedMentor.name}
+                </h2>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pt-1.5">
+                  {selectedMentor.specialization}
+                </p>
+                {selectedMentor.organization && (
+                  <p className="text-[9px] text-slate-500 font-semibold pt-0.5">
+                    {selectedMentor.organization}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="relative z-10 flex flex-col items-end gap-2 shrink-0">
+              <Badge variant="emerald" className="text-[9px] font-black uppercase tracking-wider">Active Guide</Badge>
+              <span className="text-[10px] font-bold text-slate-400">Joined {new Date(selectedMentor.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+            
+            {/* LEFT COLUMN: Workload and invite code info (col-span-1) */}
+            <div className="md:col-span-1 space-y-6">
+              
+              {/* Capacity Card */}
+              <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 space-y-4 text-left">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
+                  Workload Status
+                </span>
+                
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center text-[10px] font-bold">
+                    <span className="text-slate-800 dark:text-slate-200">Active Load</span>
+                    <span className="text-slate-400 font-mono">
+                      {selectedMentor.current}/{selectedMentor.capacity} recoverees
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-100 dark:bg-slate-955 h-2 rounded-full overflow-hidden border border-slate-250/20">
+                    <div 
+                      className={cn(
+                        "h-full rounded-full transition-all duration-500",
+                        selectedMentor.color === 'emerald' ? 'bg-emerald-600' : selectedMentor.color === 'rose' ? 'bg-rose-550' : 'bg-amber-600'
+                      )} 
+                      style={{ width: `${(selectedMentor.current / selectedMentor.capacity) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </Card>
+
+              {/* Copy Invite Code Card */}
+              <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 space-y-4 text-left">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
+                  Connection Invitation
+                </span>
+                
+                <div className="flex justify-between items-center bg-white dark:bg-slate-950 px-3.5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-900/60">
+                  <div>
+                    <span className="text-[8px] font-black text-slate-450 uppercase tracking-widest block leading-none">Invite Code</span>
+                    <span className="text-[11px] font-mono font-bold text-slate-805 dark:text-slate-200 mt-1.5 block select-all">{selectedMentor.inviteCode}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedMentor.inviteCode);
+                      triggerToast(`Copied invite code for ${selectedMentor.name}`);
+                    }}
+                    disabled={selectedMentor.inviteCode === 'N/A'}
+                    className="p-2 rounded-xl border border-slate-200 hover:border-blue-500 hover:text-blue-600 dark:border-slate-800 text-slate-400 dark:text-slate-350 cursor-pointer transition-colors"
+                    title="Copy Code"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </button>
+                </div>
+              </Card>
+            </div>
+
+            {/* RIGHT COLUMN: Connected recoverees and bio detail (col-span-2) */}
+            <div className="md:col-span-2 space-y-6">
+              
+              {/* Connected Mentees Card */}
+              <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 space-y-4 text-left">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
+                  Assigned Recoverees ({connectedMentees.length})
+                </span>
+
+                <div className="space-y-2">
+                  {connectedMentees.length === 0 ? (
+                    <div className="text-center py-8 text-xs text-slate-400 italic border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+                      No recoverees currently connected.
+                    </div>
+                  ) : (
+                    connectedMentees.map((member) => (
+                      <div key={member.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 dark:border-slate-900/60 bg-white/30 dark:bg-slate-900/10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-955 text-slate-705 dark:text-slate-350 flex items-center justify-center font-bold text-xs shrink-0 select-none border border-slate-200/60 dark:border-slate-850/60">
+                            {member.initials}
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-slate-900 dark:text-white leading-none">{member.name}</h5>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase mt-1 tracking-wider">
+                              @{member.username}
+                            </p>
+                          </div>
+                        </div>
+                        <Badge variant={member.status === 'NEEDS_ATTENTION' ? 'rose' : 'emerald'}>
+                          {member.status === 'NEEDS_ATTENTION' ? 'Needs Care' : 'Active'}
+                        </Badge>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </Card>
+
+              {/* Bio & Details Card */}
+              <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 space-y-4 text-left">
+                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
+                  Professional Credentials
+                </span>
+
+                <div className="space-y-4 text-xs font-medium text-slate-705 dark:text-slate-300">
+                  <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800/40">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px]">Years of experience</span>
+                    <span className="font-mono font-bold text-slate-900 dark:text-white">{selectedMentor.yearsOfExperience || 0} Years</span>
+                  </div>
+                  
+                  <div className="space-y-1 pt-2">
+                    <span className="text-slate-400 font-bold uppercase tracking-wider text-[9px] block">Biography</span>
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {selectedMentor.bio || "No professional biography provided."}
+                    </p>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-6 animate-fade-in max-w-4xl mx-auto pb-16 text-left">
         {/* Toast Alert */}
@@ -355,7 +527,20 @@ export const AdminDashboardPage: React.FC = () => {
                 const invite = matchedDetail?.inviteCode || "N/A";
                 
                 return (
-                  <Card variant="glass" key={mentor.id} className="p-5 border-slate-200/60 dark:border-slate-800/60 bg-white/40 dark:bg-slate-900/20 space-y-4 text-left">
+                  <Card 
+                    variant="glass" 
+                    key={mentor.id} 
+                    onClick={() => setSelectedMentor({
+                      ...mentor,
+                      specialization: specs,
+                      inviteCode: invite,
+                      bio: matchedDetail?.bio,
+                      organization: matchedDetail?.organization,
+                      yearsOfExperience: matchedDetail?.yearsOfExperience,
+                      createdAt: matchedDetail?.createdAt
+                    })}
+                    className="p-5 border-slate-200/60 dark:border-slate-800/60 bg-white/40 dark:bg-slate-900/20 space-y-4 text-left hover:-translate-y-0.5 hover:shadow-md hover:border-blue-500/35 cursor-pointer transition-all duration-300"
+                  >
                     <div className="flex justify-between items-start">
                       <div>
                         <h4 className="text-xs font-black text-slate-900 dark:text-white leading-none">{mentor.name}</h4>
@@ -367,7 +552,7 @@ export const AdminDashboardPage: React.FC = () => {
                     </div>
 
                     {/* Copyable connection invite code block */}
-                    <div className="flex justify-between items-center bg-white dark:bg-slate-950 px-3.5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-900/60">
+                    <div className="flex justify-between items-center bg-white dark:bg-slate-950 px-3.5 py-2.5 rounded-xl border border-slate-100 dark:border-slate-900/60" onClick={(e) => e.stopPropagation()}>
                       <div>
                         <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest block leading-none">Connection Code</span>
                         <span className="text-[11px] font-mono font-bold text-slate-805 dark:text-slate-200 mt-1.5 block select-all">{invite}</span>
@@ -432,12 +617,14 @@ export const AdminDashboardPage: React.FC = () => {
 
         {/* Applications List */}
         <div className="space-y-3.5">
-          {applications.length === 0 ? (
+          {applications.filter((app) => app.status === 'PENDING').length === 0 ? (
             <div className="text-center py-12 text-xs text-slate-405 italic border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
               No applications awaiting review at the moment.
             </div>
           ) : (
-            applications.map((app) => (
+            applications
+              .filter((app) => app.status === 'PENDING')
+              .map((app) => (
               <Card 
                 variant="glass" 
                 key={app.id} 
@@ -574,180 +761,87 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-[8px] font-bold uppercase tracking-wider text-amber-605 mt-1 block">Applications</span>
           </div>
         </div>
-      </div>
-
-      {/* Main Bento Columns */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+       {/* Main Bento Columns */}
+      <div className="grid grid-cols-1 gap-6 items-start">
         
-        {/* LEFT COLUMN: Onboarding Applications (col-span-8) */}
-        <div className="lg:col-span-8 space-y-6">
-          
-          {/* Onboarding Applications board */}
-          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
-            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 pb-2">
-              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
-                <span>{adminContent.applications.title}</span>
-              </h2>
-              {pendingAppsCount > 0 && (
-                <Badge variant="rose" className="animate-pulse">
-                  {pendingAppsCount} {adminContent.applications.pendingBadge}
-                </Badge>
-              )}
-            </div>
+        {/* Onboarding Applications board */}
+        <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
+          <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 pb-2">
+            <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+              <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+              <span>{adminContent.applications.title}</span>
+            </h2>
+            {pendingAppsCount > 0 && (
+              <Badge variant="rose" className="animate-pulse">
+                {pendingAppsCount} {adminContent.applications.pendingBadge}
+              </Badge>
+            )}
+          </div>
 
-            <div className="space-y-3">
-              {applications.length === 0 ? (
-                <p className="text-[10px] text-slate-400 dark:text-slate-500 italic text-center py-4 font-medium border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
-                  {adminContent.applications.emptyMessage}
-                </p>
-              ) : (
-                applications.map((app) => (
-                  <div 
-                    key={app.id}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/65 dark:border-slate-800/65 gap-4 transition-all duration-200 hover:border-emerald-500/25"
-                  >
-                    <div className="flex items-center gap-3 text-left">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-350 font-extrabold text-xs shrink-0 select-none border border-slate-200 dark:border-slate-800">
-                        {app.fullName.substring(0, 2).toUpperCase()}
-                      </div>
-                      <div className="text-left">
-                        <h4 className="text-xs font-black text-slate-900 dark:text-white">{app.fullName}</h4>
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">@{app.username}</p>
-                        
-                        <div className="flex gap-4 mt-2 border-t border-slate-100 dark:border-slate-800/40 pt-1.5 text-[9px] font-bold text-slate-500 uppercase">
-                          <span>
-                            {adminContent.applications.qualificationLabel}: <span className="text-slate-700 dark:text-slate-300 font-medium normal-case">{app.qualification}</span>
-                          </span>
-                          <span>
-                            {adminContent.applications.experienceLabel}: <span className="text-slate-700 dark:text-slate-300 font-mono font-medium">{app.experience} Years</span>
-                          </span>
-                        </div>
-                      </div>
+          <div className="space-y-3">
+            {applications.filter((app) => app.status === 'PENDING').length === 0 ? (
+              <p className="text-[10px] text-slate-400 dark:text-slate-500 italic text-center py-4 font-medium border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+                {adminContent.applications.emptyMessage}
+              </p>
+            ) : (
+              applications
+                .filter((app) => app.status === 'PENDING')
+                .map((app) => (
+                <div 
+                  key={app.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/65 dark:border-slate-800/65 gap-4 transition-all duration-200 hover:border-emerald-500/25"
+                >
+                  <div className="flex items-center gap-3 text-left">
+                    <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-350 font-extrabold text-xs shrink-0 select-none border border-slate-200 dark:border-slate-800">
+                      {app.fullName.substring(0, 2).toUpperCase()}
                     </div>
-
-                    <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end items-center">
-                      {app.status === 'PENDING' ? (
-                        <>
-                          <button
-                            onClick={() => handleReject(app.id, app.fullName)}
-                            className="flex-1 sm:flex-none px-3.5 py-2 border border-slate-200 dark:border-slate-855 text-slate-750 dark:text-slate-350 hover:border-rose-500/40 hover:text-rose-650 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
-                          >
-                            {adminContent.applications.btnReject}
-                          </button>
-                          <button
-                            onClick={() => handleApprove(app.id, app.fullName)}
-                            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer shadow-sm shadow-emerald-500/10"
-                          >
-                            {adminContent.applications.btnApprove}
-                          </button>
-                        </>
-                      ) : (
-                        <span className={cn(
-                          "text-[9px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider border",
-                          app.status === 'APPROVED' ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-rose-500/10 text-rose-750 border-rose-500/20"
-                        )}>
-                          {app.status}
+                    <div className="text-left">
+                      <h4 className="text-xs font-black text-slate-900 dark:text-white">{app.fullName}</h4>
+                      <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">@{app.username}</p>
+                      
+                      <div className="flex gap-4 mt-2 border-t border-slate-100 dark:border-slate-800/40 pt-1.5 text-[9px] font-bold text-slate-500 uppercase">
+                        <span>
+                          {adminContent.applications.qualificationLabel}: <span className="text-slate-700 dark:text-slate-300 font-medium normal-case">{app.qualification}</span>
                         </span>
-                      )}
+                        <span>
+                          {adminContent.applications.experienceLabel}: <span className="text-slate-700 dark:text-slate-300 font-mono font-medium">{app.experience} Years</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
-          </Card>
 
-        </div>
-
-        {/* RIGHT COLUMN: Capacity Monitoring & Broadcast Center (col-span-4) */}
-        <div className="lg:col-span-4 space-y-6">
-          
-          {/* Capacity monitoring */}
-          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
-            <div className="border-b border-slate-100 dark:border-slate-800/50 pb-2">
-              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                {adminContent.capacity.title}
-              </h2>
-            </div>
-
-            <div className="space-y-4 pr-1">
-              {mentorCapacities.map((item) => (
-                <div key={item.id} className="space-y-2">
-                  <div className="flex justify-between items-center text-[10px] font-bold">
-                    <span className="text-slate-800 dark:text-slate-200 font-extrabold">{item.name}</span>
-                    <span className="text-slate-400 font-mono">
-                      {item.current}/{item.capacity} {adminContent.capacity.capacitySuffix}
-                    </span>
-                  </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-955 h-2 rounded-full overflow-hidden border border-slate-250/20">
-                    <div 
-                      className={cn(
-                        "h-full rounded-full transition-all duration-500",
-                        item.color === 'emerald' ? 'bg-emerald-600' : item.color === 'rose' ? 'bg-rose-550' : 'bg-amber-600'
-                      )} 
-                      style={{ width: `${(item.current / item.capacity) * 100}%` }}
-                    />
+                  <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end items-center">
+                    {app.status === 'PENDING' ? (
+                      <>
+                        <button
+                          onClick={() => handleReject(app.id, app.fullName)}
+                          className="flex-1 sm:flex-none px-3.5 py-2 border border-slate-200 dark:border-slate-855 text-slate-750 dark:text-slate-350 hover:border-rose-500/40 hover:text-rose-650 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          {adminContent.applications.btnReject}
+                        </button>
+                        <button
+                          onClick={() => handleApprove(app.id, app.fullName)}
+                          className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer shadow-sm shadow-emerald-500/10"
+                        >
+                          {adminContent.applications.btnApprove}
+                        </button>
+                      </>
+                    ) : (
+                      <span className={cn(
+                        "text-[9px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider border",
+                        app.status === 'APPROVED' ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-rose-500/10 text-rose-750 border-rose-500/20"
+                      )}>
+                        {app.status}
+                      </span>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          </Card>
+              ))
+            )}
+          </div>
+        </Card>
 
-          {/* Announcements composer */}
-          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
-            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 pb-2">
-              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                {adminContent.announcements.title}
-              </h2>
-              <Badge variant="slate">Broadcasts</Badge>
-            </div>
-
-            {/* Broadcast Form */}
-            <form onSubmit={handleAddAnnouncement} className="space-y-3">
-              <textarea
-                rows={3}
-                value={newAnnouncementText}
-                onChange={(e) => setNewAnnouncementText(e.target.value)}
-                placeholder={adminContent.announcements.placeholder}
-                className="w-full bg-slate-50/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-505 font-medium transition-all resize-none"
-              />
-              <button
-                type="submit"
-                disabled={!newAnnouncementText.trim()}
-                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:text-slate-400 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
-              >
-                <Bell className="w-3.5 h-3.5" />
-                <span>{adminContent.announcements.btnPost}</span>
-              </button>
-            </form>
-
-            {/* Active Announcements List */}
-            <div className="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800/40">
-              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
-                Active Broadcasts
-              </span>
-              <div className="space-y-2 max-h-[190px] overflow-y-auto pr-1">
-                {announcements.length === 0 ? (
-                  <p className="text-[10px] text-slate-400 font-medium italic text-center py-4">
-                    {adminContent.announcements.emptyMessage}
-                  </p>
-                ) : (
-                  announcements.map((item) => (
-                    <div 
-                      key={item.id} 
-                      className="p-3.5 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-1.5 text-xs text-slate-800 dark:text-slate-200"
-                    >
-                      <p className="font-semibold text-slate-700 dark:text-slate-300 leading-relaxed text-left">{item.title}</p>
-                      <span className="text-[9px] text-slate-400 font-mono font-bold self-start">{item.date}</span>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </Card>
-
-        </div>
-
+      </div>
       </div>
 
     </div>

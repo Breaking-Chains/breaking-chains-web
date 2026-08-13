@@ -77,3 +77,10 @@ export async function cancelPartnershipTermination(
     body: JSON.stringify({ reasonCategory, rating, userMessage }),
   });
 }
+
+export async function getAllPartnerships(): Promise<AccountabilityPartnership[]> {
+  const res = await apiFetch<AccountabilityPartnership[]>('/api/v1/partnerships/all', {
+    method: 'GET',
+  });
+  return Array.isArray(res) ? res : [];
+}
