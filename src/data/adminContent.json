@@ -5,8 +5,8 @@
     "subtitle": "Manage registered recoverees, balance mentor workload capacity, approve counselor applications, and publish announcements."
   },
   "stats": {
-    "recoverees": "Connected Struggles",
-    "mentors": "Active Guides",
+    "recoverees": "Total Users",
+    "mentors": "Active Mentors",
     "applications": "Awaiting Review",
     "capacity": "System Load Capacity"
   },

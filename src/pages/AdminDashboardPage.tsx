@@ -208,7 +208,7 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
               {isDemoSession ? activeMembers.length : 128}
             </span>
-            <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-600 mt-1 block">Active struggles</span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-600 mt-1 block">Active Accounts</span>
           </div>
         </div>
 
@@ -222,7 +222,7 @@ export const AdminDashboardPage: React.FC = () => {
             <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
               {isDemoSession ? mentorCapacities.length : 8}
             </span>
-            <span className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mt-1 block">Guides</span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mt-1 block">Verified Mentors</span>
           </div>
         </div>
 
