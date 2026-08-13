@@ -1,20 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../components/ui/Card';
-import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { useQuery } from '@tanstack/react-query';
 import { 
   ShieldCheck, 
-  Check, 
-  X, 
   Bell, 
-  ShieldAlert,
   Award, 
   Search, 
-  Filter, 
-  MoreVertical 
+  Users,
+  Percent,
+  Sliders
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAllMentorApplications } from '../services/mentorService';
 import { cn } from '../utils/cn';
+import adminContent from '../data/adminContent.json';
 
 interface Application {
   id: string;
@@ -24,8 +24,6 @@ interface Application {
   experience: number;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
 }
-
-
 
 interface ActiveMember {
   id: string;
@@ -41,7 +39,7 @@ interface MentorCapacity {
   name: string;
   current: number;
   capacity: number;
-  color: 'primary' | 'error' | 'secondary';
+  color: 'emerald' | 'amber' | 'rose';
 }
 
 export const AdminDashboardPage: React.FC = () => {
@@ -54,69 +52,69 @@ export const AdminDashboardPage: React.FC = () => {
   
   // Auditing states
   const [applications, setApplications] = useState<Application[]>([]);
-
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [newAnnouncementText, setNewAnnouncementText] = useState('');
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
+  // TanStack Query for Mentor Onboarding Applications
+  const { data: realAppsData, refetch: refetchRealApps } = useQuery({
+    queryKey: ['mentorApplications'],
+    queryFn: getAllMentorApplications,
+    enabled: !isDemoSession,
+  });
+
   useEffect(() => {
     if (isDemoSession) {
-      // Mock bento roster data
       setActiveMembers([
-        { id: 'mem-1', name: 'John Doe', initials: 'JD', streakDays: 45, status: 'ACTIVE', assignedMentor: 'Sarah Connor' },
-        { id: 'mem-2', name: 'Alice Smith', initials: 'AS', streakDays: 0, status: 'NEEDS_ATTENTION', assignedMentor: 'Unassigned' },
-        { id: 'mem-3', name: 'Michael Ross', initials: 'MR', streakDays: 120, status: 'ACTIVE', assignedMentor: 'David Palmer' }
+        { id: 'mem-1', name: 'Zayd Malik', initials: 'ZM', streakDays: 12, status: 'ACTIVE', assignedMentor: 'Shaykh Ahmad' },
+        { id: 'mem-2', name: 'Bilal Khan', initials: 'BK', streakDays: 0, status: 'NEEDS_ATTENTION', assignedMentor: 'Shaykh Ahmad' },
+        { id: 'mem-3', name: 'Tariq Ali', initials: 'TA', streakDays: 42, status: 'ACTIVE', assignedMentor: 'Shaykh Luqman' }
       ]);
       setMentorCapacities([
-        { id: 'cap-1', name: 'Sarah Connor', current: 4, capacity: 5, color: 'primary' },
-        { id: 'cap-2', name: 'David Palmer', current: 5, capacity: 5, color: 'error' },
-        { id: 'cap-3', name: 'Elena Rodriguez', current: 1, capacity: 5, color: 'secondary' }
+        { id: 'cap-1', name: 'Shaykh Ahmad', current: 2, capacity: 5, color: 'emerald' },
+        { id: 'cap-2', name: 'Shaykh Luqman', current: 5, capacity: 5, color: 'rose' },
+        { id: 'cap-3', name: 'Dr. Tariq Mahmood', current: 0, capacity: 8, color: 'amber' }
       ]);
       setApplications([
         { id: 'app-1', fullName: 'Shaykh Luqman', username: 'luqman_h', qualification: 'MA Islamic Counseling', experience: 8, status: 'PENDING' },
         { id: 'app-2', fullName: 'Dr. Tariq Mahmood', username: 'tariq_m', qualification: 'PhD Clinical Psychology', experience: 15, status: 'PENDING' },
       ]);
-
       setAnnouncements([
         { id: 'a-1', title: 'Prepare for Ramadan Tazkiyah Program', date: 'August 1' },
         { id: 'a-2', title: 'Daily Check-in Streaks System Update', date: 'July 28' },
       ]);
-    } else {
-      const loadRealData = async () => {
-        try {
-          const apps = await getAllMentorApplications().catch(() => []);
-          const mappedApps = apps.map((app) => ({
-            id: app.id,
-            fullName: app.fullName,
-            username: app.username,
-            qualification: app.qualification,
-            experience: app.yearsOfExperience,
-            status: app.status,
-          }));
-          setApplications(mappedApps);
-        } catch {
-          // Ignore
-        }
-      };
-      loadRealData();
+    } else if (realAppsData) {
+      const mappedApps = realAppsData.map((app) => ({
+        id: app.id,
+        fullName: app.fullName,
+        username: app.username,
+        qualification: app.qualification,
+        experience: app.yearsOfExperience,
+        status: app.status as 'PENDING' | 'APPROVED' | 'REJECTED',
+      }));
+      setApplications(mappedApps);
     }
-  }, [isDemoSession]);
+  }, [realAppsData, isDemoSession]);
 
-  const handleApprove = (appId: string, name: string) => {
+  const handleApprove = async (appId: string, name: string) => {
     setApplications((prev) =>
       prev.map((app) => (app.id === appId ? { ...app, status: 'APPROVED' } : app))
     );
     triggerToast(`Approved verification for ${name}`);
+    if (!isDemoSession) {
+      refetchRealApps();
+    }
   };
 
-  const handleReject = (appId: string, name: string) => {
+  const handleReject = async (appId: string, name: string) => {
     setApplications((prev) =>
       prev.map((app) => (app.id === appId ? { ...app, status: 'REJECTED' } : app))
     );
     triggerToast(`Rejected application for ${name}`);
+    if (!isDemoSession) {
+      refetchRealApps();
+    }
   };
-
-
 
   const handleAddAnnouncement = (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,21 +132,16 @@ export const AdminDashboardPage: React.FC = () => {
     setTimeout(() => setSuccessToast(null), 3000);
   };
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
   // Filter members list
   const filteredMembers = activeMembers.filter((m) =>
     m.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     m.assignedMentor.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const pendingAppsCount = applications.filter((app) => app.status === 'PENDING').length;
+
   return (
-    <div className="space-y-8 animate-fade-in max-w-6xl mx-auto pb-16">
+    <div className="space-y-6 animate-fade-in max-w-6xl mx-auto pb-16">
       
       {/* Toast Alert */}
       {successToast && (
@@ -158,292 +151,337 @@ export const AdminDashboardPage: React.FC = () => {
         </div>
       )}
 
-      {/* Page Header & Global Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-wider">
-            Admin Overview
+      {/* Top Header Card */}
+      <div className="relative overflow-hidden px-6 py-5 sm:px-8 sm:py-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800/80 shadow-xs flex justify-between items-center gap-4">
+        <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 to-teal-500/3 pointer-events-none select-none" />
+        <div className="relative z-10 space-y-1 text-left">
+          <span className="text-[9px] font-black uppercase text-emerald-600 dark:text-emerald-455 tracking-widest bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 block w-fit">
+            {adminContent.header.shieldText}
+          </span>
+          <h2 className="text-lg font-black font-manrope tracking-tight text-slate-900 dark:text-white uppercase pt-2">
+            {adminContent.header.title}
           </h2>
-          <p className="text-xs text-slate-500 font-medium mt-0.5">
-            Manage users, mentors, and program assignments.
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed max-w-xl">
+            {adminContent.header.subtitle}
           </p>
         </div>
-
-        {/* Global Search Header Panel */}
-        <div className="flex items-center w-full sm:w-auto gap-3">
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search accounts..."
-              className="w-full bg-white dark:bg-slate-950 border border-outline-variant rounded-xl py-2 pl-10 pr-4 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-primary outline-none transition-all"
-            />
-          </div>
-          <button className="flex items-center justify-center p-2 bg-white dark:bg-slate-950 border border-outline-variant rounded-xl hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-500 transition-colors cursor-pointer">
-            <Filter className="w-4 h-4" />
-          </button>
+        <div className="shrink-0 flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-955/40 border border-emerald-200 dark:border-emerald-800 shadow-inner md:flex hidden animate-pulse">
+          <Sliders className="w-5 h-5 text-emerald-600 dark:text-emerald-450" />
         </div>
       </div>
 
-      {/* primary Bento Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* High-Level Statistics Bento Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Total Recoverees */}
+        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-emerald-500/5 dark:bg-emerald-955/5 border-emerald-500/15 dark:border-emerald-505/10">
+          <div className="flex justify-between items-center">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.recoverees}</span>
+            <Users className="w-4 h-4 text-emerald-600" />
+          </div>
+          <div className="mt-2">
+            <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
+              {isDemoSession ? activeMembers.length : 128}
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-600 mt-1 block">Active struggles</span>
+          </div>
+        </div>
+
+        {/* Active Guides */}
+        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-blue-500/5 dark:bg-blue-955/5 border-blue-500/15 dark:border-blue-505/10">
+          <div className="flex justify-between items-center">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.mentors}</span>
+            <Award className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="mt-2">
+            <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
+              {isDemoSession ? mentorCapacities.length : 8}
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-blue-600 mt-1 block">Guides</span>
+          </div>
+        </div>
+
+        {/* Pending Onboarding Applications */}
+        <div className={cn(
+          "p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-amber-500/5 dark:bg-amber-955/5 border-amber-500/15 dark:border-amber-500/10",
+          pendingAppsCount > 0 && "animate-pulse border-amber-500/30"
+        )}>
+          <div className="flex justify-between items-center">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.applications}</span>
+            <ShieldCheck className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="mt-2">
+            <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
+              {pendingAppsCount}
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-amber-600 mt-1 block">Applications</span>
+          </div>
+        </div>
+
+        {/* Workload health score */}
+        <div className="p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 bg-white dark:bg-slate-900 transition-all duration-300 flex flex-col justify-between h-[100px] hover:-translate-y-0.5 hover:shadow-xs text-left bg-purple-500/5 dark:bg-purple-955/5 border-purple-500/15 dark:border-purple-505/10">
+          <div className="flex justify-between items-center">
+            <span className="text-[8px] font-black uppercase tracking-widest text-slate-450">{adminContent.stats.capacity}</span>
+            <Percent className="w-4 h-4 text-purple-600" />
+          </div>
+          <div className="mt-2">
+            <span className="text-lg font-black text-slate-900 dark:text-white block leading-none">
+              94%
+            </span>
+            <span className="text-[8px] font-bold uppercase tracking-wider text-purple-600 mt-1 block">Workload</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Bento Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Column (col-span-2): Active Members list */}
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-slate-950 rounded-xl border border-outline-variant overflow-hidden shadow-sm flex flex-col h-[380px]">
-            <div className="px-6 py-4 border-b border-outline-variant flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/20 shrink-0">
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-                Active Members
-              </h3>
-              <button 
-                onClick={() => triggerToast('Viewing all active members list')} 
-                className="text-primary hover:underline text-xs font-bold cursor-pointer"
-              >
-                View All
-              </button>
+        {/* LEFT COLUMN: Platform Roster & Onboarding Applications (col-span-8) */}
+        <div className="lg:col-span-8 space-y-6">
+          
+          {/* Active Members Roster */}
+          <Card variant="glass" className="p-5 flex flex-col h-[520px] border-slate-200/80 dark:border-slate-800/80 shadow-xs">
+            <div className="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-800/50 pb-2 shrink-0">
+              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5 select-none">
+                <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+                <span>{adminContent.roster.title}</span>
+              </h2>
+              <Badge variant="emerald">{filteredMembers.length} Accounts</Badge>
             </div>
 
-            <div className="flex-grow overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 pr-1">
+            {/* Roster search filter */}
+            <div className="relative mb-3 shrink-0">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={adminContent.roster.searchPlaceholder}
+                className="w-full bg-slate-55 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-850 rounded-xl py-2.5 pl-10 pr-4 text-xs text-slate-800 dark:text-slate-205 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 font-semibold transition-all"
+              />
+            </div>
+
+            {/* Roster scroll list */}
+            <div className="flex-grow overflow-y-auto space-y-2 pr-1 text-left">
               {filteredMembers.length === 0 ? (
-                <div className="text-center py-16 text-xs text-slate-400 italic">
-                  No active members found matching search query.
+                <div className="text-center py-12 text-xs text-slate-400 italic border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+                  {adminContent.roster.emptyMessage}
                 </div>
               ) : (
                 filteredMembers.map((member) => (
-                  <div 
-                    key={member.id} 
-                    className="px-6 py-3.5 flex items-center justify-between hover:bg-slate-50/60 dark:hover:bg-slate-900/40 transition-colors group"
+                  <div
+                    key={member.id}
+                    className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200/60 dark:border-slate-800/60 bg-white dark:bg-slate-950 text-left transition-all relative overflow-hidden hover:scale-[1.005] hover:border-emerald-505/20 hover:bg-slate-50 dark:hover:bg-slate-900/30"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-primary font-bold text-xs border border-slate-200/50 dark:border-slate-800 shrink-0">
+                    <div className="flex items-center gap-3 pl-1">
+                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-350 flex items-center justify-center font-bold text-xs shrink-0 select-none">
                         {member.initials}
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-slate-900 dark:text-white">{member.name}</p>
-                        <p className="text-[10px] text-slate-500 font-medium flex items-center gap-1.5 mt-0.5 select-none">
-                          <span className={cn(
-                            "w-1.5 h-1.5 rounded-full shrink-0",
-                            member.status === 'NEEDS_ATTENTION' ? "bg-rose-500 animate-pulse" : "bg-emerald-500"
-                          )} />
-                          <span>{member.status === 'NEEDS_ATTENTION' ? 'Needs Attention' : `Day ${member.streakDays}`}</span>
+                      <div className="text-left">
+                        <h3 className="text-xs font-black text-slate-900 dark:text-white truncate">
+                          {member.name}
+                        </h3>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+                          {adminContent.roster.assignedMentorPrefix} {member.assignedMentor}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-6">
-                      <div className="text-right hidden sm:block">
-                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider select-none">Assigned Mentor</p>
-                        <p className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{member.assignedMentor}</p>
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <span className="text-[10px] font-black text-slate-900 dark:text-white block leading-none">
+                          {member.streakDays} Days
+                        </span>
+                        <span className="text-[8px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-450 mt-1 block">
+                          Streak
+                        </span>
                       </div>
-                      <button 
-                        className="text-slate-400 hover:text-slate-850 dark:hover:text-white transition-colors cursor-pointer"
-                        title="Member Actions"
-                      >
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+                      <div className="flex flex-col items-end">
+                        <span className={cn(
+                          "w-2 h-2 rounded-full",
+                          member.status === 'NEEDS_ATTENTION' ? "bg-rose-500" : "bg-emerald-500"
+                        )} />
+                        <span className={cn(
+                          "text-[9px] font-black mt-1.5 uppercase tracking-wider",
+                          member.status === 'NEEDS_ATTENTION' ? "text-rose-600" : "text-emerald-600"
+                        )}>
+                          {member.status === 'NEEDS_ATTENTION' ? 'Needs Care' : 'Clean'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))
               )}
             </div>
-          </div>
+          </Card>
+
+          {/* Onboarding Applications board */}
+          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 pb-2">
+              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-450" />
+                <span>{adminContent.applications.title}</span>
+              </h2>
+              {pendingAppsCount > 0 && (
+                <Badge variant="rose" className="animate-pulse">
+                  {pendingAppsCount} {adminContent.applications.pendingBadge}
+                </Badge>
+              )}
+            </div>
+
+            <div className="space-y-3">
+              {applications.length === 0 ? (
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 italic text-center py-4 font-medium border border-dashed border-slate-250 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-900/10">
+                  {adminContent.applications.emptyMessage}
+                </p>
+              ) : (
+                applications.map((app) => (
+                  <div 
+                    key={app.id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200/65 dark:border-slate-800/65 gap-4 transition-all duration-200 hover:border-emerald-500/25"
+                  >
+                    <div className="flex items-center gap-3 text-left">
+                      <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-900 flex items-center justify-center text-slate-700 dark:text-slate-300 font-extrabold text-xs shrink-0 select-none border border-slate-200 dark:border-slate-800">
+                        {app.fullName.substring(0, 2).toUpperCase()}
+                      </div>
+                      <div className="text-left">
+                        <h4 className="text-xs font-black text-slate-900 dark:text-white">{app.fullName}</h4>
+                        <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wider">@{app.username}</p>
+                        
+                        <div className="flex gap-4 mt-2 border-t border-slate-100 dark:border-slate-800/40 pt-1.5 text-[9px] font-bold text-slate-500 uppercase">
+                          <span>
+                            {adminContent.applications.qualificationLabel}: <span className="text-slate-700 dark:text-slate-300 font-medium normal-case">{app.qualification}</span>
+                          </span>
+                          <span>
+                            {adminContent.applications.experienceLabel}: <span className="text-slate-700 dark:text-slate-300 font-mono font-medium">{app.experience} Years</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 w-full sm:w-auto shrink-0 justify-end items-center">
+                      {app.status === 'PENDING' ? (
+                        <>
+                          <button
+                            onClick={() => handleReject(app.id, app.fullName)}
+                            className="flex-1 sm:flex-none px-3.5 py-2 border border-slate-200 dark:border-slate-850 text-slate-750 dark:text-slate-350 hover:border-rose-500/40 hover:text-rose-600 rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer"
+                          >
+                            {adminContent.applications.btnReject}
+                          </button>
+                          <button
+                            onClick={() => handleApprove(app.id, app.fullName)}
+                            className="flex-1 sm:flex-none px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer shadow-sm shadow-emerald-500/10"
+                          >
+                            {adminContent.applications.btnApprove}
+                          </button>
+                        </>
+                      ) : (
+                        <span className={cn(
+                          "text-[9px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider border",
+                          app.status === 'APPROVED' ? "bg-emerald-500/10 text-emerald-700 border-emerald-500/20" : "bg-rose-500/10 text-rose-750 border-rose-500/20"
+                        )}>
+                          {app.status}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </Card>
+
         </div>
 
-        {/* Right Column (col-span-1): Stats & Capacity Cards */}
-        <div className="space-y-6">
+        {/* RIGHT COLUMN: Capacity Monitoring & Broadcast Center (col-span-4) */}
+        <div className="lg:col-span-4 space-y-6">
           
-          {/* Mentor Capacity Card */}
-          <div className="bg-white dark:bg-slate-950 rounded-xl border border-outline-variant p-5 shadow-sm">
-            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 select-none">
-              Mentor Capacity
-            </h3>
-            
-            <div className="space-y-4">
-              {mentorCapacities.map((mentor) => (
-                <div key={mentor.id} className="space-y-1">
-                  <div className="flex justify-between items-center text-xs">
-                    <p className="font-bold text-slate-800 dark:text-slate-200">{mentor.name}</p>
-                    <p className="font-mono text-slate-500 font-medium">{mentor.current}/{mentor.capacity} Mentees</p>
+          {/* Capacity monitoring */}
+          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
+            <div className="border-b border-slate-100 dark:border-slate-800/50 pb-2">
+              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                {adminContent.capacity.title}
+              </h2>
+            </div>
+
+            <div className="space-y-4 pr-1">
+              {mentorCapacities.map((item) => (
+                <div key={item.id} className="space-y-2">
+                  <div className="flex justify-between items-center text-[10px] font-bold">
+                    <span className="text-slate-800 dark:text-slate-200 font-extrabold">{item.name}</span>
+                    <span className="text-slate-400 font-mono">
+                      {item.current}/{item.capacity} {adminContent.capacity.capacitySuffix}
+                    </span>
                   </div>
-                  <div className="w-full bg-slate-100 dark:bg-slate-900 rounded-full h-1.5 overflow-hidden">
+                  <div className="w-full bg-slate-100 dark:bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-250/20">
                     <div 
                       className={cn(
-                        "h-full rounded-full transition-all duration-300",
-                        mentor.color === 'error' ? "bg-rose-500" : mentor.color === 'secondary' ? "bg-emerald-500" : "bg-primary"
+                        "h-full rounded-full transition-all duration-500",
+                        item.color === 'emerald' ? 'bg-emerald-600' : item.color === 'rose' ? 'bg-rose-550' : 'bg-amber-600'
                       )} 
-                      style={{ width: `${Math.round((mentor.current / mentor.capacity) * 100)}%` }}
+                      style={{ width: `${(item.current / item.capacity) * 100}%` }}
                     />
                   </div>
                 </div>
               ))}
             </div>
+          </Card>
 
-            <button 
-              onClick={() => scrollToSection('verification-section')}
-              className="w-full mt-5 py-2 border border-slate-250 dark:border-slate-800 text-slate-650 hover:bg-slate-50 dark:text-slate-350 dark:hover:bg-slate-900 rounded-xl text-xs font-bold transition-colors cursor-pointer text-center block"
-            >
-              Manage Mentors
-            </button>
-          </div>
-
-          {/* System Status Card */}
-          <div className="bg-white dark:bg-slate-950 rounded-xl border border-outline-variant p-5 shadow-sm relative overflow-hidden">
-            {/* Decorative Grid Pattern */}
-            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none">
-              <svg height="100%" width="100%">
-                <defs>
-                  <pattern id="dots" width="16" height="16" patternUnits="userSpaceOnUse">
-                    <circle cx="2" cy="2" r="1.5" fill="currentColor" className="text-primary" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#dots)" />
-              </svg>
+          {/* Announcements composer */}
+          <Card variant="glass" className="p-5 border-slate-200/80 dark:border-slate-800/80 shadow-xs space-y-4 text-left">
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800/50 pb-2">
+              <h2 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
+                {adminContent.announcements.title}
+              </h2>
+              <Badge variant="slate">Broadcasts</Badge>
             </div>
 
-            <div className="relative z-10 space-y-3">
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider select-none">
-                System Status
-              </h3>
-              
-              <div className="flex items-center gap-2 mb-2 bg-slate-50/50 dark:bg-slate-900/40 p-2 rounded-xl border border-slate-100 dark:border-slate-850">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <p className="text-[11px] font-bold text-slate-600 dark:text-slate-350 uppercase tracking-wider">All services operational</p>
-              </div>
+            {/* Broadcast Form */}
+            <form onSubmit={handleAddAnnouncement} className="space-y-3">
+              <textarea
+                rows={3}
+                value={newAnnouncementText}
+                onChange={(e) => setNewAnnouncementText(e.target.value)}
+                placeholder={adminContent.announcements.placeholder}
+                className="w-full bg-slate-50/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-505 font-medium transition-all resize-none"
+              />
+              <button
+                type="submit"
+                disabled={!newAnnouncementText.trim()}
+                className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-100 dark:disabled:bg-slate-900 disabled:text-slate-400 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Bell className="w-3.5 h-3.5" />
+                <span>{adminContent.announcements.btnPost}</span>
+              </button>
+            </form>
 
-              <div className="grid grid-cols-2 gap-3.5 pt-1">
-                <div className="bg-slate-50/30 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850">
-                  <p className="text-xl font-black text-primary leading-none mb-1 font-mono">128</p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider select-none">Total Active</p>
-                </div>
-                <div className="bg-slate-50/30 dark:bg-slate-950/40 p-3 rounded-xl border border-slate-100 dark:border-slate-850">
-                  <p className="text-xl font-black text-primary leading-none mb-1 font-mono">12</p>
-                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider select-none">New Today</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* BOTTOM SECTION: Compliance & Operations Control (Queues) */}
-      <div className="border-t border-slate-200 dark:border-slate-850 pt-8 space-y-8">
-        
-        <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-          <ShieldAlert className="w-5 h-5 text-primary shrink-0" />
-          <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">
-            Compliance &amp; Operations Control
-          </h3>
-        </div>
-
-        <div id="verification-section" className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
-          {/* Mentor Verification Approvals Card */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black text-slate-900 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5 select-none pl-1">
-              <Award className="w-4 h-4 text-primary" /> 
-              <span>Pending Mentor Verifications</span>
-            </h3>
-
-            <div className="space-y-3">
-              {applications.length === 0 ? (
-                <Card variant="glass" className="p-8 text-center bg-slate-50/10 border-slate-150 dark:border-slate-850 rounded-xl">
-                  <p className="text-xs text-slate-500 italic">No pending mentor applications.</p>
-                </Card>
-              ) : (
-                applications.map((app) => (
-                  <Card key={app.id} variant="glass" className="p-4 space-y-3 border-slate-150 dark:border-slate-850/80 shadow-xs">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <strong className="text-slate-900 dark:text-slate-100 text-xs font-black">{app.fullName}</strong>
-                        <span className="text-[10px] text-slate-500 block font-mono">@{app.username}</span>
-                      </div>
-                      
-                      {app.status !== 'PENDING' ? (
-                        <span className={cn(
-                          "inline-block text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border",
-                          app.status === 'APPROVED' ? "bg-emerald-50 text-emerald-700 border-emerald-250" : "bg-rose-50 text-rose-700 border-rose-250"
-                        )}>
-                          {app.status}
-                        </span>
-                      ) : (
-                        <div className="flex gap-1.5 shrink-0">
-                          <button
-                            onClick={() => handleApprove(app.id, app.fullName)}
-                            className="p-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950 dark:hover:bg-emerald-900 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-400 cursor-pointer"
-                            title="Approve"
-                          >
-                            <Check className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleReject(app.id, app.fullName)}
-                            className="p-1 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-400 cursor-pointer"
-                            title="Reject"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                    <div className="text-[10px] text-slate-700 dark:text-slate-400 leading-relaxed font-semibold border-t border-slate-100/50 dark:border-slate-900/40 pt-2">
-                      <p><strong>Credentials:</strong> {app.qualification} ({app.experience} yrs experience)</p>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Announcements Manager Card */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black text-slate-900 dark:text-slate-250 uppercase tracking-wider flex items-center gap-1.5 select-none pl-1">
-              <Bell className="w-4 h-4 text-primary" /> 
-              <span>Content &amp; Announcements</span>
-            </h3>
-
-            <Card variant="glass" className="p-4 space-y-4">
-              <form onSubmit={handleAddAnnouncement} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Broadcast a new platform announcement..."
-                  value={newAnnouncementText}
-                  onChange={(e) => setNewAnnouncementText(e.target.value)}
-                  className="flex-1 p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs focus:outline-none placeholder:text-slate-400 text-slate-900 dark:text-slate-100 font-semibold"
-                  required
-                />
-                <Button type="submit" variant="emerald" size="sm" className="text-xs font-bold px-3">
-                  Publish
-                </Button>
-              </form>
-
+            {/* Active Announcements List */}
+            <div className="space-y-3.5 pt-2 border-t border-slate-100 dark:border-slate-800/40">
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 block select-none">
+                Active Broadcasts
+              </span>
               <div className="space-y-2 max-h-[190px] overflow-y-auto pr-1">
                 {announcements.length === 0 ? (
-                  <p className="text-xs text-slate-400 font-medium italic text-center py-4 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-slate-950/20">
-                    No announcements published yet.
+                  <p className="text-[10px] text-slate-400 font-medium italic text-center py-4">
+                    {adminContent.announcements.emptyMessage}
                   </p>
                 ) : (
                   announcements.map((item) => (
                     <div 
                       key={item.id} 
-                      className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-150 dark:border-slate-850 flex items-center justify-between gap-3 text-[11px] font-semibold text-slate-750 dark:text-slate-350"
+                      className="p-3.5 rounded-xl bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200/40 dark:border-slate-800/40 flex flex-col gap-1.5 text-xs text-slate-800 dark:text-slate-200"
                     >
-                      <span className="truncate">{item.title}</span>
-                      <span className="text-[9px] text-slate-400 font-mono shrink-0">{item.date}</span>
+                      <p className="font-semibold text-slate-700 dark:text-slate-300 leading-relaxed text-left">{item.title}</p>
+                      <span className="text-[9px] text-slate-400 font-mono font-bold self-start">{item.date}</span>
                     </div>
                   ))
                 )}
               </div>
-            </Card>
-          </div>
+            </div>
+          </Card>
 
         </div>
+
       </div>
+
     </div>
   );
 };

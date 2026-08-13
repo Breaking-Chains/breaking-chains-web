@@ -1,0 +1,38 @@
+{
+  "header": {
+    "shieldText": "🛡️ Platform Administration Space",
+    "title": "System Operations & Hub",
+    "subtitle": "Manage registered recoverees, balance mentor workload capacity, approve counselor applications, and publish announcements."
+  },
+  "stats": {
+    "recoverees": "Connected Struggles",
+    "mentors": "Active Guides",
+    "applications": "Awaiting Review",
+    "capacity": "System Load Capacity"
+  },
+  "roster": {
+    "title": "Platform Roster",
+    "searchPlaceholder": "Search struggles, email address or assigned mentor...",
+    "emptyMessage": "No connected struggles matching query.",
+    "assignedMentorPrefix": "Guide:"
+  },
+  "applications": {
+    "title": "Mentor Onboarding Applications",
+    "pendingBadge": "Pending Verification",
+    "emptyMessage": "No pending advisor onboarding applications.",
+    "qualificationLabel": "Credentials & Specs",
+    "experienceLabel": "Experience",
+    "btnApprove": "Approve Guide",
+    "btnReject": "Decline"
+  },
+  "capacity": {
+    "title": "Mentor Workloads & Balance",
+    "capacitySuffix": "Recoverees"
+  },
+  "announcements": {
+    "title": "System Broadcast Workspace",
+    "placeholder": "Write a spiritual challenge, event notice, or system update...",
+    "btnPost": "Broadcast Alert",
+    "emptyMessage": "No active broadcasts published."
+  }
+}
